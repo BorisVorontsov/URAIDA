@@ -6,21 +6,21 @@
 #include <memory>
 #pragma hdrstop
 
-#include "UnitFormPickColor.h"
+#include "UnitFormPickPoint.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TFormPickColor *FormPickColor;
+TFormPickPoint *FormPickPoint;
 
 //---------------------------------------------------------------------------
-__fastcall TFormPickColor::TFormPickColor(TComponent* Owner)
+__fastcall TFormPickPoint::TFormPickPoint(TComponent* Owner)
 	: TForm(Owner)
 {
 
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::ImageCapturedFrameClick(TObject *Sender)
+void __fastcall TFormPickPoint::ImageCapturedFrameClick(TObject *Sender)
 {
 	m_Data.Color = ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y];
 	m_Data.bCancelled = false;
@@ -28,7 +28,7 @@ void __fastcall TFormPickColor::ImageCapturedFrameClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::FormKeyPress(TObject *Sender, System::WideChar &Key)
+void __fastcall TFormPickPoint::FormKeyPress(TObject *Sender, System::WideChar &Key)
 {
 	if (Key == VK_ESCAPE)
 	{
@@ -38,7 +38,7 @@ void __fastcall TFormPickColor::FormKeyPress(TObject *Sender, System::WideChar &
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::ButtonSourceFromGameClick(TObject *Sender)
+void __fastcall TFormPickPoint::ButtonSourceFromGameClick(TObject *Sender)
 {
 	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 	PanelMenu->Visible = false;
@@ -51,7 +51,7 @@ void __fastcall TFormPickColor::ButtonSourceFromGameClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::ButtonSourceFromFileClick(TObject *Sender)
+void __fastcall TFormPickPoint::ButtonSourceFromFileClick(TObject *Sender)
 {
 	if (FileOpenDialog1->Execute(this->Handle))
 	{
@@ -98,7 +98,7 @@ void __fastcall TFormPickColor::ButtonSourceFromFileClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
+void __fastcall TFormPickPoint::ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y)
 {
 	LabelX->Caption = IntToStr(static_cast<int>(this->m_Data.XY.x = X));
@@ -112,7 +112,7 @@ void __fastcall TFormPickColor::ImageCapturedFrameMouseMove(TObject *Sender, TSh
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickColor::FormShow(TObject *Sender)
+void __fastcall TFormPickPoint::FormShow(TObject *Sender)
 {
 	this->ClientWidth = this->Constraints->MinWidth;
 	this->ClientHeight = this->Constraints->MinHeight;
@@ -123,7 +123,7 @@ void __fastcall TFormPickColor::FormShow(TObject *Sender)
 	PanelMenu->Visible = true;
 }
 //---------------------------------------------------------------------------
-void TFormPickColor::ResizeAndAlignWindow()
+void TFormPickPoint::ResizeAndAlignWindow()
 {
 	TRect RAIDWindowSize = g_pRAIDWorker->GetGameWindowSize(true);
 

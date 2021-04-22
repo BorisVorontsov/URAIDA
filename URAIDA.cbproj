@@ -184,10 +184,10 @@
             <DependentOn>UnitFormMain.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
-        <CppCompile Include="UnitFormPickColor.cpp">
-            <Form>FormPickColor</Form>
+        <CppCompile Include="UnitFormPickPoint.cpp">
+            <Form>FormPickPoint</Form>
             <FormType>dfm</FormType>
-            <DependentOn>UnitFormPickColor.h</DependentOn>
+            <DependentOn>UnitFormPickPoint.h</DependentOn>
             <BuildOrder>6</BuildOrder>
         </CppCompile>
         <CppCompile Include="UnitRAIDWorker.cpp">
@@ -206,7 +206,7 @@
             <PCH>true</PCH>
         </PCHCompile>
         <FormResources Include="UnitFormMain.dfm"/>
-        <FormResources Include="UnitFormPickColor.dfm"/>
+        <FormResources Include="UnitFormPickPoint.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

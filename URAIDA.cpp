@@ -13,7 +13,7 @@
 #include <Vcl.Styles.hpp>
 #include <Vcl.Themes.hpp>
 USEFORM("UnitFormMain.cpp", FormMain);
-USEFORM("UnitFormPickColor.cpp", FormPickColor);
+USEFORM("UnitFormPickPoint.cpp", FormPickPoint);
 //---------------------------------------------------------------------------
 int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 {
@@ -23,7 +23,7 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 		Application->MainFormOnTaskBar = true;
 		Application->Title = "Ultimate RAID Automatizer";
 		Application->CreateForm(__classid(TFormMain), &FormMain);
-		Application->CreateForm(__classid(TFormPickColor), &FormPickColor);
+		Application->CreateForm(__classid(TFormPickPoint), &FormPickPoint);
 		Application->Run();
 	}
 	catch (Exception &exception)

@@ -275,7 +275,7 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormMain::BitBtnSSPickColorClick(TObject *Sender)
+void __fastcall TFormMain::BitBtnSSPickPointClick(TObject *Sender)
 {
 	FormPickColor->ShowModal();
 
@@ -519,7 +519,7 @@ void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormMain::BitBtnRSPickColorClick(TObject *Sender)
+void __fastcall TFormMain::BitBtnRSPickPointClick(TObject *Sender)
 {
 	FormPickColor->ShowModal();
 
@@ -839,7 +839,7 @@ void __fastcall TFormMain::CheckBoxSaveResultsClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormMain::BitBtnEDPickColorClick(TObject *Sender)
+void __fastcall TFormMain::BitBtnEDPickPointClick(TObject *Sender)
 {
 	FormPickColor->ShowModal();
 
@@ -910,12 +910,5 @@ void __fastcall TFormMain::PanelSMColorClick(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::Button1Click(TObject *Sender)
-{
-	TPoint AcceptButtonPos;
-	AcceptButtonPos.x = 320;//g_pSettingsManager->RAIDWindowSize.cx / 2;
-	AcceptButtonPos.y = 865;
-	g_pRAIDWorker->SendMouseClick(AcceptButtonPos);
-}
-//---------------------------------------------------------------------------
+
 

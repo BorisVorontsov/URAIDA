@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 
-#ifndef UnitFormPickColorH
-#define UnitFormPickColorH
+#ifndef UnitFormPickPointH
+#define UnitFormPickPointH
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 #include <Vcl.Controls.hpp>
@@ -17,7 +17,7 @@ typedef struct tagPCData
 	bool bCancelled;
 } PCData;
 
-class TFormPickColor : public TForm
+class TFormPickPoint : public TForm
 {
 __published:	// IDE-managed Components
 	TPanel *PanelCapturedFrame;
@@ -48,11 +48,11 @@ private:	// User declarations
 
 	void ResizeAndAlignWindow();
 public:		// User declarations
-	__fastcall TFormPickColor(TComponent* Owner);
+	__fastcall TFormPickPoint(TComponent* Owner);
 
 	PCData GetResults() { return m_Data; }
 };
 //---------------------------------------------------------------------------
-extern PACKAGE TFormPickColor *FormPickColor;
+extern PACKAGE TFormPickPoint *FormPickPoint;
 //---------------------------------------------------------------------------
 #endif

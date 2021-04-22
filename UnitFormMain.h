@@ -104,9 +104,9 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownRSXPos;
 	TEdit *EditRSX;
 	TPanel *PanelRSColor;
-	TBitBtn *BitBtnRSPickColor;
+	TBitBtn *BitBtnRSPickPoint;
 	TEdit *EditSSY;
-	TBitBtn *BitBtnSSPickColor;
+	TBitBtn *BitBtnSSPickPoint;
 	TUpDown *UpDownSSYPos;
 	TPanel *PanelSSColor;
 	TUpDown *UpDownSSXPos;
@@ -135,9 +135,9 @@ __published:	// IDE-managed Components
 	TLabel *LabelEDY;
 	TLabel *LabelEDX;
 	TLabel *LabelEDColor;
-	TLabel *LabelEDABCP;
+	TLabel *LabelEDCP;
 	TEdit *EditEDY;
-	TBitBtn *BitBtnEDPickColor;
+	TBitBtn *BitBtnEDPickPoint;
 	TUpDown *UpDownEDYPos;
 	TPanel *PanelEDColor;
 	TUpDown *UpDownEDXPos;
@@ -164,7 +164,14 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownColorTolerance;
 	TColorDialog *ColorDialogCPColor;
 	TLabel *LabelPreferredGWSize;
-	TButton *Button1;
+	TLabel *LabelEDGETButton;
+	TLabel *LabelEDGETX;
+	TEdit *EditEDGETX;
+	TUpDown *UpDownEDGETXPos;
+	TLabel *LabelEDGETY;
+	TEdit *EditEDGETY;
+	TUpDown *UpDownEDGETYPos;
+	TBitBtn *BitBtnEDGETPickPoint;
 	void __fastcall ButtonRunTaskClick(TObject *Sender);
 	void __fastcall ButtonStopTaskClick(TObject *Sender);
 	void __fastcall TimerMainTimer(TObject *Sender);
@@ -172,10 +179,10 @@ __published:	// IDE-managed Components
 	void __fastcall Exit1Click(TObject *Sender);
 	void __fastcall TrayIconAppDblClick(TObject *Sender);
 	void __fastcall FormCreate(TObject *Sender);
-	void __fastcall BitBtnSSPickColorClick(TObject *Sender);
+	void __fastcall BitBtnSSPickPointClick(TObject *Sender);
 	void __fastcall ButtonApplyGWSizeClick(TObject *Sender);
 	void __fastcall ButtonUseCurrentGWSizeClick(TObject *Sender);
-	void __fastcall BitBtnRSPickColorClick(TObject *Sender);
+	void __fastcall BitBtnRSPickPointClick(TObject *Sender);
 	void __fastcall FormResize(TObject *Sender);
 	void __fastcall LinkLabel1Click(TObject *Sender);
 	void __fastcall LinkLabel2Click(TObject *Sender);
@@ -188,13 +195,12 @@ __published:	// IDE-managed Components
 	void __fastcall ButtonClearAllResultsClick(TObject *Sender);
 	void __fastcall OpenResults1Click(TObject *Sender);
 	void __fastcall CheckBoxSaveResultsClick(TObject *Sender);
-	void __fastcall BitBtnEDPickColorClick(TObject *Sender);
+	void __fastcall BitBtnEDPickPointClick(TObject *Sender);
 	void __fastcall BitBtnSMPickColorClick(TObject *Sender);
 	void __fastcall PanelSSColorClick(TObject *Sender);
 	void __fastcall PanelRSColorClick(TObject *Sender);
 	void __fastcall PanelEDColorClick(TObject *Sender);
 	void __fastcall PanelSMColorClick(TObject *Sender);
-	void __fastcall Button1Click(TObject *Sender);
 
 
 private:	// User declarations

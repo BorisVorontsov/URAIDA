@@ -4,7 +4,7 @@ object FormMain: TFormMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Ultimate RAID Automatizer'
-  ClientHeight = 640
+  ClientHeight = 601
   ClientWidth = 527
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,13 +22,13 @@ object FormMain: TFormMain
   TextHeight = 23
   object Bevel1: TBevel
     Left = 8
-    Top = 580
+    Top = 540
     Width = 513
     Height = 2
   end
   object LabelBattlesCounter: TLabel
     Left = 212
-    Top = 524
+    Top = 484
     Width = 102
     Height = 32
     Alignment = taCenter
@@ -44,7 +44,7 @@ object FormMain: TFormMain
   end
   object LabelCopyright1: TLabel
     Left = 8
-    Top = 597
+    Top = 557
     Width = 305
     Height = 18
     AutoSize = False
@@ -58,7 +58,7 @@ object FormMain: TFormMain
   end
   object LabelCopyright2: TLabel
     Left = 8
-    Top = 617
+    Top = 577
     Width = 102
     Height = 18
     Caption = 'Boris Vorontsov'
@@ -71,7 +71,7 @@ object FormMain: TFormMain
   end
   object Bevel3: TBevel
     Left = 212
-    Top = 519
+    Top = 479
     Width = 102
     Height = 41
     Shape = bsFrame
@@ -80,14 +80,14 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 511
-    Height = 461
+    Height = 425
     BevelOuter = bvNone
     TabOrder = 6
     object ImageAppIcon: TImage
       Left = 0
       Top = 0
       Width = 511
-      Height = 461
+      Height = 425
       Align = alClient
       Center = True
       Picture.Data = {
@@ -276,8 +276,8 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 513
-    Height = 465
-    ActivePage = TabSheetCampaign
+    Height = 425
+    ActivePage = TabSheetCommon
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -289,32 +289,34 @@ object FormMain: TFormMain
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
       Caption = 'Campaign'
+      ExplicitHeight = 431
       object ScrollBoxGMSpecSettings: TScrollBox
         Left = 0
         Top = 0
         Width = 505
-        Height = 431
+        Height = 391
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitHeight = 431
         object LabelBT: TLabel
           Left = 19
-          Top = 305
+          Top = 241
           Width = 234
           Height = 19
           Caption = 'Delay (average battle time, m:s):'
         end
         object LabelNumberofBattles: TLabel
           Left = 19
-          Top = 347
+          Top = 283
           Width = 133
           Height = 19
           Caption = 'Number of battles:'
         end
         object LabelBTSeparator: TLabel
           Left = 321
-          Top = 305
+          Top = 241
           Width = 6
           Height = 19
           Caption = ':'
@@ -323,62 +325,62 @@ object FormMain: TFormMain
           Left = 19
           Top = 16
           Width = 470
-          Height = 257
+          Height = 193
           Caption = 'Screens'
           TabOrder = 0
           object LabelRSY: TLabel
-            Left = 213
-            Top = 171
-            Width = 44
+            Left = 158
+            Top = 132
+            Width = 16
             Height = 19
-            Caption = 'Y (px)'
+            Caption = 'Y:'
           end
           object LabelRSX: TLabel
-            Left = 59
-            Top = 171
-            Width = 43
+            Left = 57
+            Top = 132
+            Width = 15
             Height = 19
-            Caption = 'X (px)'
+            Caption = 'X:'
           end
           object LabelREPLAYScreen: TLabel
             Left = 24
-            Top = 144
+            Top = 104
             Width = 208
             Height = 19
             Caption = 'REPLAY screen control point:'
           end
           object LabelRSColor: TLabel
-            Left = 57
-            Top = 209
-            Width = 79
-            Height = 19
-            Caption = 'Pixel color:'
-          end
-          object LabelSSY: TLabel
-            Left = 211
-            Top = 59
+            Left = 260
+            Top = 132
             Width = 44
             Height = 19
-            Caption = 'Y (px)'
+            Caption = 'Color:'
+          end
+          object LabelSSY: TLabel
+            Left = 158
+            Top = 60
+            Width = 16
+            Height = 19
+            Caption = 'Y:'
           end
           object LabelSSX: TLabel
             Left = 57
-            Top = 59
-            Width = 43
+            Top = 60
+            Width = 15
             Height = 19
-            Caption = 'X (px)'
+            Caption = 'X:'
           end
           object LabelSSColor: TLabel
-            Left = 57
-            Top = 98
-            Width = 79
+            Left = 260
+            Top = 60
+            Width = 44
             Height = 19
-            Caption = 'Pixel color:'
+            Caption = 'Color:'
           end
           object EditRSY: TEdit
-            Left = 263
-            Top = 171
-            Width = 72
+            Left = 180
+            Top = 129
+            Width = 52
             Height = 27
             Alignment = taCenter
             ReadOnly = True
@@ -386,8 +388,8 @@ object FormMain: TFormMain
             Text = '0'
           end
           object UpDownRSYPos: TUpDown
-            Left = 335
-            Top = 171
+            Left = 232
+            Top = 129
             Width = 16
             Height = 27
             Associate = EditRSY
@@ -395,8 +397,8 @@ object FormMain: TFormMain
             TabOrder = 10
           end
           object UpDownRSXPos: TUpDown
-            Left = 180
-            Top = 171
+            Left = 130
+            Top = 129
             Width = 16
             Height = 27
             Associate = EditRSX
@@ -404,9 +406,9 @@ object FormMain: TFormMain
             TabOrder = 8
           end
           object EditRSX: TEdit
-            Left = 108
-            Top = 171
-            Width = 72
+            Left = 78
+            Top = 129
+            Width = 52
             Height = 27
             Alignment = taCenter
             ReadOnly = True
@@ -414,8 +416,8 @@ object FormMain: TFormMain
             Text = '0'
           end
           object PanelRSColor: TPanel
-            Left = 142
-            Top = 211
+            Left = 310
+            Top = 132
             Width = 20
             Height = 20
             BevelKind = bkFlat
@@ -427,9 +429,9 @@ object FormMain: TFormMain
             TabStop = True
             OnClick = PanelRSColorClick
           end
-          object BitBtnRSPickColor: TBitBtn
+          object BitBtnRSPickPoint: TBitBtn
             Left = 363
-            Top = 164
+            Top = 123
             Width = 41
             Height = 41
             Glyph.Data = {
@@ -508,21 +510,21 @@ object FormMain: TFormMain
               FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
             TabOrder = 11
-            OnClick = BitBtnRSPickColorClick
+            OnClick = BitBtnRSPickPointClick
           end
           object EditSSY: TEdit
-            Left = 263
-            Top = 59
-            Width = 72
+            Left = 180
+            Top = 57
+            Width = 52
             Height = 27
             Alignment = taCenter
             ReadOnly = True
             TabOrder = 3
             Text = '0'
           end
-          object BitBtnSSPickColor: TBitBtn
+          object BitBtnSSPickPoint: TBitBtn
             Left = 363
-            Top = 52
+            Top = 51
             Width = 41
             Height = 41
             Glyph.Data = {
@@ -601,11 +603,11 @@ object FormMain: TFormMain
               FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
             TabOrder = 5
-            OnClick = BitBtnSSPickColorClick
+            OnClick = BitBtnSSPickPointClick
           end
           object UpDownSSYPos: TUpDown
-            Left = 335
-            Top = 59
+            Left = 232
+            Top = 57
             Width = 16
             Height = 27
             Associate = EditSSY
@@ -613,8 +615,8 @@ object FormMain: TFormMain
             TabOrder = 4
           end
           object PanelSSColor: TPanel
-            Left = 142
-            Top = 99
+            Left = 310
+            Top = 60
             Width = 20
             Height = 20
             BevelKind = bkFlat
@@ -627,8 +629,8 @@ object FormMain: TFormMain
             OnClick = PanelSSColorClick
           end
           object UpDownSSXPos: TUpDown
-            Left = 180
-            Top = 59
+            Left = 130
+            Top = 57
             Width = 16
             Height = 27
             Associate = EditSSX
@@ -636,9 +638,9 @@ object FormMain: TFormMain
             TabOrder = 2
           end
           object EditSSX: TEdit
-            Left = 108
-            Top = 59
-            Width = 72
+            Left = 78
+            Top = 57
+            Width = 52
             Height = 27
             Alignment = taCenter
             ReadOnly = True
@@ -656,7 +658,7 @@ object FormMain: TFormMain
         end
         object EditNumberofBattles: TEdit
           Left = 159
-          Top = 344
+          Top = 280
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -666,7 +668,7 @@ object FormMain: TFormMain
         end
         object UpDownNumberofBattles: TUpDown
           Left = 197
-          Top = 344
+          Top = 280
           Width = 16
           Height = 27
           Associate = EditNumberofBattles
@@ -677,7 +679,7 @@ object FormMain: TFormMain
         end
         object EditBTMinutes: TEdit
           Left = 263
-          Top = 302
+          Top = 238
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -687,7 +689,7 @@ object FormMain: TFormMain
         end
         object UpDownBTMinutes: TUpDown
           Left = 301
-          Top = 302
+          Top = 238
           Width = 17
           Height = 27
           Associate = EditBTMinutes
@@ -697,7 +699,7 @@ object FormMain: TFormMain
         end
         object EditBTSeconds: TEdit
           Left = 333
-          Top = 302
+          Top = 238
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -707,7 +709,7 @@ object FormMain: TFormMain
         end
         object UpDownBTSeconds: TUpDown
           Left = 371
-          Top = 302
+          Top = 238
           Width = 17
           Height = 27
           Associate = EditBTSeconds
@@ -720,62 +722,65 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = 'Dungeons'
       ImageIndex = 1
+      ExplicitHeight = 431
     end
     object TabSheetFactionWars: TTabSheet
       Caption = 'Faction Wars'
       ImageIndex = 2
+      ExplicitHeight = 431
     end
     object TabSheetCommon: TTabSheet
       Caption = 'Common Settings'
       ImageIndex = 3
+      ExplicitHeight = 431
       object ScrollBox1: TScrollBox
         Left = 0
         Top = 0
         Width = 505
-        Height = 431
-        VertScrollBar.Position = 587
+        Height = 391
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitHeight = 431
         object LabelGWWidth: TLabel
           Left = 65
-          Top = -537
-          Width = 75
+          Top = 50
+          Width = 47
           Height = 19
-          Caption = 'Width (px)'
+          Caption = 'Width:'
         end
         object LabelGWHeight: TLabel
-          Left = 251
-          Top = -537
-          Width = 80
+          Left = 218
+          Top = 50
+          Width = 52
           Height = 19
-          Caption = 'Height (px)'
+          Caption = 'Height:'
         end
         object LabelTaskEndAction: TLabel
           Left = 18
-          Top = -254
+          Top = 333
           Width = 132
           Height = 19
           Caption = 'At the and of task:'
         end
         object Bevel2: TBevel
           Left = 27
-          Top = 447
+          Top = 1034
           Width = 471
           Height = 2
         end
         object LabelPreferredGWSize: TLabel
           Left = 17
-          Top = -569
+          Top = 18
           Width = 217
           Height = 19
           AutoSize = False
           Caption = 'Preferred game window size:'
         end
         object EditGWWidth: TEdit
-          Left = 146
-          Top = -540
+          Left = 118
+          Top = 47
           Width = 72
           Height = 27
           Alignment = taCenter
@@ -784,8 +789,8 @@ object FormMain: TFormMain
           Text = '100'
         end
         object UpDownGWWidth: TUpDown
-          Left = 218
-          Top = -540
+          Left = 190
+          Top = 47
           Width = 16
           Height = 27
           Associate = EditGWWidth
@@ -795,8 +800,8 @@ object FormMain: TFormMain
           TabOrder = 1
         end
         object EditGWHeight: TEdit
-          Left = 337
-          Top = -540
+          Left = 276
+          Top = 47
           Width = 72
           Height = 27
           Alignment = taCenter
@@ -805,8 +810,8 @@ object FormMain: TFormMain
           Text = '100'
         end
         object UpDownGWHeight: TUpDown
-          Left = 409
-          Top = -540
+          Left = 348
+          Top = 47
           Width = 16
           Height = 27
           Associate = EditGWHeight
@@ -817,7 +822,7 @@ object FormMain: TFormMain
         end
         object GroupBoxResults: TGroupBox
           Left = 18
-          Top = -446
+          Top = 141
           Width = 471
           Height = 169
           Caption = 'Results'
@@ -905,7 +910,7 @@ object FormMain: TFormMain
         end
         object ComboBoxTaskEndAction: TComboBox
           Left = 72
-          Top = -229
+          Top = 358
           Width = 213
           Height = 27
           Style = csDropDownList
@@ -919,7 +924,7 @@ object FormMain: TFormMain
         end
         object CheckBoxTEAExit: TCheckBox
           Left = 291
-          Top = -225
+          Top = 362
           Width = 54
           Height = 17
           Caption = 'Exit'
@@ -927,7 +932,7 @@ object FormMain: TFormMain
         end
         object CheckBoxTEACloseTheGame: TCheckBox
           Left = 351
-          Top = -229
+          Top = 358
           Width = 138
           Height = 25
           Caption = 'Close the game'
@@ -935,7 +940,7 @@ object FormMain: TFormMain
         end
         object GroupBoxErrorHandling: TGroupBox
           Left = 19
-          Top = -182
+          Top = 405
           Width = 471
           Height = 148
           Caption = 'Error handling'
@@ -1026,18 +1031,18 @@ object FormMain: TFormMain
           end
         end
         object ButtonApplyGWSize: TButton
-          Left = 340
-          Top = -499
-          Width = 85
+          Left = 387
+          Top = 88
+          Width = 81
           Height = 33
           Caption = 'Apply'
           TabOrder = 5
           OnClick = ButtonApplyGWSizeClick
         end
         object ButtonUseCurrentGWSize: TButton
-          Left = 232
-          Top = -499
-          Width = 102
+          Left = 259
+          Top = 88
+          Width = 122
           Height = 33
           Caption = 'Use current'
           TabOrder = 4
@@ -1045,7 +1050,7 @@ object FormMain: TFormMain
         end
         object GroupBoxTaskBreakers: TGroupBox
           Left = 27
-          Top = -11
+          Top = 576
           Width = 471
           Height = 421
           Caption = 'Task breakers'
@@ -1054,55 +1059,76 @@ object FormMain: TFormMain
             Left = 24
             Top = 21
             Width = 425
-            Height = 180
+            Height = 212
             Caption = 'Energy purchasing dialog'
             TabOrder = 0
             object LabelEDY: TLabel
-              Left = 212
-              Top = 57
-              Width = 44
+              Left = 158
+              Top = 60
+              Width = 16
               Height = 19
-              Caption = 'Y (px)'
+              Caption = 'Y:'
             end
             object LabelEDX: TLabel
               Left = 57
-              Top = 57
-              Width = 43
+              Top = 60
+              Width = 15
               Height = 19
-              Caption = 'X (px)'
+              Caption = 'X:'
             end
             object LabelEDColor: TLabel
-              Left = 57
-              Top = 96
-              Width = 79
+              Left = 260
+              Top = 60
+              Width = 44
               Height = 19
-              Caption = 'Pixel color:'
+              Caption = 'Color:'
             end
-            object LabelEDABCP: TLabel
-              Left = 24
+            object LabelEDCP: TLabel
+              Left = 25
               Top = 32
-              Width = 228
+              Width = 99
               Height = 19
-              Caption = 'ACCEPT BUTTON control point:'
+              Caption = 'Control point:'
             end
             object LabelEDAction: TLabel
-              Left = 23
-              Top = 136
+              Left = 25
+              Top = 168
               Width = 51
               Height = 19
               Caption = 'Action:'
             end
+            object LabelEDGETButton: TLabel
+              Left = 25
+              Top = 90
+              Width = 163
+              Height = 19
+              Caption = 'GET button click point:'
+            end
+            object LabelEDGETX: TLabel
+              Left = 57
+              Top = 118
+              Width = 15
+              Height = 19
+              Caption = 'X:'
+            end
+            object LabelEDGETY: TLabel
+              Left = 158
+              Top = 118
+              Width = 16
+              Height = 19
+              Caption = 'Y:'
+            end
             object EditEDY: TEdit
-              Left = 264
+              Left = 180
               Top = 57
-              Width = 72
+              Width = 52
               Height = 27
               Alignment = taCenter
               ReadOnly = True
               TabOrder = 2
               Text = '0'
             end
-            object BitBtnEDPickColor: TBitBtn
+            object BitBtnEDPickPoint: TBitBtn
               Left = 364
               Top = 50
               Width = 41
@@ -1183,10 +1209,10 @@ object FormMain: TFormMain
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
               TabOrder = 4
-              OnClick = BitBtnEDPickColorClick
+              OnClick = BitBtnEDPickPointClick
             end
             object UpDownEDYPos: TUpDown
-              Left = 336
+              Left = 232
               Top = 57
               Width = 16
               Height = 27
@@ -1195,8 +1221,8 @@ object FormMain: TFormMain
               TabOrder = 3
             end
             object PanelEDColor: TPanel
-              Left = 142
-              Top = 97
+              Left = 310
+              Top = 60
               Width = 20
               Height = 20
               BevelKind = bkFlat
@@ -1209,7 +1235,7 @@ object FormMain: TFormMain
               OnClick = PanelEDColorClick
             end
             object UpDownEDXPos: TUpDown
-              Left = 180
+              Left = 130
               Top = 57
               Width = 16
               Height = 27
@@ -1218,9 +1244,9 @@ object FormMain: TFormMain
               TabOrder = 1
             end
             object EditEDX: TEdit
-              Left = 108
+              Left = 78
               Top = 57
-              Width = 72
+              Width = 52
               Height = 27
               Alignment = taCenter
               ReadOnly = True
@@ -1228,27 +1254,148 @@ object FormMain: TFormMain
               Text = '0'
             end
             object RadioButtonEDAccept: TRadioButton
-              Left = 84
-              Top = 134
-              Width = 79
+              Left = 86
+              Top = 166
+              Width = 45
               Height = 25
-              Caption = 'Accept'
+              Caption = 'Get'
               Checked = True
               TabOrder = 6
               TabStop = True
             end
             object RadioButtonEDSkip: TRadioButton
-              Left = 162
-              Top = 137
+              Left = 137
+              Top = 169
               Width = 75
               Height = 19
               Caption = 'Decline'
               TabOrder = 7
             end
+            object EditEDGETX: TEdit
+              Left = 78
+              Top = 115
+              Width = 52
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 8
+              Text = '0'
+            end
+            object UpDownEDGETXPos: TUpDown
+              Left = 130
+              Top = 115
+              Width = 16
+              Height = 27
+              Associate = EditEDGETX
+              Max = 9999
+              TabOrder = 9
+            end
+            object EditEDGETY: TEdit
+              Left = 180
+              Top = 115
+              Width = 52
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 10
+              Text = '0'
+            end
+            object UpDownEDGETYPos: TUpDown
+              Left = 232
+              Top = 115
+              Width = 16
+              Height = 27
+              Associate = EditEDGETY
+              Max = 9999
+              TabOrder = 11
+            end
+            object BitBtnEDGETPickPoint: TBitBtn
+              Left = 364
+              Top = 108
+              Width = 41
+              Height = 41
+              Glyph.Data = {
+                36090000424D3609000000000000360000002800000018000000180000000100
+                20000000000000090000C30E0000C30E00000000000000000000FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A8A8A8003333
+                33001010100001010100010101001111110033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000066666600FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000040404000FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004040
+                400000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0000000000F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800000000003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FAFAFA003B3B3B003B3B3B00FAFAFA00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00232323000000
+                00000000000000000000000000000505050000000000000000002C2C2C00FFFF
+                FF004B4B4B0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000050505000000000000000000000000000000000023232300232323000000
+                00000000000000000000000000000404040000000000000000002C2C2C00FFFF
+                FF004C4C4C0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000040404000000000000000000000000000000000023232300FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00F9F9F9003B3B3B003A3A3A00F9F9F900FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0001010100F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800010101003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000041414100FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004141
+                410000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000067676700FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7003333
+                33001010100001010100010101001010100033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+              TabOrder = 12
+              OnClick = BitBtnEDPickPointClick
+            end
           end
           object GroupBoxMaintenanceDialog: TGroupBox
             Left = 24
-            Top = 220
+            Top = 239
             Width = 425
             Height = 180
             Caption = 'Service maintenance dialog'
@@ -1448,7 +1595,7 @@ object FormMain: TFormMain
   end
   object ButtonRunTask: TButton
     Left = 31
-    Top = 519
+    Top = 479
     Width = 117
     Height = 41
     Caption = '#'
@@ -1463,7 +1610,7 @@ object FormMain: TFormMain
   end
   object ButtonStopTask: TButton
     Left = 384
-    Top = 519
+    Top = 479
     Width = 117
     Height = 41
     Caption = 'Stop'
@@ -1478,7 +1625,7 @@ object FormMain: TFormMain
   end
   object LinkLabel1: TLinkLabel
     Left = 388
-    Top = 593
+    Top = 553
     Width = 131
     Height = 22
     Alignment = taRightJustify
@@ -1494,7 +1641,7 @@ object FormMain: TFormMain
   end
   object LinkLabel2: TLinkLabel
     Left = 453
-    Top = 613
+    Top = 573
     Width = 66
     Height = 22
     Caption = '<a>Feedback</a>'
@@ -1509,25 +1656,16 @@ object FormMain: TFormMain
   end
   object ProgressBarBattle: TProgressBar
     Left = 8
-    Top = 487
+    Top = 447
     Width = 511
     Height = 8
     TabOrder = 5
-  end
-  object Button1: TButton
-    Left = 224
-    Top = 588
-    Width = 142
-    Height = 44
-    Caption = 'SendMouseClick'
-    TabOrder = 7
-    OnClick = Button1Click
   end
   object TimerMain: TTimer
     Enabled = False
     OnTimer = TimerMainTimer
     Left = 248
-    Top = 464
+    Top = 416
   end
   object TrayIconApp: TTrayIcon
     BalloonFlags = bfInfo
@@ -2067,11 +2205,11 @@ object FormMain: TFormMain
     OnBalloonClick = TrayIconAppBalloonClick
     OnDblClick = TrayIconAppDblClick
     Left = 368
-    Top = 464
+    Top = 416
   end
   object PopupMenuTray: TPopupMenu
     Left = 416
-    Top = 464
+    Top = 416
     object ShowHideAutomatizer1: TMenuItem
       Caption = 'Show/Hide Automatizer'
       Default = True
@@ -2094,11 +2232,11 @@ object FormMain: TFormMain
     FileTypes = <>
     Options = []
     Left = 96
-    Top = 464
+    Top = 416
   end
   object ColorDialogCPColor: TColorDialog
     Options = [cdFullOpen, cdAnyColor]
     Left = 56
-    Top = 464
+    Top = 416
   end
 end

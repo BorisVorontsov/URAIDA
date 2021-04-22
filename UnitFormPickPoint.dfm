@@ -1,4 +1,4 @@
-object FormPickColor: TFormPickColor
+object FormPickPoint: TFormPickPoint
   Left = 0
   Top = 0
   BorderIcons = []
