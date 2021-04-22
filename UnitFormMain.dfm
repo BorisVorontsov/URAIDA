@@ -277,7 +277,7 @@ object FormMain: TFormMain
     Top = 8
     Width = 513
     Height = 425
-    ActivePage = TabSheetCommon
+    ActivePage = TabSheetCampaign
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -742,7 +742,7 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitHeight = 431
+        ExplicitTop = -3
         object LabelGWWidth: TLabel
           Left = 65
           Top = 50
@@ -765,13 +765,13 @@ object FormMain: TFormMain
           Caption = 'At the and of task:'
         end
         object Bevel2: TBevel
-          Left = 27
-          Top = 1034
+          Left = 19
+          Top = 999
           Width = 471
           Height = 2
         end
         object LabelPreferredGWSize: TLabel
-          Left = 17
+          Left = 18
           Top = 18
           Width = 217
           Height = 19
@@ -1049,10 +1049,10 @@ object FormMain: TFormMain
           OnClick = ButtonUseCurrentGWSizeClick
         end
         object GroupBoxTaskBreakers: TGroupBox
-          Left = 27
+          Left = 18
           Top = 576
           Width = 471
-          Height = 421
+          Height = 391
           Caption = 'Task breakers'
           TabOrder = 11
           object GroupBoxEnergyDialog: TGroupBox
@@ -1208,7 +1208,7 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 4
+              TabOrder = 5
               OnClick = BitBtnEDPickPointClick
             end
             object UpDownEDYPos: TUpDown
@@ -1230,7 +1230,7 @@ object FormMain: TFormMain
               BorderWidth = 1
               Color = clWhite
               ParentBackground = False
-              TabOrder = 5
+              TabOrder = 4
               TabStop = True
               OnClick = PanelEDColorClick
             end
@@ -1260,7 +1260,7 @@ object FormMain: TFormMain
               Height = 25
               Caption = 'Get'
               Checked = True
-              TabOrder = 6
+              TabOrder = 11
               TabStop = True
             end
             object RadioButtonEDSkip: TRadioButton
@@ -1269,7 +1269,7 @@ object FormMain: TFormMain
               Width = 75
               Height = 19
               Caption = 'Decline'
-              TabOrder = 7
+              TabOrder = 12
             end
             object EditEDGETX: TEdit
               Left = 78
@@ -1278,7 +1278,7 @@ object FormMain: TFormMain
               Height = 27
               Alignment = taCenter
               ReadOnly = True
-              TabOrder = 8
+              TabOrder = 6
               Text = '0'
             end
             object UpDownEDGETXPos: TUpDown
@@ -1288,7 +1288,7 @@ object FormMain: TFormMain
               Height = 27
               Associate = EditEDGETX
               Max = 9999
-              TabOrder = 9
+              TabOrder = 7
             end
             object EditEDGETY: TEdit
               Left = 180
@@ -1297,7 +1297,7 @@ object FormMain: TFormMain
               Height = 27
               Alignment = taCenter
               ReadOnly = True
-              TabOrder = 10
+              TabOrder = 8
               Text = '0'
             end
             object UpDownEDGETYPos: TUpDown
@@ -1307,7 +1307,7 @@ object FormMain: TFormMain
               Height = 27
               Associate = EditEDGETY
               Max = 9999
-              TabOrder = 11
+              TabOrder = 9
             end
             object BitBtnEDGETPickPoint: TBitBtn
               Left = 364
@@ -1389,37 +1389,37 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 12
-              OnClick = BitBtnEDPickPointClick
+              TabOrder = 10
+              OnClick = BitBtnEDGETPickPointClick
             end
           end
           object GroupBoxMaintenanceDialog: TGroupBox
             Left = 24
-            Top = 239
+            Top = 255
             Width = 425
-            Height = 180
+            Height = 114
             Caption = 'Service maintenance dialog'
             TabOrder = 1
             object LabelSMY: TLabel
-              Left = 214
-              Top = 57
-              Width = 44
+              Left = 158
+              Top = 60
+              Width = 16
               Height = 19
-              Caption = 'Y (px)'
+              Caption = 'Y:'
             end
             object LabelSMX: TLabel
               Left = 57
-              Top = 57
-              Width = 43
+              Top = 60
+              Width = 15
               Height = 19
-              Caption = 'X (px)'
+              Caption = 'X:'
             end
             object LabelSMColor: TLabel
-              Left = 57
-              Top = 96
-              Width = 79
+              Left = 260
+              Top = 60
+              Width = 44
               Height = 19
-              Caption = 'Pixel color:'
+              Caption = 'Color:'
             end
             object LabelSMCP: TLabel
               Left = 24
@@ -1428,17 +1428,10 @@ object FormMain: TFormMain
               Height = 19
               Caption = 'Control point:'
             end
-            object LabelSMAction: TLabel
-              Left = 23
-              Top = 136
-              Width = 51
-              Height = 19
-              Caption = 'Action:'
-            end
             object EditSMY: TEdit
-              Left = 264
+              Left = 180
               Top = 57
-              Width = 72
+              Width = 52
               Height = 27
               Alignment = taCenter
               ReadOnly = True
@@ -1525,11 +1518,11 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 4
+              TabOrder = 5
               OnClick = BitBtnSMPickColorClick
             end
             object UpDownSMYPos: TUpDown
-              Left = 336
+              Left = 232
               Top = 57
               Width = 16
               Height = 27
@@ -1538,8 +1531,8 @@ object FormMain: TFormMain
               TabOrder = 3
             end
             object PanelSMColor: TPanel
-              Left = 142
-              Top = 97
+              Left = 310
+              Top = 60
               Width = 20
               Height = 20
               BevelKind = bkFlat
@@ -1547,12 +1540,12 @@ object FormMain: TFormMain
               BorderWidth = 1
               Color = clWhite
               ParentBackground = False
-              TabOrder = 5
+              TabOrder = 4
               TabStop = True
               OnClick = PanelSMColorClick
             end
             object UpDownSMXPos: TUpDown
-              Left = 180
+              Left = 129
               Top = 57
               Width = 16
               Height = 27
@@ -1561,32 +1554,14 @@ object FormMain: TFormMain
               TabOrder = 1
             end
             object EditSMX: TEdit
-              Left = 108
+              Left = 78
               Top = 57
-              Width = 72
+              Width = 52
               Height = 27
               Alignment = taCenter
               ReadOnly = True
               TabOrder = 0
               Text = '0'
-            end
-            object RadioButtonSMAccept: TRadioButton
-              Left = 84
-              Top = 134
-              Width = 52
-              Height = 25
-              Caption = 'Exit'
-              Checked = True
-              TabOrder = 6
-              TabStop = True
-            end
-            object RadioButtonSMSkip: TRadioButton
-              Left = 142
-              Top = 137
-              Width = 75
-              Height = 19
-              Caption = 'Ignore'
-              TabOrder = 7
             end
           end
         end

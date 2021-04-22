@@ -92,11 +92,11 @@ public:
 
 	__property TPoint EnergyDialogControlPoint = { read = GetEDControlPoint, write = SetEDControlPoint };
 	__property TColor EnergyDialogControlPointColor = { read = GetEDControlPointColor, write = SetEDControlPointColor };
+	__property TPoint EnergyDialogGETButtonPoint = { read = GetEDGETButtonPoint, write = SetEDGETButtonPoint };
 	__property PromptDialogAction EnergyDialogPreferredAction = { read = GetEDPreferredAction, write = SetEDPreferredAction };
 
 	__property TPoint SMDialogControlPoint = { read = GetSMDControlPoint, write = SetSMDControlPoint };
 	__property TColor SMDialogControlPointColor = { read = GetSMDControlPointColor, write = SetSMDControlPointColor };
-	__property PromptDialogAction SMDialogPreferredAction = { read = GetSMDPreferredAction, write = SetSMDPreferredAction };
 
 	__property unsigned int RecentActivePage = { read = GetRecentActivePage, write = SetRecentActivePage };
 
@@ -130,10 +130,11 @@ private:
 
 	TPoint m_EnergyDialogControlPoint;
 	TColor m_EnergyDialogControlPointColor;
+    TPoint m_EnergyDialogGETButtonPoint;
 	PromptDialogAction m_EnergyDialogAction;
 	TPoint m_SMDialogControlPoint;
 	TColor m_SMDialogControlPointColor;
-	PromptDialogAction m_SMDialogAction;
+	TPoint m_SMDialogXButtonPoint;
 
 	unsigned int m_uRecentActivePageIndex;
 
@@ -174,6 +175,8 @@ private:
 	void SetEDControlPoint(TPoint NewValue) { m_EnergyDialogControlPoint = NewValue; }
 	TColor GetEDControlPointColor() { return m_EnergyDialogControlPointColor; }
 	void SetEDControlPointColor(TColor NewValue) { m_EnergyDialogControlPointColor = NewValue; }
+	TPoint GetEDGETButtonPoint() { return m_EnergyDialogGETButtonPoint; }
+	void SetEDGETButtonPoint(TPoint NewValue) { m_EnergyDialogGETButtonPoint = NewValue; }
 	PromptDialogAction GetEDPreferredAction() { return m_EnergyDialogAction; }
 	void SetEDPreferredAction(PromptDialogAction NewValue) { m_EnergyDialogAction = NewValue; }
 
@@ -181,8 +184,6 @@ private:
 	void SetSMDControlPoint(TPoint NewValue) { m_SMDialogControlPoint = NewValue; }
 	TColor GetSMDControlPointColor() { return m_SMDialogControlPointColor; }
 	void SetSMDControlPointColor(TColor NewValue) { m_SMDialogControlPointColor = NewValue; }
-	PromptDialogAction GetSMDPreferredAction() { return m_SMDialogAction; }
-	void SetSMDPreferredAction(PromptDialogAction NewValue) { m_SMDialogAction = NewValue; }
 
 	unsigned int GetRecentActivePage() { return m_uRecentActivePageIndex; }
 	void SetRecentActivePage(unsigned int uNewValue) { m_uRecentActivePageIndex = uNewValue; }

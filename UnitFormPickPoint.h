@@ -10,12 +10,11 @@
 #include <Vcl.ExtCtrls.hpp>
 #include <Vcl.Dialogs.hpp>
 //---------------------------------------------------------------------------
-typedef struct tagPCData
+typedef struct tagPickPointData
 {
 	TPoint XY;
 	TColor Color;
-	bool bCancelled;
-} PCData;
+} PickPointData;
 
 class TFormPickPoint : public TForm
 {
@@ -42,15 +41,19 @@ __published:	// IDE-managed Components
           int X, int Y);
 	void __fastcall FormShow(TObject *Sender);
 
-
 private:	// User declarations
-	PCData m_Data;
+	PickPointData m_Data;
+	bool m_bCancelled;
+	bool m_bOnlyCoordinates;
 
 	void ResizeAndAlignWindow();
 public:		// User declarations
 	__fastcall TFormPickPoint(TComponent* Owner);
 
-	PCData GetResults() { return m_Data; }
+	__property bool OnlyCoordinates = { read = m_bOnlyCoordinates, write = m_bOnlyCoordinates };
+
+	bool Execute();
+	PickPointData GetResults() { return m_Data; }
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormPickPoint *FormPickPoint;

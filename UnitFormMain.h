@@ -150,15 +150,12 @@ __published:	// IDE-managed Components
 	TLabel *LabelSMX;
 	TLabel *LabelSMColor;
 	TLabel *LabelSMCP;
-	TLabel *LabelSMAction;
 	TEdit *EditSMY;
 	TBitBtn *BitBtnSMPickColor;
 	TUpDown *UpDownSMYPos;
 	TPanel *PanelSMColor;
 	TUpDown *UpDownSMXPos;
 	TEdit *EditSMX;
-	TRadioButton *RadioButtonSMAccept;
-	TRadioButton *RadioButtonSMSkip;
 	TLabel *LabelColorTolerance;
 	TEdit *EditColorTolerance;
 	TUpDown *UpDownColorTolerance;
@@ -201,6 +198,7 @@ __published:	// IDE-managed Components
 	void __fastcall PanelRSColorClick(TObject *Sender);
 	void __fastcall PanelEDColorClick(TObject *Sender);
 	void __fastcall PanelSMColorClick(TObject *Sender);
+	void __fastcall BitBtnEDGETPickPointClick(TObject *Sender);
 
 
 private:	// User declarations

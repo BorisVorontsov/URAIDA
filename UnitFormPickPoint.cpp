@@ -22,17 +22,36 @@ __fastcall TFormPickPoint::TFormPickPoint(TComponent* Owner)
 
 void __fastcall TFormPickPoint::ImageCapturedFrameClick(TObject *Sender)
 {
-	m_Data.Color = ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y];
-	m_Data.bCancelled = false;
+	m_Data.Color = (!m_bOnlyCoordinates)?(ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y]):clWhite;
+    m_bCancelled = false;
 	this->Close();
 }
 //---------------------------------------------------------------------------
+bool TFormPickPoint::Execute()
+{
+	if (m_bOnlyCoordinates)
+	{
+		LabelColorInfo->Visible = false;
+		PanelColor->Visible = false;
+		LabelColorInRGB->Visible = false;
+	}
+	else
+	{
+		LabelColorInfo->Visible = true;
+		PanelColor->Visible = true;
+		LabelColorInRGB->Visible = true;
+	}
 
+	this->ShowModal();
+
+	return !m_bCancelled;
+}
+//---------------------------------------------------------------------------
 void __fastcall TFormPickPoint::FormKeyPress(TObject *Sender, System::WideChar &Key)
 {
 	if (Key == VK_ESCAPE)
 	{
-		m_Data.bCancelled = true;
+		m_bCancelled = true;
 		this->Close();
 	}
 }
@@ -104,11 +123,14 @@ void __fastcall TFormPickPoint::ImageCapturedFrameMouseMove(TObject *Sender, TSh
 	LabelX->Caption = IntToStr(static_cast<int>(this->m_Data.XY.x = X));
 	LabelY->Caption = IntToStr(static_cast<int>(this->m_Data.XY.y = Y));
 
-	TColor PixelColor = ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y];
-	String strRGBValues;
-	strRGBValues.sprintf(L"R: %i G: %i B: %i", GetRValue(PixelColor), GetGValue(PixelColor), GetBValue(PixelColor));
-	PanelColor->Color = PixelColor;
-	LabelColorInRGB->Caption = strRGBValues;
+	if (!m_bOnlyCoordinates)
+	{
+		TColor PixelColor = ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y];
+		String strRGBValues;
+		strRGBValues.sprintf(L"R: %i G: %i B: %i", GetRValue(PixelColor), GetGValue(PixelColor), GetBValue(PixelColor));
+		PanelColor->Color = PixelColor;
+		LabelColorInRGB->Caption = strRGBValues;
+	}
 }
 //---------------------------------------------------------------------------
 

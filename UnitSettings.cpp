@@ -92,12 +92,13 @@ bool TSettingsManager::ReadINI()
 	m_EnergyDialogControlPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointX", 0);
 	m_EnergyDialogControlPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointY", 0);
 	m_EnergyDialogControlPointColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", clWhite));
+	m_EnergyDialogGETButtonPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointX", 0);
+	m_EnergyDialogGETButtonPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointY", 0);
 	m_EnergyDialogAction = static_cast<PromptDialogAction>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogAction", PromptDialogAction::pdaSkip));
 
 	m_SMDialogControlPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointX", 0);
 	m_SMDialogControlPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointY", 0);
 	m_SMDialogControlPointColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointColor", clWhite));
-	m_SMDialogAction = static_cast<PromptDialogAction>(pSettings->ReadInteger(m_strSectionCommon, L"SMDialogAction", PromptDialogAction::pdaSkip));
 
 	//Внутренние
 	m_uRecentActivePageIndex = pSettings->ReadInteger(m_strSectionInternal, L"RecentActivePage", 0);
@@ -165,12 +166,13 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointX", m_EnergyDialogControlPoint.x);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointY", m_EnergyDialogControlPoint.y);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", m_EnergyDialogControlPointColor);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointX", m_EnergyDialogGETButtonPoint.x);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointY", m_EnergyDialogGETButtonPoint.y);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogAction", m_EnergyDialogAction);
 
 	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointX", m_SMDialogControlPoint.x);
 	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointY", m_SMDialogControlPoint.y);
 	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointColor", m_SMDialogControlPointColor);
-	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogAction", m_SMDialogAction);
 
 	//Внутренние
 	pSettings->WriteInteger(m_strSectionInternal, L"RecentActivePage", m_uRecentActivePageIndex);

@@ -9,7 +9,7 @@
 #pragma hdrstop
 
 #include "UnitFormMain.h"
-#include "UnitFormPickColor.h"
+#include "UnitFormPickPoint.h"
 #include "UnitCommon.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -148,21 +148,27 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		}
 
 		//Проверяем прерыватели выполнения задачи
+
+		//Диалог пополнения энергии
 		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->EnergyDialogControlPoint, g_pSettingsManager->EnergyDialogControlPointColor))
 		{
 			switch (g_pSettingsManager->EnergyDialogPreferredAction)
 			{
 				case PromptDialogAction::pdaAccept:
-				{
-					TPoint AcceptButtonPos;
-					//
-					g_pRAIDWorker->SendMouseClick(AcceptButtonPos);
+					//Кликаем, куда задал пользователь (предполагается кнопка "Получить")
+					g_pRAIDWorker->SendMouseClick(g_pSettingsManager->EnergyDialogGETButtonPoint);
 					break;
-				}
 				case PromptDialogAction::pdaSkip:
 					g_pRAIDWorker->SendKey(VK_ESCAPE);
 					break;
 			}
+		}
+
+		//Диалог работ на сервере
+		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->SMDialogControlPoint, g_pSettingsManager->SMDialogControlPointColor))
+		{
+			//Просто игнорируем
+			g_pRAIDWorker->SendKey(VK_ESCAPE);
 		}
 
 		//Если мы прошли первый бой или если не удалось найти кнопку "Начать", подразумеваем, что перед нами экран
@@ -277,16 +283,15 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnSSPickPointClick(TObject *Sender)
 {
-	FormPickColor->ShowModal();
+	FormPickPoint->OnlyCoordinates = false;
 
-	PCData PCResults;
-	PCResults = FormPickColor->GetResults();
-
-	if (!PCResults.bCancelled)
+	if (FormPickPoint->Execute())
 	{
-		UpDownSSXPos->Position = PCResults.XY.x;
-		UpDownSSYPos->Position = PCResults.XY.y;
-		PanelSSColor->Color = PCResults.Color;
+		PickPointData PPResults = FormPickPoint->GetResults();
+
+		UpDownSSXPos->Position = PPResults.XY.x;
+		UpDownSSYPos->Position = PPResults.XY.y;
+		PanelSSColor->Color = PPResults.Color;
 	}
 }
 //---------------------------------------------------------------------------
@@ -394,6 +399,9 @@ void TFormMain::UpdateCommonSettingsFrame()
 	UpDownEDYPos->Position = g_pSettingsManager->EnergyDialogControlPoint.y;
 	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPointColor;
 
+	UpDownEDGETXPos->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.x;
+	UpDownEDGETYPos->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.y;
+
 	switch (g_pSettingsManager->EnergyDialogPreferredAction)
 	{
 		case PromptDialogAction::pdaAccept:
@@ -407,16 +415,6 @@ void TFormMain::UpdateCommonSettingsFrame()
 	UpDownSMXPos->Position = g_pSettingsManager->SMDialogControlPoint.x;
 	UpDownSMYPos->Position = g_pSettingsManager->SMDialogControlPoint.y;
 	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPointColor;
-
-	switch (g_pSettingsManager->SMDialogPreferredAction)
-	{
-		case PromptDialogAction::pdaAccept:
-			RadioButtonSMAccept->Checked = true;
-			break;
-		case PromptDialogAction::pdaSkip:
-			RadioButtonSMSkip->Checked = true;
-			break;
-	}
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromCommonSettingsFrame()
@@ -483,6 +481,7 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->EnergyDialogControlPoint = TPoint(UpDownEDXPos->Position, UpDownEDYPos->Position);
 	g_pSettingsManager->EnergyDialogControlPointColor = PanelEDColor->Color;
+	g_pSettingsManager->EnergyDialogGETButtonPoint = TPoint(UpDownEDGETXPos->Position, UpDownEDGETYPos->Position);
 
 	if (RadioButtonEDAccept->Checked)
 	{
@@ -495,15 +494,6 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMXPos->Position, UpDownSMYPos->Position);
 	g_pSettingsManager->SMDialogControlPointColor = PanelSMColor->Color;
-
-	if (RadioButtonSMAccept->Checked)
-	{
-		g_pSettingsManager->SMDialogPreferredAction = PromptDialogAction::pdaAccept;
-	}
-	else if (RadioButtonSMSkip->Checked)
-	{
-		g_pSettingsManager->SMDialogPreferredAction = PromptDialogAction::pdaSkip;
-	}
 
 	//Запись в файл
 	g_pSettingsManager->UpdateINI();
@@ -521,16 +511,15 @@ void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnRSPickPointClick(TObject *Sender)
 {
-	FormPickColor->ShowModal();
+	FormPickPoint->OnlyCoordinates = false;
 
-	PCData PCResults;
-	PCResults = FormPickColor->GetResults();
-
-	if (!PCResults.bCancelled)
+	if (FormPickPoint->Execute())
 	{
-		UpDownRSXPos->Position = PCResults.XY.x;
-		UpDownRSYPos->Position = PCResults.XY.y;
-		PanelRSColor->Color = PCResults.Color;
+		PickPointData PPResults = FormPickPoint->GetResults();
+
+		UpDownRSXPos->Position = PPResults.XY.x;
+		UpDownRSYPos->Position = PPResults.XY.y;
+		PanelRSColor->Color = PPResults.Color;
     }
 }
 //---------------------------------------------------------------------------
@@ -841,32 +830,44 @@ void __fastcall TFormMain::CheckBoxSaveResultsClick(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnEDPickPointClick(TObject *Sender)
 {
-	FormPickColor->ShowModal();
+	FormPickPoint->OnlyCoordinates = false;
 
-	PCData PCResults;
-	PCResults = FormPickColor->GetResults();
-
-	if (!PCResults.bCancelled)
+	if (FormPickPoint->Execute())
 	{
-		UpDownEDXPos->Position = PCResults.XY.x;
-		UpDownEDYPos->Position = PCResults.XY.y;
-		PanelEDColor->Color = PCResults.Color;
+		PickPointData PPResults = FormPickPoint->GetResults();
+
+		UpDownEDXPos->Position = PPResults.XY.x;
+		UpDownEDYPos->Position = PPResults.XY.y;
+		PanelEDColor->Color = PPResults.Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnEDGETPickPointClick(TObject *Sender)
+{
+	FormPickPoint->OnlyCoordinates = true;
+
+	if (FormPickPoint->Execute())
+	{
+		PickPointData PPResults = FormPickPoint->GetResults();
+
+		UpDownEDGETXPos->Position = PPResults.XY.x;
+		UpDownEDGETYPos->Position = PPResults.XY.y;
 	}
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::BitBtnSMPickColorClick(TObject *Sender)
 {
-	FormPickColor->ShowModal();
+	FormPickPoint->OnlyCoordinates = false;
 
-	PCData PCResults;
-	PCResults = FormPickColor->GetResults();
-
-	if (!PCResults.bCancelled)
+	if (FormPickPoint->Execute())
 	{
-		UpDownSMXPos->Position = PCResults.XY.x;
-		UpDownSMYPos->Position = PCResults.XY.y;
-		PanelSMColor->Color = PCResults.Color;
+		PickPointData PPResults = FormPickPoint->GetResults();
+
+		UpDownSMXPos->Position = PPResults.XY.x;
+		UpDownSMYPos->Position = PPResults.XY.y;
+		PanelSMColor->Color = PPResults.Color;
 	}
 }
 //---------------------------------------------------------------------------
