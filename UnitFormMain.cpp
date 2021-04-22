@@ -114,6 +114,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			uBattleTimeout = 0;
 			LabelBattlesCounter->Caption = String(nCycleCounter) + L"/" +
 				String(m_ActiveTaskInfo.Settings.nNumberOfBattles);
+
+			String strTrayHint;
+			strTrayHint.sprintf(L"%s (%i/%i)", Application->Title.c_str(), nCycleCounter,
+				m_ActiveTaskInfo.Settings.nNumberOfBattles);
+			TrayIconApp->Hint = strTrayHint;
 		}
 		LabelBattlesCounter->Font->Color = clSilver;
 
@@ -139,6 +144,24 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				g_pRAIDWorker->SendKey(VK_RETURN);
 				LabelBattlesCounter->Font->Color = clBlack;
 				bScreenCheckPassed = true;
+			}
+		}
+
+		//Проверяем прерыватели выполнения задачи
+		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->EnergyDialogControlPoint, g_pSettingsManager->EnergyDialogControlPointColor))
+		{
+			switch (g_pSettingsManager->EnergyDialogPreferredAction)
+			{
+				case PromptDialogAction::pdaAccept:
+				{
+					TPoint AcceptButtonPos;
+					//
+					g_pRAIDWorker->SendMouseClick(AcceptButtonPos);
+					break;
+				}
+				case PromptDialogAction::pdaSkip:
+					g_pRAIDWorker->SendKey(VK_ESCAPE);
+					break;
 			}
 		}
 
@@ -174,6 +197,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		//Если превысили число ошибочных попыток сравнения, завершаем всю задачу
 		if (nScreenCheckFailures == g_pSettingsManager->TriesBeforeForceTaskEnding)
 		{
+            nCycleCounter = 0;
 			this->StopTask(TaskStoppingReason::tsrError);
 
 			return;
@@ -253,10 +277,6 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnSSPickColorClick(TObject *Sender)
 {
-	if (!this->CheckGameState()) return;
-
-	this->ValidateGameWindow();
-
 	FormPickColor->ShowModal();
 
 	PCData PCResults;
@@ -273,9 +293,7 @@ void __fastcall TFormMain::BitBtnSSPickColorClick(TObject *Sender)
 
 void __fastcall TFormMain::ButtonApplyGWSizeClick(TObject *Sender)
 {
-	if (!this->CheckGameState()) return;
-
-	g_pSettingsManager->RAIDWindowSize = TSize(UpDownGWWidth->Position, UpDownGWHeight->Position);
+	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
 	g_pRAIDWorker->ResizeGameWindow(g_pSettingsManager->RAIDWindowSize);
 }
@@ -346,7 +364,6 @@ GameModeSpecSettings TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 //---------------------------------------------------------------------------
 void TFormMain::UpdateCommonSettingsFrame()
 {
-	CheckBoxAutoResizeGW->Checked = g_pSettingsManager->AutoResizeGameWindow;
 	UpDownGWWidth->Position = g_pSettingsManager->RAIDWindowSize.cx;
 	UpDownGWHeight->Position = g_pSettingsManager->RAIDWindowSize.cy;
 	CheckBoxSaveResults->Checked = g_pSettingsManager->SaveResults;
@@ -371,12 +388,77 @@ void TFormMain::UpdateCommonSettingsFrame()
 
 	UpDownTriesBeforeFTE->Position = g_pSettingsManager->TriesBeforeForceTaskEnding;
 	UpDownScreenCheckingInterval->Position = g_pSettingsManager->ScreenCheckingPeriod;
+	UpDownColorTolerance->Position = g_pSettingsManager->ColorTolerance;
+
+	UpDownEDXPos->Position = g_pSettingsManager->EnergyDialogControlPoint.x;
+	UpDownEDYPos->Position = g_pSettingsManager->EnergyDialogControlPoint.y;
+	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPointColor;
+
+	switch (g_pSettingsManager->EnergyDialogPreferredAction)
+	{
+		case PromptDialogAction::pdaAccept:
+			RadioButtonEDAccept->Checked = true;
+			break;
+		case PromptDialogAction::pdaSkip:
+			RadioButtonEDSkip->Checked = true;
+			break;
+	}
+
+	UpDownSMXPos->Position = g_pSettingsManager->SMDialogControlPoint.x;
+	UpDownSMYPos->Position = g_pSettingsManager->SMDialogControlPoint.y;
+	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPointColor;
+
+	switch (g_pSettingsManager->SMDialogPreferredAction)
+	{
+		case PromptDialogAction::pdaAccept:
+			RadioButtonSMAccept->Checked = true;
+			break;
+		case PromptDialogAction::pdaSkip:
+			RadioButtonSMSkip->Checked = true;
+			break;
+	}
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromCommonSettingsFrame()
 {
-	g_pSettingsManager->AutoResizeGameWindow = CheckBoxAutoResizeGW->Checked;
-	g_pSettingsManager->RAIDWindowSize = TSize(UpDownGWWidth->Position, UpDownGWHeight->Position);
+	TSize NewGWSize(UpDownGWWidth->Position, UpDownGWHeight->Position);
+	TSize CurrentGWSize = g_pSettingsManager->RAIDWindowSize;
+
+	//При сохранении размеров окна игры пересчитываем координаты всех контрольных точек,
+	//если новые размеры отличаются от прежних
+	if (NewGWSize != CurrentGWSize)
+	{
+		float fWidthCoeff, fHeightCoeff;
+
+		if (NewGWSize.cx > CurrentGWSize.cx)
+			fWidthCoeff = static_cast<float>(CurrentGWSize.cx) / static_cast<float>(NewGWSize.cx);
+		else
+			fWidthCoeff = static_cast<float>(NewGWSize.cx) / static_cast<float>(CurrentGWSize.cx);
+
+		if (NewGWSize.cy > CurrentGWSize.cy)
+			fHeightCoeff = static_cast<float>(CurrentGWSize.cy) / static_cast<float>(NewGWSize.cy);
+		else
+			fHeightCoeff = static_cast<float>(NewGWSize.cy) / static_cast<float>(CurrentGWSize.cy);
+
+		GameModeSpecSettings GMSpecSettings;
+		GMSpecSettings = g_pSettingsManager->CampaignSettings;
+		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		g_pSettingsManager->CampaignSettings = GMSpecSettings;
+		GMSpecSettings = g_pSettingsManager->DungeonsSettings;
+		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		g_pSettingsManager->DungeonsSettings = GMSpecSettings;
+		GMSpecSettings = g_pSettingsManager->FactionWarsSettings;
+		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		g_pSettingsManager->FactionWarsSettings = GMSpecSettings;
+
+		this->UpDownEDXPos->Position *= fWidthCoeff;
+		this->UpDownEDYPos->Position *= fHeightCoeff;
+		this->UpDownSMXPos->Position *= fWidthCoeff;
+		this->UpDownSMYPos->Position *= fHeightCoeff;
+
+		g_pSettingsManager->RAIDWindowSize = NewGWSize;
+	}
+
 	g_pSettingsManager->SaveResults = CheckBoxSaveResults->Checked;
 
 	if (RadioButtonSRAtTheEndOfEachBattle->Checked)
@@ -397,6 +479,31 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->TriesBeforeForceTaskEnding = UpDownTriesBeforeFTE->Position;
 	g_pSettingsManager->ScreenCheckingPeriod = UpDownScreenCheckingInterval->Position;
+	g_pSettingsManager->ColorTolerance = UpDownColorTolerance->Position;
+
+	g_pSettingsManager->EnergyDialogControlPoint = TPoint(UpDownEDXPos->Position, UpDownEDYPos->Position);
+	g_pSettingsManager->EnergyDialogControlPointColor = PanelEDColor->Color;
+
+	if (RadioButtonEDAccept->Checked)
+	{
+		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaAccept;
+	}
+	else if (RadioButtonEDSkip->Checked)
+	{
+		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaSkip;
+	}
+
+	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMXPos->Position, UpDownSMYPos->Position);
+	g_pSettingsManager->SMDialogControlPointColor = PanelSMColor->Color;
+
+	if (RadioButtonSMAccept->Checked)
+	{
+		g_pSettingsManager->SMDialogPreferredAction = PromptDialogAction::pdaAccept;
+	}
+	else if (RadioButtonSMSkip->Checked)
+	{
+		g_pSettingsManager->SMDialogPreferredAction = PromptDialogAction::pdaSkip;
+	}
 
 	//Запись в файл
 	g_pSettingsManager->UpdateINI();
@@ -404,20 +511,16 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
 {
-	if (!this->CheckGameState()) return;
+	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
-	TRect GameWindowSize = g_pRAIDWorker->GetGameWindowSize();
-	UpDownGWWidth->Position = GameWindowSize.Right;
-	UpDownGWHeight->Position = GameWindowSize.Bottom;
+	TRect GameWindowSize = g_pRAIDWorker->GetGameWindowSize(true);
+	UpDownGWWidth->Position = GameWindowSize.Width();
+	UpDownGWHeight->Position = GameWindowSize.Height();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::BitBtnRSPickColorClick(TObject *Sender)
 {
-	if (!this->CheckGameState()) return;
-
-    this->ValidateGameWindow();
-
 	FormPickColor->ShowModal();
 
 	PCData PCResults;
@@ -503,18 +606,6 @@ void __fastcall TFormMain::PageControlURAIDASettingsChange(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-bool TFormMain::CheckGameState()
-{
-	if (!g_pRAIDWorker->IsGameRunning())
-	{
-		MessageBox(this->Handle, L"Unable to find game window. Aborting", L"Warning", MB_ICONEXCLAMATION);
-
-		return false;
-	}
-
-    return true;
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TFormMain::PageControlURAIDASettingsChanging(TObject *Sender, bool &AllowChange)
 {
@@ -537,7 +628,7 @@ void __fastcall TFormMain::ButtonSRBrowsePathClick(TObject *Sender)
 	FileOpenDialogGeneric->Title = L"Select directory for results";
 	FileOpenDialogGeneric->DefaultFolder = strInitialDir;
     //BrowseForFolderDialog
-	if (FileOpenDialogGeneric->Execute())
+	if (FileOpenDialogGeneric->Execute(this->Handle))
 	{
 		EditSRPath->Text = FileOpenDialogGeneric->FileName;
     }
@@ -566,7 +657,7 @@ void __fastcall TFormMain::ButtonClearAllResultsClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TFormMain::StartTask()
 {
-	if (!this->CheckGameState()) return;
+	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 	{
@@ -575,7 +666,7 @@ void TFormMain::StartTask()
 			return;
 		}
 
-		this->ValidateGameWindow();
+		g_pRAIDWorker->ValidateGameWindow();
 
 		//Запускаем таймер задачи по указанным параметрам
 		//Параметры будут применены только при старте новой задачи
@@ -617,6 +708,8 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 
 	m_ActiveTaskInfo.CurrentState = TaskState::tsStopped;
 	ButtonRunTask->Caption = m_strButtonRTRunCaption;
+
+    TrayIconApp->Hint = Application->Title;
 
 	switch (Reason)
 	{
@@ -674,21 +767,6 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 	}
 
 	PageControlURAIDASettings->Visible = true;
-}
-//---------------------------------------------------------------------------
-void TFormMain::ValidateGameWindow()
-{
-    //Функция проверки и корректировки в случае необходимости размеров и состояния окна игры
-	if (g_pSettingsManager->AutoResizeGameWindow)
-	{
-		TRect GameWindowSize = g_pRAIDWorker->GetGameWindowSize();
-		TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
-		if ((GameWindowSize.Width() != GWSizeFromSettings.cx) || (GameWindowSize.Height() != GWSizeFromSettings.cy))
-		{
-			//Устанавливаем размеры окна для корректной работы алгоритма
-			g_pRAIDWorker->ResizeGameWindow(g_pSettingsManager->RAIDWindowSize);
-		}
-	}
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveResult(unsigned int nBattleNumber)
@@ -758,6 +836,86 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 void __fastcall TFormMain::CheckBoxSaveResultsClick(TObject *Sender)
 {
 	OpenResults1->Enabled = CheckBoxSaveResults->Checked;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnEDPickColorClick(TObject *Sender)
+{
+	FormPickColor->ShowModal();
+
+	PCData PCResults;
+	PCResults = FormPickColor->GetResults();
+
+	if (!PCResults.bCancelled)
+	{
+		UpDownEDXPos->Position = PCResults.XY.x;
+		UpDownEDYPos->Position = PCResults.XY.y;
+		PanelEDColor->Color = PCResults.Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnSMPickColorClick(TObject *Sender)
+{
+	FormPickColor->ShowModal();
+
+	PCData PCResults;
+	PCResults = FormPickColor->GetResults();
+
+	if (!PCResults.bCancelled)
+	{
+		UpDownSMXPos->Position = PCResults.XY.x;
+		UpDownSMYPos->Position = PCResults.XY.y;
+		PanelSMColor->Color = PCResults.Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PanelSSColorClick(TObject *Sender)
+{
+	ColorDialogCPColor->Color = PanelSSColor->Color;
+	if (ColorDialogCPColor->Execute(this->Handle))
+	{
+		PanelSSColor->Color = ColorDialogCPColor->Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PanelRSColorClick(TObject *Sender)
+{
+	ColorDialogCPColor->Color = PanelRSColor->Color;
+	if (ColorDialogCPColor->Execute(this->Handle))
+	{
+		PanelRSColor->Color = ColorDialogCPColor->Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PanelEDColorClick(TObject *Sender)
+{
+	ColorDialogCPColor->Color = PanelEDColor->Color;
+	if (ColorDialogCPColor->Execute(this->Handle))
+	{
+		PanelEDColor->Color = ColorDialogCPColor->Color;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PanelSMColorClick(TObject *Sender)
+{
+	ColorDialogCPColor->Color = PanelSMColor->Color;
+	if (ColorDialogCPColor->Execute(this->Handle))
+	{
+		PanelSMColor->Color = ColorDialogCPColor->Color;
+	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TFormMain::Button1Click(TObject *Sender)
+{
+	TPoint AcceptButtonPos;
+	AcceptButtonPos.x = 320;//g_pSettingsManager->RAIDWindowSize.cx / 2;
+	AcceptButtonPos.y = 865;
+	g_pRAIDWorker->SendMouseClick(AcceptButtonPos);
 }
 //---------------------------------------------------------------------------
 

@@ -72,8 +72,7 @@ bool TSettingsManager::ReadINI()
 	m_FactionWarsSettings.uDelay = pSettings->ReadInteger(m_strSectionFactionWars, L"Delay", 10);
 	m_FactionWarsSettings.nNumberOfBattles = pSettings->ReadInteger(m_strSectionFactionWars, L"NumberOfBattles", 1);
 
-    //Общие настройки
-	m_bAutoResizeWindow = pSettings->ReadBool(m_strSectionCommon, L"AutoResizeWindow", true);
+	//Общие настройки
 	m_GameWindowSize.cx = pSettings->ReadInteger(m_strSectionCommon, L"GameWindowWidth", 1280);
 	m_GameWindowSize.cy = pSettings->ReadInteger(m_strSectionCommon, L"GameWindowHeight", 720);
 
@@ -88,7 +87,19 @@ bool TSettingsManager::ReadINI()
 
 	m_uTriesBeforeForceTaskEnding = pSettings->ReadInteger(m_strSectionCommon, L"TriesBeforeForceTaskEnding", 20);
 	m_uScreenCheckingPeriod = pSettings->ReadInteger(m_strSectionCommon, L"ScreenCheckingPeriod", 5);
+	m_uColorTolerance = pSettings->ReadInteger(m_strSectionCommon, L"ColorTolerance", 1);
 
+	m_EnergyDialogControlPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointX", 0);
+	m_EnergyDialogControlPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointY", 0);
+	m_EnergyDialogControlPointColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", clWhite));
+	m_EnergyDialogAction = static_cast<PromptDialogAction>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogAction", PromptDialogAction::pdaSkip));
+
+	m_SMDialogControlPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointX", 0);
+	m_SMDialogControlPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointY", 0);
+	m_SMDialogControlPointColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointColor", clWhite));
+	m_SMDialogAction = static_cast<PromptDialogAction>(pSettings->ReadInteger(m_strSectionCommon, L"SMDialogAction", PromptDialogAction::pdaSkip));
+
+	//Внутренние
 	m_uRecentActivePageIndex = pSettings->ReadInteger(m_strSectionInternal, L"RecentActivePage", 0);
 
 	return true;
@@ -134,8 +145,7 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteInteger(m_strSectionFactionWars, L"Delay", m_FactionWarsSettings.uDelay);
 	pSettings->WriteInteger(m_strSectionFactionWars, L"NumberOfBattles", m_FactionWarsSettings.nNumberOfBattles);
 
-    //Общие
-	pSettings->WriteBool(m_strSectionCommon, L"AutoResizeWindow", m_bAutoResizeWindow);
+	//Общие
 	pSettings->WriteInteger(m_strSectionCommon, L"GameWindowWidth", m_GameWindowSize.cx);
 	pSettings->WriteInteger(m_strSectionCommon, L"GameWindowHeight", m_GameWindowSize.cy);
 
@@ -150,7 +160,19 @@ bool TSettingsManager::UpdateINI()
 
 	pSettings->WriteInteger(m_strSectionCommon, L"TriesBeforeForceTaskEnding", m_uTriesBeforeForceTaskEnding);
 	pSettings->WriteInteger(m_strSectionCommon, L"ScreenCheckingPeriod", m_uScreenCheckingPeriod);
+	pSettings->WriteInteger(m_strSectionCommon, L"ColorTolerance", m_uColorTolerance);
 
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointX", m_EnergyDialogControlPoint.x);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointY", m_EnergyDialogControlPoint.y);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", m_EnergyDialogControlPointColor);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogAction", m_EnergyDialogAction);
+
+	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointX", m_SMDialogControlPoint.x);
+	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointY", m_SMDialogControlPoint.y);
+	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointColor", m_SMDialogControlPointColor);
+	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogAction", m_SMDialogAction);
+
+	//Внутренние
 	pSettings->WriteInteger(m_strSectionInternal, L"RecentActivePage", m_uRecentActivePageIndex);
 
     return true;

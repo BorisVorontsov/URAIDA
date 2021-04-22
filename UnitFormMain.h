@@ -59,7 +59,6 @@ __published:	// IDE-managed Components
 	TMenuItem *ShowHideAutomatizer1;
 	TMenuItem *Exit1;
 	TScrollBox *ScrollBox1;
-	TCheckBox *CheckBoxAutoResizeGW;
 	TLabel *LabelGWWidth;
 	TEdit *EditGWWidth;
 	TUpDown *UpDownGWWidth;
@@ -131,6 +130,41 @@ __published:	// IDE-managed Components
 	TImage *ImageAppIcon;
 	TMenuItem *N1;
 	TMenuItem *OpenResults1;
+	TGroupBox *GroupBoxTaskBreakers;
+	TGroupBox *GroupBoxEnergyDialog;
+	TLabel *LabelEDY;
+	TLabel *LabelEDX;
+	TLabel *LabelEDColor;
+	TLabel *LabelEDABCP;
+	TEdit *EditEDY;
+	TBitBtn *BitBtnEDPickColor;
+	TUpDown *UpDownEDYPos;
+	TPanel *PanelEDColor;
+	TUpDown *UpDownEDXPos;
+	TEdit *EditEDX;
+	TLabel *LabelEDAction;
+	TRadioButton *RadioButtonEDAccept;
+	TRadioButton *RadioButtonEDSkip;
+	TGroupBox *GroupBoxMaintenanceDialog;
+	TLabel *LabelSMY;
+	TLabel *LabelSMX;
+	TLabel *LabelSMColor;
+	TLabel *LabelSMCP;
+	TLabel *LabelSMAction;
+	TEdit *EditSMY;
+	TBitBtn *BitBtnSMPickColor;
+	TUpDown *UpDownSMYPos;
+	TPanel *PanelSMColor;
+	TUpDown *UpDownSMXPos;
+	TEdit *EditSMX;
+	TRadioButton *RadioButtonSMAccept;
+	TRadioButton *RadioButtonSMSkip;
+	TLabel *LabelColorTolerance;
+	TEdit *EditColorTolerance;
+	TUpDown *UpDownColorTolerance;
+	TColorDialog *ColorDialogCPColor;
+	TLabel *LabelPreferredGWSize;
+	TButton *Button1;
 	void __fastcall ButtonRunTaskClick(TObject *Sender);
 	void __fastcall ButtonStopTaskClick(TObject *Sender);
 	void __fastcall TimerMainTimer(TObject *Sender);
@@ -154,6 +188,13 @@ __published:	// IDE-managed Components
 	void __fastcall ButtonClearAllResultsClick(TObject *Sender);
 	void __fastcall OpenResults1Click(TObject *Sender);
 	void __fastcall CheckBoxSaveResultsClick(TObject *Sender);
+	void __fastcall BitBtnEDPickColorClick(TObject *Sender);
+	void __fastcall BitBtnSMPickColorClick(TObject *Sender);
+	void __fastcall PanelSSColorClick(TObject *Sender);
+	void __fastcall PanelRSColorClick(TObject *Sender);
+	void __fastcall PanelEDColorClick(TObject *Sender);
+	void __fastcall PanelSMColorClick(TObject *Sender);
+	void __fastcall Button1Click(TObject *Sender);
 
 
 private:	// User declarations
@@ -167,8 +208,6 @@ private:	// User declarations
 	void StartTask();
 	void StopTask(TaskStoppingReason Reason);
 
-	void ValidateGameWindow();
-
 	void SaveResult(unsigned int nBattleNumber = -1);
 
 	void UpdateGMSpecSettingsFrame(TTabSheet *pPage);
@@ -176,7 +215,6 @@ private:	// User declarations
 	void UpdateCommonSettingsFrame();
 	void SaveSettingsFromCommonSettingsFrame();
 
-    bool CheckGameState();
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
 };

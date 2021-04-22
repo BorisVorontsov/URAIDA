@@ -18,8 +18,11 @@ public:
 	TRect GetGameWindowSize(bool bClient = false);
 	void ResizeGameWindow(const TSize& NewSize);
 	void SendKey(System::WideChar Key);
-	HWND GetGameWindowHandle() { this->GainRAIDWindow(); return m_hGameWindow; }
+	void SendMouseClick(const TPoint& Coordinates);
+	HWND GetGameWindowHandle() { this->GainGameWindow(); return m_hGameWindow; }
 	void CloseGame();
+	void ValidateGameWindow();
+	bool CheckGameStateWithMessage(TWinControl* pParent);
 
 private:
 	static const String m_strRAIDWindowTitle;
@@ -30,7 +33,7 @@ private:
 	HDC m_hRecentFrameDC;
 	HBITMAP m_hRecentFrame;
 
-	bool GainRAIDWindow();
+	bool GainGameWindow();
 	TRect UpdateRecentFrame();
 };
 

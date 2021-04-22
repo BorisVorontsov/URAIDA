@@ -43,7 +43,21 @@ typedef struct tagGameModeSpecSettings
 	unsigned int nNumberOfBattles;
 
 	tagGameModeSpecSettings() { ZeroMemory(this, sizeof(*this)); }
+	void ShiftCoordinates(float fXCoeff, float fYCoeff)
+	{
+		STARTScreenControlPoint.x *= fXCoeff;
+		STARTScreenControlPoint.y *= fYCoeff;
+		REPLAYScreenControlPoint.x *= fXCoeff;
+		REPLAYScreenControlPoint.y *= fYCoeff;
+	};
 } GameModeSpecSettings;
+
+//Возможные действия с диалогами, прерывающими выполнение задачи
+typedef enum tagPromptDialogAction
+{
+	pdaAccept = 0,
+	pdaSkip
+} PromptDialogAction;
 
 const String g_strDefaultResultsFolder = L"Results";
 
@@ -61,7 +75,6 @@ public:
 	__property GameModeSpecSettings DungeonsSettings = { read = GetDungeonsSettings, write = SetDungeonsSettings };
 	__property GameModeSpecSettings FactionWarsSettings = { read = GetFactionWarsSettings, write = SetFactionWarsSettings };
 
-	__property bool AutoResizeGameWindow = { read = GetAutoResizeGameWnd, write = SetAutoResizeGameWnd };
 	__property TSize RAIDWindowSize = { read = GetGameWindowSize, write = SetGameWindowSize };
 
 	__property bool SaveResults = { read = GetSaveResults, write = SetSaveResults };
@@ -75,6 +88,15 @@ public:
 
 	__property unsigned int TriesBeforeForceTaskEnding = { read = GetTriesBeforeForceTaskEnding, write = SetTriesBeforeForceTaskEnding };
 	__property unsigned int ScreenCheckingPeriod = { read = GetScreenCheckingPeriod, write = SetScreenCheckingPeriod };
+	__property unsigned int ColorTolerance = { read = GetColorTolerance, write = SetColorTolerance };
+
+	__property TPoint EnergyDialogControlPoint = { read = GetEDControlPoint, write = SetEDControlPoint };
+	__property TColor EnergyDialogControlPointColor = { read = GetEDControlPointColor, write = SetEDControlPointColor };
+	__property PromptDialogAction EnergyDialogPreferredAction = { read = GetEDPreferredAction, write = SetEDPreferredAction };
+
+	__property TPoint SMDialogControlPoint = { read = GetSMDControlPoint, write = SetSMDControlPoint };
+	__property TColor SMDialogControlPointColor = { read = GetSMDControlPointColor, write = SetSMDControlPointColor };
+	__property PromptDialogAction SMDialogPreferredAction = { read = GetSMDPreferredAction, write = SetSMDPreferredAction };
 
 	__property unsigned int RecentActivePage = { read = GetRecentActivePage, write = SetRecentActivePage };
 
@@ -91,7 +113,6 @@ private:
 	GameModeSpecSettings m_DungeonsSettings;
 	GameModeSpecSettings m_FactionWarsSettings;
 
-	bool m_bAutoResizeWindow;
 	TSize m_GameWindowSize;
 
 	bool m_bSaveResults;
@@ -105,6 +126,14 @@ private:
 
 	unsigned int m_uTriesBeforeForceTaskEnding;
 	unsigned int m_uScreenCheckingPeriod;
+	unsigned int m_uColorTolerance;
+
+	TPoint m_EnergyDialogControlPoint;
+	TColor m_EnergyDialogControlPointColor;
+	PromptDialogAction m_EnergyDialogAction;
+	TPoint m_SMDialogControlPoint;
+	TColor m_SMDialogControlPointColor;
+	PromptDialogAction m_SMDialogAction;
 
 	unsigned int m_uRecentActivePageIndex;
 
@@ -115,38 +144,45 @@ private:
 	GameModeSpecSettings GetFactionWarsSettings() { return m_FactionWarsSettings; }
 	void SetFactionWarsSettings(GameModeSpecSettings NewValue) { m_FactionWarsSettings = NewValue; }
 
-	bool GetAutoResizeGameWnd() { return m_bAutoResizeWindow; }
-	void SetAutoResizeGameWnd(bool bNewValue) { m_bAutoResizeWindow = bNewValue; }
-
 	TSize GetGameWindowSize() { return m_GameWindowSize; }
 	void SetGameWindowSize(TSize NewValue) { m_GameWindowSize = NewValue; }
 
 	bool GetSaveResults() { return m_bSaveResults; }
 	void SetSaveResults(bool bNewValue) { m_bSaveResults = bNewValue; }
-
 	ResultSavingMode GetResultSavingMode() { return m_ResultSavingMode; }
 	void SetResultSavingMode(ResultSavingMode NewValue) { m_ResultSavingMode = NewValue; }
-
 	unsigned int GetResultSavingPeriod() { return m_uResultSavingPeriod; }
 	void SetResultSavingPeriod(unsigned int uNewValue) { m_uResultSavingPeriod = uNewValue; }
-
 	String GetPathForResults() { return m_strPathForResults; }
 	void SetPathForResults(String strNewValue) { m_strPathForResults = strNewValue; }
 
 	TaskEndAction GetTaskEndBehavior() { return m_TaskEndAction; }
 	void SetTaskEndBehavior(TaskEndAction NewValue) { m_TaskEndAction = NewValue; }
-
 	bool GetExitOnTaskEnding() { return m_bExitOnTaskEnding; }
 	void SetExitOnTaskEnding(bool bNewValue) { m_bExitOnTaskEnding = bNewValue; }
-
 	bool GetCloseGameOnTaskEnding() { return m_bCloseGameOnTaskEnding; }
 	void SetCloseGameOnTaskEnding(bool bNewValue) { m_bCloseGameOnTaskEnding = bNewValue; }
 
 	unsigned int GetTriesBeforeForceTaskEnding() { return m_uTriesBeforeForceTaskEnding; }
 	void SetTriesBeforeForceTaskEnding(unsigned int uNewValue) { m_uTriesBeforeForceTaskEnding = uNewValue; }
-
 	unsigned int GetScreenCheckingPeriod() { return m_uScreenCheckingPeriod; }
 	void SetScreenCheckingPeriod(unsigned int uNewValue) { m_uScreenCheckingPeriod = uNewValue; }
+	unsigned int GetColorTolerance() { return m_uColorTolerance; }
+	void SetColorTolerance(unsigned int uNewValue) { m_uColorTolerance = uNewValue; }
+
+	TPoint GetEDControlPoint() { return m_EnergyDialogControlPoint; }
+	void SetEDControlPoint(TPoint NewValue) { m_EnergyDialogControlPoint = NewValue; }
+	TColor GetEDControlPointColor() { return m_EnergyDialogControlPointColor; }
+	void SetEDControlPointColor(TColor NewValue) { m_EnergyDialogControlPointColor = NewValue; }
+	PromptDialogAction GetEDPreferredAction() { return m_EnergyDialogAction; }
+	void SetEDPreferredAction(PromptDialogAction NewValue) { m_EnergyDialogAction = NewValue; }
+
+	TPoint GetSMDControlPoint() { return m_SMDialogControlPoint; }
+	void SetSMDControlPoint(TPoint NewValue) { m_SMDialogControlPoint = NewValue; }
+	TColor GetSMDControlPointColor() { return m_SMDialogControlPointColor; }
+	void SetSMDControlPointColor(TColor NewValue) { m_SMDialogControlPointColor = NewValue; }
+	PromptDialogAction GetSMDPreferredAction() { return m_SMDialogAction; }
+	void SetSMDPreferredAction(PromptDialogAction NewValue) { m_SMDialogAction = NewValue; }
 
 	unsigned int GetRecentActivePage() { return m_uRecentActivePageIndex; }
 	void SetRecentActivePage(unsigned int uNewValue) { m_uRecentActivePageIndex = uNewValue; }

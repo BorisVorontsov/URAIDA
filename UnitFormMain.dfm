@@ -300,21 +300,21 @@ object FormMain: TFormMain
         TabOrder = 0
         object LabelBT: TLabel
           Left = 19
-          Top = 312
+          Top = 305
           Width = 234
           Height = 19
           Caption = 'Delay (average battle time, m:s):'
         end
         object LabelNumberofBattles: TLabel
           Left = 19
-          Top = 360
+          Top = 347
           Width = 133
           Height = 19
           Caption = 'Number of battles:'
         end
         object LabelBTSeparator: TLabel
           Left = 321
-          Top = 312
+          Top = 305
           Width = 6
           Height = 19
           Caption = ':'
@@ -327,15 +327,15 @@ object FormMain: TFormMain
           Caption = 'Screens'
           TabOrder = 0
           object LabelRSY: TLabel
-            Left = 220
-            Top = 169
+            Left = 213
+            Top = 171
             Width = 44
             Height = 19
             Caption = 'Y (px)'
           end
           object LabelRSX: TLabel
-            Left = 57
-            Top = 169
+            Left = 59
+            Top = 171
             Width = 43
             Height = 19
             Caption = 'X (px)'
@@ -349,35 +349,35 @@ object FormMain: TFormMain
           end
           object LabelRSColor: TLabel
             Left = 57
-            Top = 214
+            Top = 209
             Width = 79
             Height = 19
             Caption = 'Pixel color:'
           end
           object LabelSSY: TLabel
-            Left = 220
-            Top = 57
+            Left = 211
+            Top = 59
             Width = 44
             Height = 19
             Caption = 'Y (px)'
           end
           object LabelSSX: TLabel
             Left = 57
-            Top = 57
+            Top = 59
             Width = 43
             Height = 19
             Caption = 'X (px)'
           end
           object LabelSSColor: TLabel
-            Left = 56
-            Top = 104
+            Left = 57
+            Top = 98
             Width = 79
             Height = 19
             Caption = 'Pixel color:'
           end
           object EditRSY: TEdit
-            Left = 272
-            Top = 169
+            Left = 263
+            Top = 171
             Width = 72
             Height = 27
             Alignment = taCenter
@@ -386,8 +386,8 @@ object FormMain: TFormMain
             Text = '0'
           end
           object UpDownRSYPos: TUpDown
-            Left = 344
-            Top = 169
+            Left = 335
+            Top = 171
             Width = 16
             Height = 27
             Associate = EditRSY
@@ -396,7 +396,7 @@ object FormMain: TFormMain
           end
           object UpDownRSXPos: TUpDown
             Left = 180
-            Top = 169
+            Top = 171
             Width = 16
             Height = 27
             Associate = EditRSX
@@ -405,7 +405,7 @@ object FormMain: TFormMain
           end
           object EditRSX: TEdit
             Left = 108
-            Top = 169
+            Top = 171
             Width = 72
             Height = 27
             Alignment = taCenter
@@ -414,10 +414,10 @@ object FormMain: TFormMain
             Text = '0'
           end
           object PanelRSColor: TPanel
-            Left = 141
-            Top = 212
-            Width = 27
-            Height = 27
+            Left = 142
+            Top = 211
+            Width = 20
+            Height = 20
             BevelKind = bkFlat
             BevelOuter = bvNone
             BorderWidth = 1
@@ -425,10 +425,11 @@ object FormMain: TFormMain
             ParentBackground = False
             TabOrder = 12
             TabStop = True
+            OnClick = PanelRSColorClick
           end
           object BitBtnRSPickColor: TBitBtn
-            Left = 372
-            Top = 162
+            Left = 363
+            Top = 164
             Width = 41
             Height = 41
             Glyph.Data = {
@@ -510,8 +511,8 @@ object FormMain: TFormMain
             OnClick = BitBtnRSPickColorClick
           end
           object EditSSY: TEdit
-            Left = 272
-            Top = 57
+            Left = 263
+            Top = 59
             Width = 72
             Height = 27
             Alignment = taCenter
@@ -520,8 +521,8 @@ object FormMain: TFormMain
             Text = '0'
           end
           object BitBtnSSPickColor: TBitBtn
-            Left = 372
-            Top = 50
+            Left = 363
+            Top = 52
             Width = 41
             Height = 41
             Glyph.Data = {
@@ -603,8 +604,8 @@ object FormMain: TFormMain
             OnClick = BitBtnSSPickColorClick
           end
           object UpDownSSYPos: TUpDown
-            Left = 344
-            Top = 57
+            Left = 335
+            Top = 59
             Width = 16
             Height = 27
             Associate = EditSSY
@@ -612,10 +613,10 @@ object FormMain: TFormMain
             TabOrder = 4
           end
           object PanelSSColor: TPanel
-            Left = 141
-            Top = 100
-            Width = 27
-            Height = 27
+            Left = 142
+            Top = 99
+            Width = 20
+            Height = 20
             BevelKind = bkFlat
             BevelOuter = bvNone
             BorderWidth = 1
@@ -623,10 +624,11 @@ object FormMain: TFormMain
             ParentBackground = False
             TabOrder = 6
             TabStop = True
+            OnClick = PanelSSColorClick
           end
           object UpDownSSXPos: TUpDown
             Left = 180
-            Top = 57
+            Top = 59
             Width = 16
             Height = 27
             Associate = EditSSX
@@ -635,7 +637,7 @@ object FormMain: TFormMain
           end
           object EditSSX: TEdit
             Left = 108
-            Top = 57
+            Top = 59
             Width = 72
             Height = 27
             Alignment = taCenter
@@ -654,7 +656,7 @@ object FormMain: TFormMain
         end
         object EditNumberofBattles: TEdit
           Left = 159
-          Top = 357
+          Top = 344
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -664,7 +666,7 @@ object FormMain: TFormMain
         end
         object UpDownNumberofBattles: TUpDown
           Left = 197
-          Top = 357
+          Top = 344
           Width = 16
           Height = 27
           Associate = EditNumberofBattles
@@ -675,7 +677,7 @@ object FormMain: TFormMain
         end
         object EditBTMinutes: TEdit
           Left = 263
-          Top = 309
+          Top = 302
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -685,7 +687,7 @@ object FormMain: TFormMain
         end
         object UpDownBTMinutes: TUpDown
           Left = 301
-          Top = 309
+          Top = 302
           Width = 17
           Height = 27
           Associate = EditBTMinutes
@@ -695,7 +697,7 @@ object FormMain: TFormMain
         end
         object EditBTSeconds: TEdit
           Left = 333
-          Top = 309
+          Top = 302
           Width = 38
           Height = 27
           Alignment = taCenter
@@ -705,7 +707,7 @@ object FormMain: TFormMain
         end
         object UpDownBTSeconds: TUpDown
           Left = 371
-          Top = 309
+          Top = 302
           Width = 17
           Height = 27
           Associate = EditBTSeconds
@@ -731,96 +733,95 @@ object FormMain: TFormMain
         Top = 0
         Width = 505
         Height = 431
+        VertScrollBar.Position = 587
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
         object LabelGWWidth: TLabel
           Left = 65
-          Top = 50
+          Top = -537
           Width = 75
           Height = 19
           Caption = 'Width (px)'
         end
         object LabelGWHeight: TLabel
           Left = 251
-          Top = 50
+          Top = -537
           Width = 80
           Height = 19
           Caption = 'Height (px)'
         end
         object LabelTaskEndAction: TLabel
           Left = 18
-          Top = 333
+          Top = -254
           Width = 132
           Height = 19
           Caption = 'At the and of task:'
         end
         object Bevel2: TBevel
-          Left = 18
-          Top = 573
+          Left = 27
+          Top = 447
           Width = 471
           Height = 2
         end
-        object CheckBoxAutoResizeGW: TCheckBox
-          Left = 18
-          Top = 16
-          Width = 319
-          Height = 25
-          Caption = 'Automatically resize game window:'
-          TabOrder = 0
+        object LabelPreferredGWSize: TLabel
+          Left = 17
+          Top = -569
+          Width = 217
+          Height = 19
+          AutoSize = False
+          Caption = 'Preferred game window size:'
         end
         object EditGWWidth: TEdit
           Left = 146
-          Top = 47
+          Top = -540
           Width = 72
           Height = 27
           Alignment = taCenter
           ReadOnly = True
-          TabOrder = 1
+          TabOrder = 0
           Text = '100'
         end
         object UpDownGWWidth: TUpDown
           Left = 218
-          Top = 47
+          Top = -540
           Width = 16
           Height = 27
           Associate = EditGWWidth
           Min = 100
           Max = 9999
-          Increment = 10
           Position = 100
-          TabOrder = 2
+          TabOrder = 1
         end
         object EditGWHeight: TEdit
           Left = 337
-          Top = 47
+          Top = -540
           Width = 72
           Height = 27
           Alignment = taCenter
           ReadOnly = True
-          TabOrder = 3
+          TabOrder = 2
           Text = '100'
         end
         object UpDownGWHeight: TUpDown
           Left = 409
-          Top = 47
+          Top = -540
           Width = 16
           Height = 27
           Associate = EditGWHeight
           Min = 100
           Max = 9999
-          Increment = 10
           Position = 100
-          TabOrder = 4
+          TabOrder = 3
         end
         object GroupBoxResults: TGroupBox
           Left = 18
-          Top = 141
+          Top = -446
           Width = 471
           Height = 169
           Caption = 'Results'
-          TabOrder = 7
+          TabOrder = 6
           object LabelSRPath: TLabel
             Left = 24
             Top = 88
@@ -904,11 +905,11 @@ object FormMain: TFormMain
         end
         object ComboBoxTaskEndAction: TComboBox
           Left = 72
-          Top = 358
+          Top = -229
           Width = 213
           Height = 27
           Style = csDropDownList
-          TabOrder = 8
+          TabOrder = 7
           Items.Strings = (
             'Do nothing'
             'Show notification'
@@ -918,27 +919,27 @@ object FormMain: TFormMain
         end
         object CheckBoxTEAExit: TCheckBox
           Left = 291
-          Top = 362
+          Top = -225
           Width = 54
           Height = 17
           Caption = 'Exit'
-          TabOrder = 9
+          TabOrder = 8
         end
         object CheckBoxTEACloseTheGame: TCheckBox
           Left = 351
-          Top = 358
+          Top = -229
           Width = 138
           Height = 25
           Caption = 'Close the game'
-          TabOrder = 10
+          TabOrder = 9
         end
         object GroupBoxErrorHandling: TGroupBox
-          Left = 18
-          Top = 413
+          Left = 19
+          Top = -182
           Width = 471
-          Height = 113
+          Height = 148
           Caption = 'Error handling'
-          TabOrder = 11
+          TabOrder = 10
           object LabelTriesBeforeForceTaskEnding: TLabel
             Left = 24
             Top = 34
@@ -952,6 +953,13 @@ object FormMain: TFormMain
             Width = 200
             Height = 19
             Caption = 'Screen checking interval (s):'
+          end
+          object LabelColorTolerance: TLabel
+            Left = 24
+            Top = 99
+            Width = 113
+            Height = 19
+            Caption = 'Color tolerance:'
           end
           object EditTriesBeforeFTE: TEdit
             Left = 319
@@ -995,24 +1003,445 @@ object FormMain: TFormMain
             Position = 1
             TabOrder = 3
           end
+          object EditColorTolerance: TEdit
+            Left = 143
+            Top = 98
+            Width = 38
+            Height = 27
+            Alignment = taCenter
+            ReadOnly = True
+            TabOrder = 4
+            Text = '1'
+          end
+          object UpDownColorTolerance: TUpDown
+            Left = 181
+            Top = 98
+            Width = 16
+            Height = 27
+            Associate = EditColorTolerance
+            Min = 1
+            Max = 255
+            Position = 1
+            TabOrder = 5
+          end
         end
         object ButtonApplyGWSize: TButton
           Left = 340
-          Top = 88
+          Top = -499
           Width = 85
           Height = 33
           Caption = 'Apply'
-          TabOrder = 6
+          TabOrder = 5
           OnClick = ButtonApplyGWSizeClick
         end
         object ButtonUseCurrentGWSize: TButton
           Left = 232
-          Top = 88
+          Top = -499
           Width = 102
           Height = 33
           Caption = 'Use current'
-          TabOrder = 5
+          TabOrder = 4
           OnClick = ButtonUseCurrentGWSizeClick
+        end
+        object GroupBoxTaskBreakers: TGroupBox
+          Left = 27
+          Top = -11
+          Width = 471
+          Height = 421
+          Caption = 'Task breakers'
+          TabOrder = 11
+          object GroupBoxEnergyDialog: TGroupBox
+            Left = 24
+            Top = 21
+            Width = 425
+            Height = 180
+            Caption = 'Energy purchasing dialog'
+            TabOrder = 0
+            object LabelEDY: TLabel
+              Left = 212
+              Top = 57
+              Width = 44
+              Height = 19
+              Caption = 'Y (px)'
+            end
+            object LabelEDX: TLabel
+              Left = 57
+              Top = 57
+              Width = 43
+              Height = 19
+              Caption = 'X (px)'
+            end
+            object LabelEDColor: TLabel
+              Left = 57
+              Top = 96
+              Width = 79
+              Height = 19
+              Caption = 'Pixel color:'
+            end
+            object LabelEDABCP: TLabel
+              Left = 24
+              Top = 32
+              Width = 228
+              Height = 19
+              Caption = 'ACCEPT BUTTON control point:'
+            end
+            object LabelEDAction: TLabel
+              Left = 23
+              Top = 136
+              Width = 51
+              Height = 19
+              Caption = 'Action:'
+            end
+            object EditEDY: TEdit
+              Left = 264
+              Top = 57
+              Width = 72
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 2
+              Text = '0'
+            end
+            object BitBtnEDPickColor: TBitBtn
+              Left = 364
+              Top = 50
+              Width = 41
+              Height = 41
+              Glyph.Data = {
+                36090000424D3609000000000000360000002800000018000000180000000100
+                20000000000000090000C30E0000C30E00000000000000000000FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A8A8A8003333
+                33001010100001010100010101001111110033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000066666600FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000040404000FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004040
+                400000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0000000000F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800000000003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FAFAFA003B3B3B003B3B3B00FAFAFA00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00232323000000
+                00000000000000000000000000000505050000000000000000002C2C2C00FFFF
+                FF004B4B4B0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000050505000000000000000000000000000000000023232300232323000000
+                00000000000000000000000000000404040000000000000000002C2C2C00FFFF
+                FF004C4C4C0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000040404000000000000000000000000000000000023232300FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00F9F9F9003B3B3B003A3A3A00F9F9F900FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0001010100F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800010101003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000041414100FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004141
+                410000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000067676700FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7003333
+                33001010100001010100010101001010100033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+              TabOrder = 4
+              OnClick = BitBtnEDPickColorClick
+            end
+            object UpDownEDYPos: TUpDown
+              Left = 336
+              Top = 57
+              Width = 16
+              Height = 27
+              Associate = EditEDY
+              Max = 9999
+              TabOrder = 3
+            end
+            object PanelEDColor: TPanel
+              Left = 142
+              Top = 97
+              Width = 20
+              Height = 20
+              BevelKind = bkFlat
+              BevelOuter = bvNone
+              BorderWidth = 1
+              Color = clWhite
+              ParentBackground = False
+              TabOrder = 5
+              TabStop = True
+              OnClick = PanelEDColorClick
+            end
+            object UpDownEDXPos: TUpDown
+              Left = 180
+              Top = 57
+              Width = 16
+              Height = 27
+              Associate = EditEDX
+              Max = 9999
+              TabOrder = 1
+            end
+            object EditEDX: TEdit
+              Left = 108
+              Top = 57
+              Width = 72
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 0
+              Text = '0'
+            end
+            object RadioButtonEDAccept: TRadioButton
+              Left = 84
+              Top = 134
+              Width = 79
+              Height = 25
+              Caption = 'Accept'
+              Checked = True
+              TabOrder = 6
+              TabStop = True
+            end
+            object RadioButtonEDSkip: TRadioButton
+              Left = 162
+              Top = 137
+              Width = 75
+              Height = 19
+              Caption = 'Decline'
+              TabOrder = 7
+            end
+          end
+          object GroupBoxMaintenanceDialog: TGroupBox
+            Left = 24
+            Top = 220
+            Width = 425
+            Height = 180
+            Caption = 'Service maintenance dialog'
+            TabOrder = 1
+            object LabelSMY: TLabel
+              Left = 214
+              Top = 57
+              Width = 44
+              Height = 19
+              Caption = 'Y (px)'
+            end
+            object LabelSMX: TLabel
+              Left = 57
+              Top = 57
+              Width = 43
+              Height = 19
+              Caption = 'X (px)'
+            end
+            object LabelSMColor: TLabel
+              Left = 57
+              Top = 96
+              Width = 79
+              Height = 19
+              Caption = 'Pixel color:'
+            end
+            object LabelSMCP: TLabel
+              Left = 24
+              Top = 32
+              Width = 99
+              Height = 19
+              Caption = 'Control point:'
+            end
+            object LabelSMAction: TLabel
+              Left = 23
+              Top = 136
+              Width = 51
+              Height = 19
+              Caption = 'Action:'
+            end
+            object EditSMY: TEdit
+              Left = 264
+              Top = 57
+              Width = 72
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 2
+              Text = '0'
+            end
+            object BitBtnSMPickColor: TBitBtn
+              Left = 364
+              Top = 50
+              Width = 41
+              Height = 41
+              Glyph.Data = {
+                36090000424D3609000000000000360000002800000018000000180000000100
+                20000000000000090000C30E0000C30E00000000000000000000FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A8A8A8003333
+                33001010100001010100010101001111110033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000066666600FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000040404000FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004040
+                400000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0000000000F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800000000003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FAFAFA003B3B3B003B3B3B00FAFAFA00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00232323000000
+                00000000000000000000000000000505050000000000000000002C2C2C00FFFF
+                FF004B4B4B0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000050505000000000000000000000000000000000023232300232323000000
+                00000000000000000000000000000404040000000000000000002C2C2C00FFFF
+                FF004C4C4C0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000040404000000000000000000000000000000000023232300FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00F9F9F9003B3B3B003A3A3A00F9F9F900FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0001010100F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800010101003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000041414100FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004141
+                410000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000067676700FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7003333
+                33001010100001010100010101001010100033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+              TabOrder = 4
+              OnClick = BitBtnSMPickColorClick
+            end
+            object UpDownSMYPos: TUpDown
+              Left = 336
+              Top = 57
+              Width = 16
+              Height = 27
+              Associate = EditSMY
+              Max = 9999
+              TabOrder = 3
+            end
+            object PanelSMColor: TPanel
+              Left = 142
+              Top = 97
+              Width = 20
+              Height = 20
+              BevelKind = bkFlat
+              BevelOuter = bvNone
+              BorderWidth = 1
+              Color = clWhite
+              ParentBackground = False
+              TabOrder = 5
+              TabStop = True
+              OnClick = PanelSMColorClick
+            end
+            object UpDownSMXPos: TUpDown
+              Left = 180
+              Top = 57
+              Width = 16
+              Height = 27
+              Associate = EditSMX
+              Max = 9999
+              TabOrder = 1
+            end
+            object EditSMX: TEdit
+              Left = 108
+              Top = 57
+              Width = 72
+              Height = 27
+              Alignment = taCenter
+              ReadOnly = True
+              TabOrder = 0
+              Text = '0'
+            end
+            object RadioButtonSMAccept: TRadioButton
+              Left = 84
+              Top = 134
+              Width = 52
+              Height = 25
+              Caption = 'Exit'
+              Checked = True
+              TabOrder = 6
+              TabStop = True
+            end
+            object RadioButtonSMSkip: TRadioButton
+              Left = 142
+              Top = 137
+              Width = 75
+              Height = 19
+              Caption = 'Ignore'
+              TabOrder = 7
+            end
+          end
         end
       end
     end
@@ -1084,6 +1513,15 @@ object FormMain: TFormMain
     Width = 511
     Height = 8
     TabOrder = 5
+  end
+  object Button1: TButton
+    Left = 224
+    Top = 588
+    Width = 142
+    Height = 44
+    Caption = 'SendMouseClick'
+    TabOrder = 7
+    OnClick = Button1Click
   end
   object TimerMain: TTimer
     Enabled = False
@@ -1655,7 +2093,12 @@ object FormMain: TFormMain
     FavoriteLinks = <>
     FileTypes = <>
     Options = []
-    Left = 472
+    Left = 96
+    Top = 464
+  end
+  object ColorDialogCPColor: TColorDialog
+    Options = [cdFullOpen, cdAnyColor]
+    Left = 56
     Top = 464
   end
 end

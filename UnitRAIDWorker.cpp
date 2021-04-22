@@ -18,7 +18,7 @@ TRAIDWorker::TRAIDWorker()
 {
 	AdjustPrivilege(SE_DEBUG_NAME);
 
-	this->GainRAIDWindow();
+	this->GainGameWindow();
 
 	HDC hRAIDDC = GetDC(m_hGameWindow);
 	m_hRecentFrameDC = CreateCompatibleDC(hRAIDDC);
@@ -35,13 +35,13 @@ TRAIDWorker::~TRAIDWorker()
 //---------------------------------------------------------------------------
 bool TRAIDWorker::IsGameRunning()
 {
-    this->GainRAIDWindow();
+    this->GainGameWindow();
 	return (IsWindow(m_hGameWindow) == TRUE);
 }
 //---------------------------------------------------------------------------
 bool TRAIDWorker::CaptureFrame(TCanvas *pDestination, const TSize& Size)
 {
-	this->GainRAIDWindow();
+	this->GainGameWindow();
 	if (!this->IsGameRunning())
 		return false;
 
@@ -54,18 +54,23 @@ bool TRAIDWorker::CaptureFrame(TCanvas *pDestination, const TSize& Size)
 //---------------------------------------------------------------------------
 bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor)
 {
-	this->GainRAIDWindow();
+	this->GainGameWindow();
 	if (!this->IsGameRunning())
 		return false;
 
 	this->UpdateRecentFrame();
-
-	return (GetPixel(m_hRecentFrameDC, PositionInFrame.x, PositionInFrame.y) == static_cast<COLORREF>(KeyColor));
+	COLORREF FramePixel = GetPixel(m_hRecentFrameDC, PositionInFrame.x, PositionInFrame.y);
+	unsigned int uDistance =
+		(GetRValue(FramePixel) - GetRValue(KeyColor)) ^ 2 +
+		(GetGValue(FramePixel) - GetGValue(KeyColor)) ^ 2 +
+		(GetBValue(FramePixel) - GetBValue(KeyColor)) ^ 2;
+	uDistance = sqrt(uDistance);
+	return (uDistance <= g_pSettingsManager->ColorTolerance);
 }
 //---------------------------------------------------------------------------
 TRect TRAIDWorker::GetGameWindowSize(bool bClient)
 {
-	this->GainRAIDWindow();
+	this->GainGameWindow();
 
 	RECT GameWindowSize;
 	WINDOWPLACEMENT WindowPlacement;
@@ -90,22 +95,54 @@ TRect TRAIDWorker::GetGameWindowSize(bool bClient)
 //---------------------------------------------------------------------------
 void TRAIDWorker::ResizeGameWindow(const TSize& NewSize)
 {
-	this->GainRAIDWindow();
-	SetWindowPos(m_hGameWindow, HWND_TOP, 0, 0, NewSize.cx, NewSize.cy, SWP_NOMOVE);
+	this->GainGameWindow();
+
+	RECT NewWindowSize;
+	SetRect(&NewWindowSize, 0, 0, NewSize.cx, NewSize.cy);
+	AdjustWindowRectEx(&NewWindowSize, GetWindowLong(m_hGameWindow, GWL_STYLE),
+		FALSE, GetWindowLong(m_hGameWindow, GWL_EXSTYLE));
+	SetWindowPos(m_hGameWindow, NULL, 0, 0, NewWindowSize.right - NewWindowSize.left,
+		NewWindowSize.bottom - NewWindowSize.top, SWP_NOMOVE | SWP_NOZORDER);
 }
 //---------------------------------------------------------------------------
 void TRAIDWorker::SendKey(System::WideChar Key)
 {
-	this->GainRAIDWindow();
+	this->GainGameWindow();
+
 	//Костыль для обхода обработчика нажатия у игры
-	PostMessage(m_hGameWindow, WM_ACTIVATE, WA_INACTIVE, 0);
-	PostMessage(m_hGameWindow, WM_ACTIVATE, WA_ACTIVE, 0);
+	//Обманываем игру, что её окно активно
+	SendMessage(m_hGameWindow, WM_ACTIVATE, WA_INACTIVE, 0);
+	SendMessage(m_hGameWindow, WM_ACTIVATE, WA_ACTIVE, 0);
 	//Симулируем нажатие
-	PostMessage(m_hGameWindow, WM_KEYDOWN, static_cast<WPARAM>(Key), 0);
-	PostMessage(m_hGameWindow, WM_KEYUP, static_cast<WPARAM>(Key), 0);
+	SendMessage(m_hGameWindow, WM_KEYDOWN, static_cast<WPARAM>(Key), 0);
+	SendMessage(m_hGameWindow, WM_KEYUP, static_cast<WPARAM>(Key), 0);
 }
 //---------------------------------------------------------------------------
-bool TRAIDWorker::GainRAIDWindow()
+void TRAIDWorker::SendMouseClick(const TPoint& Coordinates)
+{
+	this->GainGameWindow();
+
+	//Костыль для обхода обработчика нажатия у игры
+	//Обманываем игру, что её окно активно
+	SendMessage(m_hGameWindow, WM_ACTIVATE, WA_INACTIVE, 0);
+	SendMessage(m_hGameWindow, WM_ACTIVATE, WA_ACTIVE, 0);
+
+	//Симулируем клик
+    //Это требует моментального перемещения курсора для обмана игры
+	POINT CurrentCursorPos, ScreenCoords;
+
+	GetCursorPos(&CurrentCursorPos);
+	ScreenCoords = Coordinates;
+	ClientToScreen(m_hGameWindow, &ScreenCoords);
+	SetCursorPos(ScreenCoords.x, ScreenCoords.y);
+
+	SendMessage(m_hGameWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(Coordinates.x, Coordinates.y));
+	SendMessage(m_hGameWindow, WM_LBUTTONUP, 0, MAKELPARAM(Coordinates.x, Coordinates.y));
+
+	SetCursorPos(CurrentCursorPos.x, CurrentCursorPos.y);
+}
+//---------------------------------------------------------------------------
+bool TRAIDWorker::GainGameWindow()
 {
 	m_hGameWindow = FindWindow(m_strRAIDWindowClass.c_str(), m_strRAIDWindowTitle.c_str());
 
@@ -166,5 +203,29 @@ TRect TRAIDWorker::UpdateRecentFrame()
 	ReleaseDC(m_hGameWindow, hRAIDDC);
 
 	return TRect(ClientRect);
+}
+//---------------------------------------------------------------------------
+void TRAIDWorker::ValidateGameWindow()
+{
+	//Функция проверки и корректировки в случае необходимости размеров и состояния окна игры
+	TRect GameWindowSize = this->GetGameWindowSize(true);
+	TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
+	if ((GameWindowSize.Width() != GWSizeFromSettings.cx) || (GameWindowSize.Height() != GWSizeFromSettings.cy))
+	{
+		//Устанавливаем размеры окна для корректной работы алгоритма
+		this->ResizeGameWindow(g_pSettingsManager->RAIDWindowSize);
+	}
+}
+//---------------------------------------------------------------------------
+bool TRAIDWorker::CheckGameStateWithMessage(TWinControl* pParent)
+{
+	if (!this->IsGameRunning())
+	{
+		MessageBox(pParent->Handle, L"Unable to find game window. Aborting", L"Warning", MB_ICONEXCLAMATION);
+
+		return false;
+	}
+
+	return true;
 }
 //---------------------------------------------------------------------------

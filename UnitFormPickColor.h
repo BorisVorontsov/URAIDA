@@ -8,6 +8,7 @@
 #include <Vcl.StdCtrls.hpp>
 #include <Vcl.Forms.hpp>
 #include <Vcl.ExtCtrls.hpp>
+#include <Vcl.Dialogs.hpp>
 //---------------------------------------------------------------------------
 typedef struct tagPCData
 {
@@ -19,22 +20,33 @@ typedef struct tagPCData
 class TFormPickColor : public TForm
 {
 __published:	// IDE-managed Components
-	TLabel *LabelXInfo;
-	TLabel *LabelX;
-	TLabel *LabelYInfo;
-	TLabel *LabelY;
+	TPanel *PanelCapturedFrame;
 	TLabel *LabelColorInfo;
-	TImage *ImageCapturedFrame;
+	TLabel *LabelX;
+	TLabel *LabelXInfo;
+	TLabel *LabelY;
+	TLabel *LabelYInfo;
 	TPanel *PanelColor;
-	void __fastcall FormShow(TObject *Sender);
-	void __fastcall FormActivate(TObject *Sender);
-	void __fastcall ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
-          int X, int Y);
+	TLabel *LabelColorInRGB;
+	TImage *ImageCapturedFrame;
+	TPanel *PanelMenu;
+	TButton *ButtonSourceFromFile;
+	TButton *ButtonSourceFromGame;
+	TLabel *LabelSource;
+	TFileOpenDialog *FileOpenDialog1;
 	void __fastcall ImageCapturedFrameClick(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
+	void __fastcall ButtonSourceFromGameClick(TObject *Sender);
+	void __fastcall ButtonSourceFromFileClick(TObject *Sender);
+	void __fastcall ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
+          int X, int Y);
+	void __fastcall FormShow(TObject *Sender);
+
 
 private:	// User declarations
 	PCData m_Data;
+
+	void ResizeAndAlignWindow();
 public:		// User declarations
 	__fastcall TFormPickColor(TComponent* Owner);
 
