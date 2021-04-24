@@ -19,9 +19,9 @@ TFormMain *FormMain;
 TSettingsManager *g_pSettingsManager;
 TRAIDWorker *g_pRAIDWorker;
 
-const String TFormMain::m_strButtonRTRunCaption = L"Run";
-const String TFormMain::m_strButtonRTPauseCaption = L"Pause";
-const String TFormMain::m_strButtonRTResumeCaption = L"Resume";
+const String TFormMain::m_strButtonRTRunCaption = L"Старт";
+const String TFormMain::m_strButtonRTPauseCaption = L"Пауза";
+const String TFormMain::m_strButtonRTResumeCaption = L"Продолжить";
 
 //---------------------------------------------------------------------------
 __fastcall TFormMain::TFormMain(TComponent* Owner)
@@ -45,15 +45,6 @@ void __fastcall TFormMain::ButtonStopTaskClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 {
-	//А вдруг?
-	if (!g_pRAIDWorker->IsGameRunning())
-	{
-		this->StopTask(TaskStoppingReason::tsrError);
-		MessageBox(this->Handle, L"Unable to find game window!", L"Error", MB_ICONSTOP);
-
-		return;
-	}
-
     static unsigned int nCycleCounter = 0;
 	static unsigned int uBattleTimeout = 0;
 	static unsigned int uBattleDelayInSeconds = 0;
@@ -61,6 +52,16 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	static bool bScreenCheckPassed = false;
 	static unsigned int uScreenCheckingTiomeout = 0;
 	static unsigned int uResultSavingTimeout = 0;
+
+	//А вдруг?
+	if (!g_pRAIDWorker->IsGameRunning())
+	{
+        nCycleCounter = 0;
+		this->StopTask(TaskStoppingReason::tsrError);
+		MessageBox(this->Handle, L"Не удаётся найти окно игры!", L"Ошибка", MB_ICONSTOP);
+
+		return;
+	}
 
 	//Сохранение скриншота (отчёта) боя с заданным периодом
 	if (g_pSettingsManager->SaveResults &&
@@ -79,7 +80,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		if (!uBattleDelayInSeconds)
 		{
 			this->StopTask(TaskStoppingReason::tsrError);
-			MessageBox(this->Handle, L"Battle time should be greater than 0!", L"Error", MB_ICONSTOP);
+			MessageBox(this->Handle, L"Время боя должно быть больше нуля!", L"Ошибка", MB_ICONSTOP);
 
 			return;
         }
@@ -246,7 +247,7 @@ void __fastcall TFormMain::OpenResults1Click(TObject *Sender)
 {
 	if (!g_pSettingsManager->PathForResults.IsEmpty() && !DirectoryExists(g_pSettingsManager->PathForResults))
 	{
-		MessageBox(this->Handle, L"There is no results!", L"Error", MB_ICONSTOP);
+		MessageBox(this->Handle, L"Результаты отсутствуют!", L"Ошибка", MB_ICONSTOP);
 		return;
 	}
 
@@ -290,7 +291,7 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	//Вывод названия и версии программы
 	String strAppVersion;
 	GetFileVersion(Application->ExeName, strAppVersion, fvfMajorMinor);
-	LabelCopyright1->Caption = Application->Title + L" v." + strAppVersion + L" by";
+	LabelCopyright1->Caption = Application->Title + L" вер." + strAppVersion + L" от";
 }
 //---------------------------------------------------------------------------
 
@@ -562,8 +563,8 @@ void __fastcall TFormMain::LinkLabel2Click(TObject *Sender)
 	String strAddress;
 	String strFullAppVersion;
 	GetFileVersion(Application->ExeName, strFullAppVersion, fvfMajorMinorReleaseBuild);
-	strAddress.sprintf(L"mailto:borisvorontsov@yandex.ru?subject=%s v%s feedback", Application->Title.c_str(),
-		strFullAppVersion.c_str());
+	strAddress.sprintf(L"mailto:borisvorontsov@yandex.ru?subject=%s вер.%s через обратную связь",
+		Application->Title.c_str(), strFullAppVersion.c_str());
 
 	ShellExecute(NULL, NULL, strAddress.c_str(), NULL, NULL, SW_SHOWNORMAL);
 }
@@ -634,7 +635,7 @@ void __fastcall TFormMain::ButtonSRBrowsePathClick(TObject *Sender)
 	String strPath;
 	String strInitialDir = (EditSRPath->Text.IsEmpty())?ExtractFilePath(Application->ExeName):EditSRPath->Text;
 	FileOpenDialogGeneric->Options = TFileDialogOptions() << fdoPickFolders << fdoPathMustExist;
-	FileOpenDialogGeneric->Title = L"Select directory for results";
+	FileOpenDialogGeneric->Title = L"Выберите директорию для сохранения результатов";
 	FileOpenDialogGeneric->DefaultFolder = strInitialDir;
     //BrowseForFolderDialog
 	if (FileOpenDialogGeneric->Execute(this->Handle))
@@ -648,13 +649,13 @@ void __fastcall TFormMain::ButtonClearAllResultsClick(TObject *Sender)
 {
 	if (g_pSettingsManager->PathForResults.IsEmpty() || !DirectoryExists(g_pSettingsManager->PathForResults))
 	{
-		MessageBox(this->Handle, L"Path error!", L"Error", MB_ICONSTOP);
+		MessageBox(this->Handle, L"Путь не найден!", L"Ошибка", MB_ICONSTOP);
 		return;
 	}
 
 	if (!TDirectory::IsEmpty(g_pSettingsManager->PathForResults))
 	{
-		if (MessageBox(this->Handle, L"Are you sure you want to delete all results?", L"Warning",
+		if (MessageBox(this->Handle, L"Вы уверены, что хотите удалить все результаты?", L"Предупреждение",
 			MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
 		{
 			return;
@@ -671,7 +672,7 @@ void TFormMain::StartTask()
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 	{
 		if (PageControlURAIDASettings->ActivePage == TabSheetCommon) {
-			MessageBox(this->Handle, L"Select game mode first", L"Warning", MB_ICONEXCLAMATION);
+			MessageBox(this->Handle, L"Сначала выберите режим игры", L"Предупреждение", MB_ICONEXCLAMATION);
 			return;
 		}
 
@@ -748,11 +749,11 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 				TrayIconApp->BalloonTitle = Application->Title;
 				if (Reason == TaskStoppingReason::tsrSuccessfulCompletion)
 				{
-					TrayIconApp->BalloonHint = L"Task completed successfully";
+					TrayIconApp->BalloonHint = L"Задача успешно завершена";
 				}
 				else if (Reason == TaskStoppingReason::tsrError)
 				{
-					TrayIconApp->BalloonHint = L"Force task termination due to errors";
+					TrayIconApp->BalloonHint = L"Принудительное завершение задачи из-за ошибок";
 				}
 				TrayIconApp->ShowBalloonHint();
 				break;
@@ -803,13 +804,13 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 	switch (m_ActiveTaskInfo.Settings.GameMode)
 	{
 		case SupportedGameModes::gmCampaign:
-			strGameMode = L"Campaign";
+			strGameMode = L"Кампания";
 			break;
 		case SupportedGameModes::gmDungeons:
-			strGameMode = L"Dungeons";
+			strGameMode = L"Подземелья";
 			break;
 		case SupportedGameModes::gmFactionWars:
-			strGameMode = L"FactionWars";
+			strGameMode = L"ВойныФракций";
 			break;
 	}
 	strActiveTaskSubDir.sprintf(L"%s_%s", strGameMode.c_str(),
@@ -818,12 +819,12 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 	//Формируем имя файла JPEG
 	if (nBattleNumber != -1)
 	{
-		strFileName.sprintf(L"Battle%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
+		strFileName.sprintf(L"Битва%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
 	}
 	else
 	{
 		//Если nBattleNumber равен 0xFFFFFFFF (-1), записываем как причину аварийной остановки задачи
-		strFileName.sprintf(L"Error_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
+		strFileName.sprintf(L"Ошибка_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
 	}
 
 	strFinalPath = IncludeTrailingPathDelimiter(strPathForResults) + strActiveTaskSubDir;
@@ -932,5 +933,4 @@ void __fastcall TFormMain::PanelSMColorClick(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-
 

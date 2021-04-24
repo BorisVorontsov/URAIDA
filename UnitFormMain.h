@@ -89,8 +89,6 @@ __published:	// IDE-managed Components
 	TBevel *Bevel2;
 	TLabel *LabelCopyright2;
 	TScrollBox *ScrollBoxGMSpecSettings;
-	TLabel *LabelBT;
-	TLabel *LabelNumberofBattles;
 	TGroupBox *GroupBoxScreens;
 	TLabel *LabelRSY;
 	TLabel *LabelRSX;
@@ -112,8 +110,6 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownSSXPos;
 	TEdit *EditSSX;
 	TCheckBox *CheckBoxProcessSTARTScreen;
-	TEdit *EditNumberofBattles;
-	TUpDown *UpDownNumberofBattles;
 	TLinkLabel *LinkLabel1;
 	TLinkLabel *LinkLabel2;
 	TBevel *Bevel3;
@@ -121,11 +117,6 @@ __published:	// IDE-managed Components
 	TButton *ButtonUseCurrentGWSize;
 	TProgressBar *ProgressBarBattle;
 	TFileOpenDialog *FileOpenDialogGeneric;
-	TEdit *EditBTMinutes;
-	TUpDown *UpDownBTMinutes;
-	TLabel *LabelBTSeparator;
-	TEdit *EditBTSeconds;
-	TUpDown *UpDownBTSeconds;
 	TPanel *PanelCover;
 	TImage *ImageAppIcon;
 	TMenuItem *N1;
@@ -170,6 +161,16 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownEDGETYPos;
 	TBitBtn *BitBtnEDGETPickPoint;
 	TRadioButton *RadioButtonEDAbort;
+	TGroupBox *GroupBoxTaskParameters;
+	TEdit *EditBTMinutes;
+	TUpDown *UpDownNumberofBattles;
+	TEdit *EditNumberofBattles;
+	TUpDown *UpDownBTSeconds;
+	TEdit *EditBTSeconds;
+	TLabel *LabelBTSeparator;
+	TUpDown *UpDownBTMinutes;
+	TLabel *LabelBT;
+	TLabel *LabelNumberofBattles;
 	void __fastcall ButtonRunTaskClick(TObject *Sender);
 	void __fastcall ButtonStopTaskClick(TObject *Sender);
 	void __fastcall TimerMainTimer(TObject *Sender);

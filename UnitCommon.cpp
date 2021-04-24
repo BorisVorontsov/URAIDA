@@ -89,6 +89,7 @@ void AdjustPrivilege(String strPrivilege)
 	TOKEN_PRIVILEGES TKP = {};
 	TOKEN_PRIVILEGES TKPOLD = {};
 	DWORD dwRetLen;
+
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
 	{
 		LookupPrivilegeValue(0, strPrivilege.c_str(), &TKP.Privileges[0].Luid);

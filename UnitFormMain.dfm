@@ -59,9 +59,10 @@ object FormMain: TFormMain
   object LabelCopyright2: TLabel
     Left = 8
     Top = 577
-    Width = 102
+    Width = 308
     Height = 18
-    Caption = 'Boris Vorontsov'
+    AutoSize = False
+    Caption = #1041#1086#1088#1080#1089#1072' '#1042#1086#1088#1086#1085#1094#1086#1074#1072
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
@@ -288,8 +289,7 @@ object FormMain: TFormMain
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
-      Caption = 'Campaign'
-      ExplicitHeight = 431
+      Caption = #1050#1072#1084#1087#1072#1085#1080#1103
       object ScrollBoxGMSpecSettings: TScrollBox
         Left = 0
         Top = 0
@@ -299,34 +299,12 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitHeight = 431
-        object LabelBT: TLabel
-          Left = 19
-          Top = 241
-          Width = 234
-          Height = 19
-          Caption = 'Delay (average battle time, m:s):'
-        end
-        object LabelNumberofBattles: TLabel
-          Left = 19
-          Top = 283
-          Width = 133
-          Height = 19
-          Caption = 'Number of battles:'
-        end
-        object LabelBTSeparator: TLabel
-          Left = 321
-          Top = 241
-          Width = 6
-          Height = 19
-          Caption = ':'
-        end
         object GroupBoxScreens: TGroupBox
           Left = 19
           Top = 16
           Width = 470
           Height = 193
-          Caption = 'Screens'
+          Caption = #1069#1082#1088#1072#1085#1099
           TabOrder = 0
           object LabelRSY: TLabel
             Left = 158
@@ -345,16 +323,17 @@ object FormMain: TFormMain
           object LabelREPLAYScreen: TLabel
             Left = 24
             Top = 104
-            Width = 208
+            Width = 306
             Height = 19
-            Caption = 'REPLAY screen control point:'
+            AutoSize = False
+            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1072' '#1101#1082#1088#1072#1085#1072' '#1055#1054#1042#1058#1054#1056'/'#1044#1040#1051#1045#1045':'
           end
           object LabelRSColor: TLabel
             Left = 260
             Top = 132
-            Width = 44
+            Width = 41
             Height = 19
-            Caption = 'Color:'
+            Caption = #1062#1074#1077#1090':'
           end
           object LabelSSY: TLabel
             Left = 158
@@ -373,17 +352,20 @@ object FormMain: TFormMain
           object LabelSSColor: TLabel
             Left = 260
             Top = 60
-            Width = 44
+            Width = 41
             Height = 19
-            Caption = 'Color:'
+            Caption = #1062#1074#1077#1090':'
           end
           object EditRSY: TEdit
             Left = 180
             Top = 129
             Width = 52
             Height = 27
+            Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 9
             Text = '0'
           end
@@ -410,8 +392,11 @@ object FormMain: TFormMain
             Top = 129
             Width = 52
             Height = 27
+            Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 7
             Text = '0'
           end
@@ -517,8 +502,11 @@ object FormMain: TFormMain
             Top = 57
             Width = 52
             Height = 27
+            Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 3
             Text = '0'
           end
@@ -642,97 +630,134 @@ object FormMain: TFormMain
             Top = 57
             Width = 52
             Height = 27
+            Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 1
             Text = '0'
           end
           object CheckBoxProcessSTARTScreen: TCheckBox
             Left = 24
             Top = 34
-            Width = 225
+            Width = 306
             Height = 17
-            Caption = 'START screen control point:'
+            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1072' '#1101#1082#1088#1072#1085#1072' '#1053#1040#1063#1040#1058#1068':'
             TabOrder = 0
           end
         end
-        object EditNumberofBattles: TEdit
-          Left = 159
-          Top = 280
-          Width = 38
-          Height = 27
-          Alignment = taCenter
-          ReadOnly = True
-          TabOrder = 5
-          Text = '1'
-        end
-        object UpDownNumberofBattles: TUpDown
-          Left = 197
-          Top = 280
-          Width = 16
-          Height = 27
-          Associate = EditNumberofBattles
-          Min = 1
-          Max = 999
-          Position = 1
-          TabOrder = 6
-        end
-        object EditBTMinutes: TEdit
-          Left = 263
-          Top = 238
-          Width = 38
-          Height = 27
-          Alignment = taCenter
-          ReadOnly = True
+        object GroupBoxTaskParameters: TGroupBox
+          Left = 19
+          Top = 231
+          Width = 470
+          Height = 114
+          Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1079#1072#1076#1072#1095#1080
           TabOrder = 1
-          Text = '0'
-        end
-        object UpDownBTMinutes: TUpDown
-          Left = 301
-          Top = 238
-          Width = 17
-          Height = 27
-          Associate = EditBTMinutes
-          Max = 59
-          TabOrder = 2
-          Wrap = True
-        end
-        object EditBTSeconds: TEdit
-          Left = 333
-          Top = 238
-          Width = 38
-          Height = 27
-          Alignment = taCenter
-          ReadOnly = True
-          TabOrder = 3
-          Text = '0'
-        end
-        object UpDownBTSeconds: TUpDown
-          Left = 371
-          Top = 238
-          Width = 17
-          Height = 27
-          Associate = EditBTSeconds
-          Max = 59
-          TabOrder = 4
-          Wrap = True
+          object LabelBTSeparator: TLabel
+            Left = 379
+            Top = 29
+            Width = 6
+            Height = 19
+            Caption = ':'
+          end
+          object LabelBT: TLabel
+            Left = 24
+            Top = 31
+            Width = 292
+            Height = 19
+            AutoSize = False
+            Caption = #1047#1072#1076#1077#1088#1078#1082#1072' ('#1089#1088#1077#1076#1085#1103#1103' '#1087#1088#1086#1076#1086#1083#1078#1080#1090'. '#1073#1086#1103'):'
+          end
+          object LabelNumberofBattles: TLabel
+            Left = 24
+            Top = 64
+            Width = 292
+            Height = 19
+            AutoSize = False
+            Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1073#1086#1105#1074':'
+          end
+          object EditBTMinutes: TEdit
+            Left = 321
+            Top = 28
+            Width = 38
+            Height = 27
+            Hint = #1052#1080#1085#1091#1090#1099
+            Alignment = taCenter
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = True
+            TabOrder = 0
+            Text = '0'
+          end
+          object UpDownNumberofBattles: TUpDown
+            Left = 429
+            Top = 61
+            Width = 16
+            Height = 27
+            Associate = EditNumberofBattles
+            Min = 1
+            Max = 999
+            Position = 1
+            TabOrder = 1
+          end
+          object EditNumberofBattles: TEdit
+            Left = 391
+            Top = 61
+            Width = 38
+            Height = 27
+            Alignment = taCenter
+            ReadOnly = True
+            TabOrder = 2
+            Text = '1'
+          end
+          object UpDownBTSeconds: TUpDown
+            Left = 429
+            Top = 28
+            Width = 16
+            Height = 27
+            Associate = EditBTSeconds
+            Max = 59
+            TabOrder = 3
+            Wrap = True
+          end
+          object EditBTSeconds: TEdit
+            Left = 391
+            Top = 28
+            Width = 38
+            Height = 27
+            Hint = #1057#1077#1082#1091#1085#1076#1099
+            Alignment = taCenter
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = True
+            TabOrder = 4
+            Text = '0'
+          end
+          object UpDownBTMinutes: TUpDown
+            Left = 359
+            Top = 28
+            Width = 16
+            Height = 27
+            Associate = EditBTMinutes
+            Max = 59
+            TabOrder = 5
+            Wrap = True
+          end
         end
       end
     end
     object TabSheetDungeons: TTabSheet
-      Caption = 'Dungeons'
+      Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
-      ExplicitHeight = 431
     end
     object TabSheetFactionWars: TTabSheet
-      Caption = 'Faction Wars'
+      Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
-      ExplicitHeight = 431
     end
     object TabSheetCommon: TTabSheet
-      Caption = 'Common Settings'
+      Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
-      ExplicitHeight = 431
       object ScrollBox1: TScrollBox
         Left = 0
         Top = 0
@@ -742,54 +767,62 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitTop = -3
+        ExplicitLeft = 35
+        ExplicitTop = -710
+        ExplicitHeight = 1113
         object LabelGWWidth: TLabel
           Left = 65
           Top = 50
-          Width = 47
+          Width = 71
           Height = 19
-          Caption = 'Width:'
+          AutoSize = False
+          Caption = #1064#1080#1088#1080#1085#1072':'
         end
         object LabelGWHeight: TLabel
-          Left = 218
+          Left = 239
           Top = 50
-          Width = 52
+          Width = 65
           Height = 19
-          Caption = 'Height:'
+          AutoSize = False
+          Caption = #1042#1099#1089#1086#1090#1072':'
         end
         object LabelTaskEndAction: TLabel
           Left = 18
           Top = 333
-          Width = 132
+          Width = 267
           Height = 19
-          Caption = 'At the and of task:'
+          AutoSize = False
+          Caption = #1055#1086' '#1079#1072#1074#1077#1088#1096#1077#1085#1080#1102' '#1079#1072#1076#1072#1095#1080':'
         end
         object Bevel2: TBevel
           Left = 19
-          Top = 999
+          Top = 1055
           Width = 471
           Height = 2
         end
         object LabelPreferredGWSize: TLabel
           Left = 18
           Top = 18
-          Width = 217
+          Width = 346
           Height = 19
           AutoSize = False
-          Caption = 'Preferred game window size:'
+          Caption = #1055#1088#1077#1076#1087#1086#1095#1080#1090#1072#1077#1084#1099#1081' '#1088#1072#1079#1084#1077#1088' '#1086#1082#1085#1072' '#1080#1075#1088#1099':'
         end
         object EditGWWidth: TEdit
-          Left = 118
+          Left = 137
           Top = 47
           Width = 72
           Height = 27
+          Hint = #1055#1080#1082#1089#1077#1083#1080
           Alignment = taCenter
+          ParentShowHint = False
           ReadOnly = True
+          ShowHint = True
           TabOrder = 0
           Text = '200'
         end
         object UpDownGWWidth: TUpDown
-          Left = 190
+          Left = 209
           Top = 47
           Width = 16
           Height = 27
@@ -800,17 +833,20 @@ object FormMain: TFormMain
           TabOrder = 1
         end
         object EditGWHeight: TEdit
-          Left = 276
+          Left = 305
           Top = 47
           Width = 72
           Height = 27
+          Hint = #1055#1080#1082#1089#1077#1083#1080
           Alignment = taCenter
+          ParentShowHint = False
           ReadOnly = True
+          ShowHint = True
           TabOrder = 2
           Text = '200'
         end
         object UpDownGWHeight: TUpDown
-          Left = 348
+          Left = 377
           Top = 47
           Width = 16
           Height = 27
@@ -825,53 +861,57 @@ object FormMain: TFormMain
           Top = 141
           Width = 471
           Height = 169
-          Caption = 'Results'
+          Caption = #1056#1077#1079#1091#1083#1100#1090#1072#1090#1099
           TabOrder = 6
           object LabelSRPath: TLabel
             Left = 24
             Top = 88
-            Width = 58
+            Width = 276
             Height = 19
-            Caption = 'Save to:'
+            AutoSize = False
+            Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1074':'
           end
           object CheckBoxSaveResults: TCheckBox
             Left = 24
             Top = 32
-            Width = 129
+            Width = 201
             Height = 25
-            Caption = 'Save results:'
+            Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1088#1077#1079#1091#1083#1100#1090#1072#1090#1099':'
             TabOrder = 0
             OnClick = CheckBoxSaveResultsClick
           end
           object RadioButtonSRAtTheEndOfEachBattle: TRadioButton
-            Left = 186
+            Left = 223
             Top = 23
-            Width = 221
+            Width = 226
             Height = 25
-            Caption = 'At the end of each battle'
+            Caption = #1042' '#1082#1086#1085#1094#1077' '#1082#1072#1078#1076#1086#1075#1086' '#1073#1086#1103
             Checked = True
             TabOrder = 1
             TabStop = True
           end
           object RadioButtonSRPeriodically: TRadioButton
-            Left = 186
+            Left = 223
             Top = 54
-            Width = 158
+            Width = 137
             Height = 19
-            Caption = 'Periodically (s):'
+            Caption = #1055#1077#1088#1080#1086#1076#1080#1095#1077#1089#1082#1080':'
             TabOrder = 2
           end
           object EditSRPeriodically: TEdit
-            Left = 322
+            Left = 359
             Top = 52
             Width = 38
             Height = 27
+            Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 3
             Text = '1'
           end
           object UpDownSRPeriodically: TUpDown
-            Left = 360
+            Left = 397
             Top = 52
             Width = 16
             Height = 27
@@ -886,7 +926,10 @@ object FormMain: TFormMain
             Top = 117
             Width = 253
             Height = 27
+            Hint = #1055#1091#1090#1100
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 5
           end
           object ButtonSRBrowsePath: TButton
@@ -903,7 +946,7 @@ object FormMain: TFormMain
             Top = 114
             Width = 99
             Height = 33
-            Caption = 'Clear all'
+            Caption = #1059#1076#1072#1083'. '#1074#1089#1105
             TabOrder = 7
             OnClick = ButtonClearAllResultsClick
           end
@@ -916,26 +959,26 @@ object FormMain: TFormMain
           Style = csDropDownList
           TabOrder = 7
           Items.Strings = (
-            'Do nothing'
-            'Show notification'
-            'Play alert (three beeps)'
-            'Go to sleep mode'
-            'Turn off PC')
+            #1053#1080#1095#1077#1075#1086' '#1085#1077' '#1076#1077#1083#1072#1090#1100
+            #1055#1086#1082#1072#1079#1072#1090#1100' '#1091#1074#1077#1076#1086#1084#1083#1077#1085#1080#1077
+            #1057#1080#1088#1077#1085#1072' ('#1090#1088#1080' '#1089#1080#1075#1085#1072#1083#1072')'
+            #1055#1077#1088#1077#1081#1090#1080' '#1074' '#1089#1087#1103#1097#1080#1081' '#1088#1077#1078#1080#1084
+            #1042#1099#1082#1083#1102#1095#1080#1090#1100' '#1082#1086#1084#1087#1100#1102#1090#1077#1088)
         end
         object CheckBoxTEAExit: TCheckBox
-          Left = 291
+          Left = 297
           Top = 362
-          Width = 54
+          Width = 71
           Height = 17
-          Caption = 'Exit'
+          Caption = #1042#1099#1081#1090#1080
           TabOrder = 8
         end
         object CheckBoxTEACloseTheGame: TCheckBox
-          Left = 351
+          Left = 370
           Top = 358
-          Width = 138
+          Width = 110
           Height = 25
-          Caption = 'Close the game'
+          Caption = #1047#1072#1082#1088'. '#1080#1075#1088#1091
           TabOrder = 9
         end
         object GroupBoxErrorHandling: TGroupBox
@@ -943,31 +986,34 @@ object FormMain: TFormMain
           Top = 405
           Width = 471
           Height = 148
-          Caption = 'Error handling'
+          Caption = #1054#1073#1088#1072#1073#1086#1090#1082#1072' '#1086#1096#1080#1073#1086#1082
           TabOrder = 10
           object LabelTriesBeforeForceTaskEnding: TLabel
             Left = 24
             Top = 34
-            Width = 287
+            Width = 365
             Height = 19
-            Caption = 'Number of tries before auto-end of task:'
+            AutoSize = False
+            Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1087#1088#1086#1074#1077#1088#1086#1082' '#1076#1086' '#1072#1074#1090#1086#1079#1072#1074#1077#1088#1096#1077#1085#1080#1103':'
           end
           object LabelScreenCheckingInterval: TLabel
             Left = 24
             Top = 66
-            Width = 200
+            Width = 365
             Height = 19
-            Caption = 'Screen checking interval (s):'
+            AutoSize = False
+            Caption = #1048#1085#1090#1077#1088#1074#1072#1083' '#1087#1088#1086#1074#1077#1088#1082#1080' '#1101#1082#1088#1072#1085#1072':'
           end
           object LabelColorTolerance: TLabel
             Left = 24
             Top = 99
-            Width = 113
+            Width = 365
             Height = 19
-            Caption = 'Color tolerance:'
+            AutoSize = False
+            Caption = #1044#1086#1087#1091#1089#1082' '#1087#1086' '#1094#1074#1077#1090#1091':'
           end
           object EditTriesBeforeFTE: TEdit
-            Left = 319
+            Left = 395
             Top = 31
             Width = 38
             Height = 27
@@ -977,7 +1023,7 @@ object FormMain: TFormMain
             Text = '1'
           end
           object UpDownTriesBeforeFTE: TUpDown
-            Left = 357
+            Left = 433
             Top = 31
             Width = 16
             Height = 27
@@ -988,17 +1034,20 @@ object FormMain: TFormMain
             TabOrder = 1
           end
           object EditScreenCheckingInterval: TEdit
-            Left = 231
+            Left = 395
             Top = 63
             Width = 38
             Height = 27
+            Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            ParentShowHint = False
             ReadOnly = True
+            ShowHint = True
             TabOrder = 2
             Text = '1'
           end
           object UpDownScreenCheckingInterval: TUpDown
-            Left = 269
+            Left = 433
             Top = 63
             Width = 16
             Height = 27
@@ -1009,8 +1058,8 @@ object FormMain: TFormMain
             TabOrder = 3
           end
           object EditColorTolerance: TEdit
-            Left = 143
-            Top = 98
+            Left = 395
+            Top = 96
             Width = 38
             Height = 27
             Alignment = taCenter
@@ -1019,8 +1068,8 @@ object FormMain: TFormMain
             Text = '1'
           end
           object UpDownColorTolerance: TUpDown
-            Left = 181
-            Top = 98
+            Left = 433
+            Top = 96
             Width = 16
             Height = 27
             Associate = EditColorTolerance
@@ -1031,20 +1080,20 @@ object FormMain: TFormMain
           end
         end
         object ButtonApplyGWSize: TButton
-          Left = 387
+          Left = 357
           Top = 88
-          Width = 81
+          Width = 111
           Height = 33
-          Caption = 'Apply'
+          Caption = #1055#1088#1080#1084#1077#1085#1080#1090#1100
           TabOrder = 5
           OnClick = ButtonApplyGWSizeClick
         end
         object ButtonUseCurrentGWSize: TButton
-          Left = 259
+          Left = 209
           Top = 88
-          Width = 122
+          Width = 142
           Height = 33
-          Caption = 'Use current'
+          Caption = #1042#1079#1103#1090#1100' '#1090#1077#1082#1091#1097#1080#1077
           TabOrder = 4
           OnClick = ButtonUseCurrentGWSizeClick
         end
@@ -1052,15 +1101,15 @@ object FormMain: TFormMain
           Left = 18
           Top = 576
           Width = 471
-          Height = 391
-          Caption = 'Task breakers'
+          Height = 439
+          Caption = #1055#1088#1077#1088#1099#1074#1072#1090#1077#1083#1080' '#1079#1072#1076#1072#1095#1080
           TabOrder = 11
           object GroupBoxEnergyDialog: TGroupBox
             Left = 24
             Top = 21
             Width = 425
-            Height = 212
-            Caption = 'Energy purchasing dialog'
+            Height = 260
+            Caption = #1044#1080#1072#1083#1086#1075' '#1087#1086#1082#1091#1087#1082#1080' '#1101#1085#1077#1088#1075#1080#1080
             TabOrder = 0
             object LabelEDY: TLabel
               Left = 158
@@ -1079,30 +1128,32 @@ object FormMain: TFormMain
             object LabelEDColor: TLabel
               Left = 260
               Top = 60
-              Width = 44
+              Width = 41
               Height = 19
-              Caption = 'Color:'
+              Caption = #1062#1074#1077#1090':'
             end
             object LabelEDCP: TLabel
               Left = 25
               Top = 32
-              Width = 99
+              Width = 305
               Height = 19
-              Caption = 'Control point:'
+              AutoSize = False
+              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1072#1103' '#1090#1086#1095#1082#1072':'
             end
             object LabelEDAction: TLabel
               Left = 25
               Top = 168
-              Width = 51
+              Width = 80
               Height = 19
-              Caption = 'Action:'
+              AutoSize = False
+              Caption = #1044#1077#1081#1089#1090#1074#1080#1077':'
             end
             object LabelEDGETButton: TLabel
               Left = 25
               Top = 90
-              Width = 163
+              Width = 242
               Height = 19
-              Caption = 'GET button click point:'
+              Caption = #1050#1086#1086#1088#1076#1080#1085#1072#1090#1099' '#1082#1085#1086#1087#1082#1080' '#1055#1054#1051#1059#1063#1048#1058#1068':'
             end
             object LabelEDGETX: TLabel
               Left = 57
@@ -1123,8 +1174,11 @@ object FormMain: TFormMain
               Top = 57
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 2
               Text = '0'
             end
@@ -1248,27 +1302,30 @@ object FormMain: TFormMain
               Top = 57
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 0
               Text = '0'
             end
             object RadioButtonEDAccept: TRadioButton
-              Left = 86
+              Left = 111
               Top = 166
-              Width = 45
+              Width = 219
               Height = 25
-              Caption = 'Get'
+              Caption = #1055#1086#1083#1091#1095#1080#1090#1100' '#1101#1085#1077#1088#1075#1080#1102
               Checked = True
               TabOrder = 11
               TabStop = True
             end
             object RadioButtonEDSkip: TRadioButton
-              Left = 137
-              Top = 169
-              Width = 75
+              Left = 111
+              Top = 193
+              Width = 219
               Height = 19
-              Caption = 'Decline'
+              Caption = #1054#1090#1082#1083#1086#1085#1080#1090#1100' '#1080' '#1087#1088#1086#1076#1086#1083#1078#1080#1090#1100
               TabOrder = 12
             end
             object EditEDGETX: TEdit
@@ -1276,8 +1333,11 @@ object FormMain: TFormMain
               Top = 115
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 6
               Text = '0'
             end
@@ -1295,8 +1355,11 @@ object FormMain: TFormMain
               Top = 115
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 8
               Text = '0'
             end
@@ -1393,20 +1456,20 @@ object FormMain: TFormMain
               OnClick = BitBtnEDGETPickPointClick
             end
             object RadioButtonEDAbort: TRadioButton
-              Left = 216
-              Top = 169
-              Width = 72
+              Left = 111
+              Top = 218
+              Width = 219
               Height = 19
-              Caption = 'Abort'
+              Caption = #1055#1088#1077#1088#1074#1072#1090#1100' '#1079#1072#1076#1072#1095#1091
               TabOrder = 13
             end
           end
           object GroupBoxMaintenanceDialog: TGroupBox
             Left = 24
-            Top = 255
+            Top = 303
             Width = 425
             Height = 114
-            Caption = 'Service maintenance dialog'
+            Caption = #1044#1080#1072#1083#1086#1075' '#1089#1077#1088#1074#1080#1089#1085#1099#1093' '#1088#1072#1073#1086#1090
             TabOrder = 1
             object LabelSMY: TLabel
               Left = 158
@@ -1425,24 +1488,27 @@ object FormMain: TFormMain
             object LabelSMColor: TLabel
               Left = 260
               Top = 60
-              Width = 44
+              Width = 41
               Height = 19
-              Caption = 'Color:'
+              Caption = #1062#1074#1077#1090':'
             end
             object LabelSMCP: TLabel
               Left = 24
               Top = 32
-              Width = 99
+              Width = 149
               Height = 19
-              Caption = 'Control point:'
+              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1072#1103' '#1090#1086#1095#1082#1072':'
             end
             object EditSMY: TEdit
               Left = 180
               Top = 57
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 2
               Text = '0'
             end
@@ -1553,7 +1619,7 @@ object FormMain: TFormMain
               OnClick = PanelSMColorClick
             end
             object UpDownSMXPos: TUpDown
-              Left = 129
+              Left = 130
               Top = 57
               Width = 16
               Height = 27
@@ -1566,8 +1632,11 @@ object FormMain: TFormMain
               Top = 57
               Width = 52
               Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              ParentShowHint = False
               ReadOnly = True
+              ShowHint = True
               TabOrder = 0
               Text = '0'
             end
@@ -1596,7 +1665,7 @@ object FormMain: TFormMain
     Top = 479
     Width = 117
     Height = 41
-    Caption = 'Stop'
+    Caption = #1057#1090#1086#1087
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -1607,12 +1676,13 @@ object FormMain: TFormMain
     OnClick = ButtonStopTaskClick
   end
   object LinkLabel1: TLinkLabel
-    Left = 388
-    Top = 553
-    Width = 131
+    Left = 369
+    Top = 557
+    Width = 150
     Height = 22
     Alignment = taRightJustify
-    Caption = '<a href="https://paypal.com">Support this project</a>'
+    AutoSize = False
+    Caption = '<a href="https://paypal.com">'#1055#1086#1076#1076#1077#1088#1078#1072#1090#1100' '#1087#1088#1086#1077#1082#1090'</a>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
@@ -1623,11 +1693,13 @@ object FormMain: TFormMain
     OnClick = LinkLabel1Click
   end
   object LinkLabel2: TLinkLabel
-    Left = 453
-    Top = 573
-    Width = 66
+    Left = 400
+    Top = 577
+    Width = 119
     Height = 22
-    Caption = '<a>Feedback</a>'
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = '<a>'#1054#1073#1088#1072#1090#1085#1072#1103' '#1089#1074#1103#1079#1100'</a>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
@@ -2194,19 +2266,19 @@ object FormMain: TFormMain
     Left = 416
     Top = 416
     object ShowHideAutomatizer1: TMenuItem
-      Caption = 'Show/Hide Automatizer'
+      Caption = #1055#1086#1082#1072#1079#1072#1090#1100'/'#1089#1082#1088#1099#1090#1100' '#1072#1074#1090#1086#1084#1072#1090#1080#1079#1072#1090#1086#1088
       Default = True
       OnClick = ShowHideAutomatizer1Click
     end
     object OpenResults1: TMenuItem
-      Caption = 'Open Results'
+      Caption = #1054#1090#1082#1088#1099#1090#1100' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1102' '#1088#1077#1079#1091#1083#1100#1090#1072#1090#1086#1074
       OnClick = OpenResults1Click
     end
     object N1: TMenuItem
       Caption = '-'
     end
     object Exit1: TMenuItem
-      Caption = 'Exit'
+      Caption = #1042#1099#1081#1090#1080
       OnClick = Exit1Click
     end
   end

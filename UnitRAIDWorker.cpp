@@ -221,7 +221,8 @@ bool TRAIDWorker::CheckGameStateWithMessage(TWinControl* pParent)
 {
 	if (!this->IsGameRunning())
 	{
-		MessageBox(pParent->Handle, L"Unable to find game window. Aborting", L"Warning", MB_ICONEXCLAMATION);
+		MessageBox(pParent->Handle, L"Не удаётся найти окно игры! Отмена действия", L"Предупреждение",
+			MB_ICONEXCLAMATION);
 
 		return false;
 	}

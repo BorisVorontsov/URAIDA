@@ -45,9 +45,9 @@ object FormPickPoint: TFormPickPoint
     object LabelColorInfo: TLabel
       Left = 24
       Top = 74
-      Width = 44
+      Width = 41
       Height = 19
-      Caption = 'Color:'
+      Caption = #1062#1074#1077#1090':'
     end
     object LabelX: TLabel
       Left = 85
@@ -111,11 +111,11 @@ object FormPickPoint: TFormPickPoint
     BevelOuter = bvNone
     TabOrder = 1
     object LabelSource: TLabel
-      Left = 39
-      Top = 53
-      Width = 122
+      Left = 36
+      Top = 71
+      Width = 150
       Height = 19
-      Caption = 'Choose a source:'
+      Caption = #1042#1099#1073#1077#1088#1080#1090#1077' '#1080#1089#1090#1086#1095#1085#1080#1082':'
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -124,11 +124,11 @@ object FormPickPoint: TFormPickPoint
       ParentFont = False
     end
     object ButtonSourceFromFile: TButton
-      Left = 39
-      Top = 131
-      Width = 177
+      Left = 36
+      Top = 143
+      Width = 186
       Height = 41
-      Caption = 'Load from file...'
+      Caption = #1047#1072#1075#1088#1091#1079#1082#1072' '#1080#1079' '#1092#1072#1081#1083#1072'...'
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -139,11 +139,11 @@ object FormPickPoint: TFormPickPoint
       OnClick = ButtonSourceFromFileClick
     end
     object ButtonSourceFromGame: TButton
-      Left = 39
-      Top = 84
-      Width = 177
+      Left = 36
+      Top = 96
+      Width = 186
       Height = 41
-      Caption = 'Capture from game'
+      Caption = #1047#1072#1093#1074#1072#1090' '#1080#1079' '#1080#1075#1088#1099
       Default = True
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
@@ -171,7 +171,7 @@ object FormPickPoint: TFormPickPoint
         FileMask = '*.bmp'
       end>
     Options = [fdoStrictFileTypes, fdoFileMustExist, fdoForcePreviewPaneOn]
-    Title = 'Select source image'
+    Title = #1042#1099#1073#1077#1088#1080#1090#1077' '#1080#1089#1090#1086#1095#1085#1080#1082' '#1076#1083#1103' '#1082#1086#1085#1090#1088#1086#1083#1100#1085#1086#1081' '#1090#1086#1095#1082#1080
     Left = 16
     Top = 184
   end
