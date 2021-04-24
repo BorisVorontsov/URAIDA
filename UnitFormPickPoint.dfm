@@ -26,7 +26,9 @@ object FormPickPoint: TFormPickPoint
     Height = 285
     Align = alClient
     BevelOuter = bvNone
+    Color = clGreen
     DoubleBuffered = True
+    ParentBackground = False
     ParentDoubleBuffered = False
     TabOrder = 0
     object ImageCapturedFrame: TImage

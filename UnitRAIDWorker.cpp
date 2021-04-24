@@ -22,7 +22,7 @@ TRAIDWorker::TRAIDWorker()
 
 	HDC hRAIDDC = GetDC(m_hGameWindow);
 	m_hRecentFrameDC = CreateCompatibleDC(hRAIDDC);
-	ReleaseDC(m_hGameWindow, hRAIDDC);
+    ReleaseDC(m_hGameWindow, hRAIDDC);
 
 	this->UpdateRecentFrame();
 }
@@ -46,8 +46,10 @@ bool TRAIDWorker::CaptureFrame(TCanvas *pDestination, const TSize& Size)
 		return false;
 
 	TRect ClientRect = this->UpdateRecentFrame();
-	StretchBlt(pDestination->Handle, 0, 0, Size.cx, Size.cy, m_hRecentFrameDC, 0, 0,
-		ClientRect.Width(), ClientRect.Height(), SRCCOPY);
+	//StretchBlt(pDestination->Handle, 0, 0, Size.cx, Size.cy, m_hRecentFrameDC, 0, 0,
+	//	ClientRect.Right - ClientRect.Left, ClientRect.Bottom - ClientRect.Top, SRCCOPY);
+	BitBlt(pDestination->Handle, 0, 0, ClientRect.Right - ClientRect.Left,
+		ClientRect.Bottom - ClientRect.Top, m_hRecentFrameDC, 0, 0, SRCCOPY);
 
 	return true;
 }
@@ -152,7 +154,7 @@ bool TRAIDWorker::GainGameWindow()
 void TRAIDWorker::CloseGame()
 {
 	//Так как RAID по закрытию обычным способом (WM_CLOSE, "крестик" окна) показывает диалог подтверждения,
-    //используем радикальный способ решения задачи
+	//что бы не добавлять новых настроек для кнопки – используем радикальный способ решения задачи
 	HANDLE hSnapshot;
 	PROCESSENTRY32 PE;
 	HANDLE hProcess;
@@ -168,7 +170,7 @@ void TRAIDWorker::CloseGame()
 				hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, PE.th32ProcessID);
 				if (TerminateProcess(hProcess, 0) == 0)
 				{
-					//
+					//Не получилось
 				}
 				CloseHandle(hProcess);
                 break;
@@ -181,6 +183,8 @@ void TRAIDWorker::CloseGame()
 //---------------------------------------------------------------------------
 TRect TRAIDWorker::UpdateRecentFrame()
 {
+    this->GainGameWindow();
+
 	RECT ClientRect;
 	WINDOWINFO WndInfo;
 	GetWindowInfo(m_hGameWindow, &WndInfo);
@@ -188,13 +192,15 @@ TRect TRAIDWorker::UpdateRecentFrame()
 
 	HDC hRAIDDC = GetDC(m_hGameWindow);
 
-	//Удаляем старый растр кадра и создаём актуальный
-	if (m_hRecentFrame) {
-		DeleteObject(m_hRecentFrame);
-	}
 	m_hRecentFrame = CreateCompatibleBitmap(hRAIDDC, ClientRect.right - ClientRect.left,
 		ClientRect.bottom - ClientRect.top);
-	SelectObject(m_hRecentFrameDC, m_hRecentFrame);
+
+	HBITMAP hOldBitmap = static_cast<HBITMAP>(SelectObject(m_hRecentFrameDC, m_hRecentFrame));
+	//Удаляем старый растр кадра
+	if (hOldBitmap && (hOldBitmap != HGDI_ERROR))
+	{
+		DeleteObject(hOldBitmap);
+	}
 
 	//PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY);
 	BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
@@ -213,7 +219,7 @@ void TRAIDWorker::ValidateGameWindow()
 	if ((GameWindowSize.Width() != GWSizeFromSettings.cx) || (GameWindowSize.Height() != GWSizeFromSettings.cy))
 	{
 		//Устанавливаем размеры окна для корректной работы алгоритма
-		this->ResizeGameWindow(g_pSettingsManager->RAIDWindowSize);
+		this->ResizeGameWindow(GWSizeFromSettings);
 	}
 }
 //---------------------------------------------------------------------------

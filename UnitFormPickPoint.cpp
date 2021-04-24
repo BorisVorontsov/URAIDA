@@ -66,6 +66,7 @@ void __fastcall TFormPickPoint::ButtonSourceFromGameClick(TObject *Sender)
 
 	this->ResizeAndAlignWindow();
 
+	ImageCapturedFrame->Picture->Bitmap->SetSize(this->ClientWidth, this->ClientHeight);
 	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, TSize(this->ClientWidth, this->ClientHeight));
 }
 //---------------------------------------------------------------------------
