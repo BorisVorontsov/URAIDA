@@ -68,7 +68,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		(uResultSavingTimeout == g_pSettingsManager->ResultSavingPeriod))
 	{
 		this->SaveResult(nCycleCounter);
-        uResultSavingTimeout = 0;
+		uResultSavingTimeout = 0;
 	}
 
 	if (!nCycleCounter)
@@ -161,6 +161,14 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				case PromptDialogAction::pdaSkip:
 					g_pRAIDWorker->SendKey(VK_ESCAPE);
 					break;
+				case PromptDialogAction::pdaAbort:
+				{
+					//Если задано, просто заканчиваем задачу
+					nCycleCounter = 0;
+					this->StopTask(TaskStoppingReason::tsrSuccessfulCompletion);
+
+					return;
+				}
 			}
 		}
 
@@ -203,7 +211,12 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		//Если превысили число ошибочных попыток сравнения, завершаем всю задачу
 		if (nScreenCheckFailures == g_pSettingsManager->TriesBeforeForceTaskEnding)
 		{
-            nCycleCounter = 0;
+			if (g_pSettingsManager->SaveResults)
+			{
+				this->SaveResult(-1);
+			}
+
+			nCycleCounter = 0;
 			this->StopTask(TaskStoppingReason::tsrError);
 
 			return;
@@ -410,6 +423,9 @@ void TFormMain::UpdateCommonSettingsFrame()
 		case PromptDialogAction::pdaSkip:
 			RadioButtonEDSkip->Checked = true;
 			break;
+		case PromptDialogAction::pdaAbort:
+			RadioButtonEDAbort->Checked = true;
+			break;
 	}
 
 	UpDownSMXPos->Position = g_pSettingsManager->SMDialogControlPoint.x;
@@ -490,6 +506,10 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 	else if (RadioButtonEDSkip->Checked)
 	{
 		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaSkip;
+	}
+	else if (RadioButtonEDAbort->Checked)
+	{
+		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaAbort;
 	}
 
 	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMXPos->Position, UpDownSMYPos->Position);
@@ -802,7 +822,8 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 	}
 	else
 	{
-		strFileName.sprintf(L"Battle_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
+		//Если nBattleNumber равен 0xFFFFFFFF (-1), записываем как причину аварийной остановки задачи
+		strFileName.sprintf(L"Error_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
 	}
 
 	strFinalPath = IncludeTrailingPathDelimiter(strPathForResults) + strActiveTaskSubDir;

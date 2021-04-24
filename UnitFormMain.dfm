@@ -786,7 +786,7 @@ object FormMain: TFormMain
           Alignment = taCenter
           ReadOnly = True
           TabOrder = 0
-          Text = '100'
+          Text = '200'
         end
         object UpDownGWWidth: TUpDown
           Left = 190
@@ -794,9 +794,9 @@ object FormMain: TFormMain
           Width = 16
           Height = 27
           Associate = EditGWWidth
-          Min = 100
+          Min = 200
           Max = 9999
-          Position = 100
+          Position = 200
           TabOrder = 1
         end
         object EditGWHeight: TEdit
@@ -807,7 +807,7 @@ object FormMain: TFormMain
           Alignment = taCenter
           ReadOnly = True
           TabOrder = 2
-          Text = '100'
+          Text = '200'
         end
         object UpDownGWHeight: TUpDown
           Left = 348
@@ -815,9 +815,9 @@ object FormMain: TFormMain
           Width = 16
           Height = 27
           Associate = EditGWHeight
-          Min = 100
+          Min = 200
           Max = 9999
-          Position = 100
+          Position = 200
           TabOrder = 3
         end
         object GroupBoxResults: TGroupBox
@@ -1391,6 +1391,14 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
               TabOrder = 10
               OnClick = BitBtnEDGETPickPointClick
+            end
+            object RadioButtonEDAbort: TRadioButton
+              Left = 216
+              Top = 169
+              Width = 72
+              Height = 19
+              Caption = 'Abort'
+              TabOrder = 13
             end
           end
           object GroupBoxMaintenanceDialog: TGroupBox

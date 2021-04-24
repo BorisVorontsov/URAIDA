@@ -56,7 +56,8 @@ typedef struct tagGameModeSpecSettings
 typedef enum tagPromptDialogAction
 {
 	pdaAccept = 0,
-	pdaSkip
+	pdaSkip,
+	pdaAbort
 } PromptDialogAction;
 
 const String g_strDefaultResultsFolder = L"Results";

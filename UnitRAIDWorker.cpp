@@ -102,7 +102,7 @@ void TRAIDWorker::ResizeGameWindow(const TSize& NewSize)
 	AdjustWindowRectEx(&NewWindowSize, GetWindowLong(m_hGameWindow, GWL_STYLE),
 		FALSE, GetWindowLong(m_hGameWindow, GWL_EXSTYLE));
 	SetWindowPos(m_hGameWindow, NULL, 0, 0, NewWindowSize.right - NewWindowSize.left,
-		NewWindowSize.bottom - NewWindowSize.top, SWP_NOMOVE | SWP_NOZORDER);
+		NewWindowSize.bottom - NewWindowSize.top, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
 }
 //---------------------------------------------------------------------------
 void TRAIDWorker::SendKey(System::WideChar Key)

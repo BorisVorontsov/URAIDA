@@ -147,12 +147,12 @@ void __fastcall TFormPickPoint::FormShow(TObject *Sender)
 //---------------------------------------------------------------------------
 void TFormPickPoint::ResizeAndAlignWindow()
 {
-	TRect RAIDWindowSize = g_pRAIDWorker->GetGameWindowSize(true);
+	TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
 
-	this->Left = (Screen->Width - RAIDWindowSize.Right) / 2;
-	this->Top = (Screen->Height - RAIDWindowSize.Bottom) / 2;
-	this->ClientWidth = RAIDWindowSize.Right;
-	this->ClientHeight = RAIDWindowSize.Bottom;
+	this->Left = (Screen->Width - GWSizeFromSettings.cx) / 2;
+	this->Top = (Screen->Height - GWSizeFromSettings.cy) / 2;
+	this->ClientWidth = GWSizeFromSettings.cx;
+	this->ClientHeight = GWSizeFromSettings.cy;
 }
 //---------------------------------------------------------------------------
 

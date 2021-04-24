@@ -169,6 +169,7 @@ __published:	// IDE-managed Components
 	TEdit *EditEDGETY;
 	TUpDown *UpDownEDGETYPos;
 	TBitBtn *BitBtnEDGETPickPoint;
+	TRadioButton *RadioButtonEDAbort;
 	void __fastcall ButtonRunTaskClick(TObject *Sender);
 	void __fastcall ButtonStopTaskClick(TObject *Sender);
 	void __fastcall TimerMainTimer(TObject *Sender);
