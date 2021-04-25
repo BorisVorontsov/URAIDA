@@ -101,6 +101,7 @@ object FormPickPoint: TFormPickPoint
       Color = clWhite
       ParentBackground = False
       TabOrder = 0
+      StyleElements = []
     end
   end
   object PanelMenu: TPanel

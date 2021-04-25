@@ -314,7 +314,7 @@ void __fastcall TFormMain::ButtonApplyGWSizeClick(TObject *Sender)
 {
 	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
-	g_pRAIDWorker->ResizeGameWindow(g_pSettingsManager->RAIDWindowSize);
+	g_pRAIDWorker->ResizeGameWindow(TSize(UpDownGWWidth->Position, UpDownGWHeight->Position));
 }
 //---------------------------------------------------------------------------
 void TFormMain::UpdateGMSpecSettingsFrame(TTabSheet *pPage)

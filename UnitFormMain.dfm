@@ -22,9 +22,10 @@ object FormMain: TFormMain
   TextHeight = 23
   object Bevel1: TBevel
     Left = 8
-    Top = 540
+    Top = 529
     Width = 513
-    Height = 2
+    Height = 11
+    Shape = bsBottomLine
   end
   object LabelBattlesCounter: TLabel
     Left = 212
@@ -41,6 +42,7 @@ object FormMain: TFormMain
     Font.Style = []
     GlowSize = 2
     ParentFont = False
+    StyleElements = [seClient, seBorder]
   end
   object LabelCopyright1: TLabel
     Left = 8
@@ -76,6 +78,7 @@ object FormMain: TFormMain
     Width = 102
     Height = 41
     Shape = bsFrame
+    Style = bsRaised
   end
   object PanelCover: TPanel
     Left = 8
@@ -299,6 +302,7 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitTop = 4
         object GroupBoxScreens: TGroupBox
           Left = 19
           Top = 16
@@ -412,6 +416,7 @@ object FormMain: TFormMain
             ParentBackground = False
             TabOrder = 12
             TabStop = True
+            StyleElements = []
             OnClick = PanelRSColorClick
           end
           object BitBtnRSPickPoint: TBitBtn
@@ -614,6 +619,7 @@ object FormMain: TFormMain
             ParentBackground = False
             TabOrder = 6
             TabStop = True
+            StyleElements = []
             OnClick = PanelSSColorClick
           end
           object UpDownSSXPos: TUpDown
@@ -796,9 +802,10 @@ object FormMain: TFormMain
         end
         object Bevel2: TBevel
           Left = 19
-          Top = 1055
+          Top = 1011
           Width = 471
-          Height = 2
+          Height = 46
+          Shape = bsBottomLine
         end
         object LabelPreferredGWSize: TLabel
           Left = 18
@@ -1285,7 +1292,7 @@ object FormMain: TFormMain
               Color = clWhite
               ParentBackground = False
               TabOrder = 4
-              TabStop = True
+              StyleElements = []
               OnClick = PanelEDColorClick
             end
             object UpDownEDXPos: TUpDown
@@ -1616,6 +1623,7 @@ object FormMain: TFormMain
               ParentBackground = False
               TabOrder = 4
               TabStop = True
+              StyleElements = []
               OnClick = PanelSMColorClick
             end
             object UpDownSMXPos: TUpDown
