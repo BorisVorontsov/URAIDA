@@ -214,7 +214,7 @@ private:	// User declarations
 	void StartTask();
 	void StopTask(TaskStoppingReason Reason);
 
-	void SaveResult(unsigned int nBattleNumber = -1);
+	void SaveResult(unsigned int nBattleNumber, bool bError = false);
 
 	void UpdateGMSpecSettingsFrame(TTabSheet *pPage);
 	GameModeSpecSettings SaveSettingsFromGMSpecSettingsFrame();

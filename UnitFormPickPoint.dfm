@@ -3,8 +3,8 @@ object FormPickPoint: TFormPickPoint
   Top = 0
   BorderIcons = []
   BorderStyle = bsNone
-  ClientHeight = 285
-  ClientWidth = 262
+  ClientHeight = 256
+  ClientWidth = 256
   Color = clBtnFace
   Constraints.MinHeight = 256
   Constraints.MinWidth = 256
@@ -22,20 +22,23 @@ object FormPickPoint: TFormPickPoint
   object PanelCapturedFrame: TPanel
     Left = 0
     Top = 0
-    Width = 262
-    Height = 285
+    Width = 256
+    Height = 256
+    Cursor = crCross
     Align = alClient
     BevelOuter = bvNone
-    Color = clGreen
+    Color = clBlack
     DoubleBuffered = True
     ParentBackground = False
     ParentDoubleBuffered = False
     TabOrder = 0
+    ExplicitWidth = 262
+    ExplicitHeight = 285
     object ImageCapturedFrame: TImage
       Left = 0
       Top = 0
-      Width = 262
-      Height = 285
+      Width = 256
+      Height = 256
       Align = alClient
       OnClick = ImageCapturedFrameClick
       OnMouseMove = ImageCapturedFrameMouseMove
@@ -44,78 +47,97 @@ object FormPickPoint: TFormPickPoint
       ExplicitWidth = 384
       ExplicitHeight = 384
     end
-    object LabelColorInfo: TLabel
-      Left = 24
-      Top = 74
-      Width = 41
-      Height = 19
-      Caption = #1062#1074#1077#1090':'
-    end
-    object LabelX: TLabel
-      Left = 85
-      Top = 24
-      Width = 63
-      Height = 23
-      AutoSize = False
-      Caption = '%'
-    end
-    object LabelXInfo: TLabel
-      Left = 24
-      Top = 24
-      Width = 15
-      Height = 19
-      Caption = 'X:'
-    end
-    object LabelY: TLabel
-      Left = 85
-      Top = 49
-      Width = 63
-      Height = 23
-      AutoSize = False
-      Caption = '%'
-    end
-    object LabelYInfo: TLabel
-      Left = 23
-      Top = 49
-      Width = 16
-      Height = 19
-      Caption = 'Y:'
-    end
-    object LabelColorInRGB: TLabel
-      Left = 114
-      Top = 76
-      Width = 177
-      Height = 19
-      AutoSize = False
-      Caption = 'R: % G: % B: %'
-      Transparent = True
-    end
-    object PanelColor: TPanel
-      Left = 85
-      Top = 76
-      Width = 20
-      Height = 20
-      BevelKind = bkFlat
+    object PanelCPInfo: TPanel
+      Left = 10
+      Top = 13
+      Width = 287
+      Height = 92
+      Cursor = crNoDrop
       BevelOuter = bvNone
-      BorderWidth = 1
-      Color = clWhite
+      Color = clBlack
+      Constraints.MaxHeight = 92
+      Constraints.MinHeight = 60
       ParentBackground = False
       TabOrder = 0
-      StyleElements = []
+      object LabelColorInfo: TLabel
+        Left = 8
+        Top = 58
+        Width = 41
+        Height = 19
+        Caption = #1062#1074#1077#1090':'
+        Transparent = True
+        OnMouseMove = ImageCapturedFrameMouseMove
+      end
+      object LabelYInfo: TLabel
+        Left = 7
+        Top = 33
+        Width = 16
+        Height = 19
+        Caption = 'Y:'
+      end
+      object LabelXInfo: TLabel
+        Left = 8
+        Top = 8
+        Width = 15
+        Height = 19
+        Caption = 'X:'
+      end
+      object LabelColorInRGB: TLabel
+        Left = 98
+        Top = 60
+        Width = 177
+        Height = 19
+        AutoSize = False
+        Caption = 'R: % G: % B: %'
+        Transparent = True
+      end
+      object LabelY: TLabel
+        Left = 69
+        Top = 33
+        Width = 63
+        Height = 23
+        AutoSize = False
+        Caption = '%'
+      end
+      object LabelX: TLabel
+        Left = 69
+        Top = 8
+        Width = 63
+        Height = 23
+        AutoSize = False
+        Caption = '%'
+      end
+      object PanelColor: TPanel
+        Left = 69
+        Top = 60
+        Width = 20
+        Height = 20
+        BevelKind = bkFlat
+        BevelOuter = bvNone
+        BorderWidth = 1
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 0
+        StyleElements = []
+      end
     end
   end
   object PanelMenu: TPanel
     Left = 0
     Top = 0
-    Width = 262
-    Height = 285
+    Width = 256
+    Height = 256
     Align = alClient
     BevelKind = bkFlat
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitLeft = 675
+    ExplicitTop = 363
+    ExplicitWidth = 262
+    ExplicitHeight = 285
     object LabelSource: TLabel
-      Left = 36
-      Top = 71
+      Left = 33
+      Top = 69
       Width = 150
       Height = 19
       Caption = #1042#1099#1073#1077#1088#1080#1090#1077' '#1080#1089#1090#1086#1095#1085#1080#1082':'
@@ -127,8 +149,8 @@ object FormPickPoint: TFormPickPoint
       ParentFont = False
     end
     object ButtonSourceFromFile: TButton
-      Left = 36
-      Top = 143
+      Left = 33
+      Top = 141
       Width = 186
       Height = 41
       Caption = #1047#1072#1075#1088#1091#1079#1082#1072' '#1080#1079' '#1092#1072#1081#1083#1072'...'
@@ -142,8 +164,8 @@ object FormPickPoint: TFormPickPoint
       OnClick = ButtonSourceFromFileClick
     end
     object ButtonSourceFromGame: TButton
-      Left = 36
-      Top = 96
+      Left = 33
+      Top = 94
       Width = 186
       Height = 41
       Caption = #1047#1072#1093#1074#1072#1090' '#1080#1079' '#1080#1075#1088#1099

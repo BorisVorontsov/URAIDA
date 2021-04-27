@@ -34,12 +34,14 @@ bool TFormPickPoint::Execute()
 		LabelColorInfo->Visible = false;
 		PanelColor->Visible = false;
 		LabelColorInRGB->Visible = false;
+		PanelCPInfo->Height = PanelCPInfo->Constraints->MinHeight;
 	}
 	else
 	{
 		LabelColorInfo->Visible = true;
 		PanelColor->Visible = true;
 		LabelColorInRGB->Visible = true;
+		PanelCPInfo->Height = PanelCPInfo->Constraints->MaxHeight;
 	}
 
 	this->ShowModal();
@@ -156,5 +158,4 @@ void TFormPickPoint::ResizeAndAlignWindow()
 	this->ClientHeight = GWSizeFromSettings.cy;
 }
 //---------------------------------------------------------------------------
-
 

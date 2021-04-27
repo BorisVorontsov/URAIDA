@@ -214,7 +214,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		{
 			if (g_pSettingsManager->SaveResults)
 			{
-				this->SaveResult(-1);
+				this->SaveResult(nCycleCounter, true);
 			}
 
 			nCycleCounter = 0;
@@ -594,6 +594,16 @@ void __fastcall TFormMain::FormShow(TObject *Sender)
 
 void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 {
+	if (this->m_ActiveTaskInfo.CurrentState != TaskState::tsStopped)
+	{
+		if (MessageBox(this->Handle, L"Текущая задача не завершена. Всё равно выйти?", L"Внимание",
+			MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDNO)
+		{
+			Action = TCloseAction::caNone;
+			return;
+		}
+	}
+
 	this->SaveSettingsFromGMSpecSettingsFrame();
 	this->SaveSettingsFromCommonSettingsFrame();
 
@@ -779,7 +789,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 	PageControlURAIDASettings->Visible = true;
 }
 //---------------------------------------------------------------------------
-void TFormMain::SaveResult(unsigned int nBattleNumber)
+void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 {
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 		return;
@@ -817,13 +827,13 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 		FormatDateTime(L"dd_mmmm_yyyy_hh-mm", m_ActiveTaskInfo.StartTime).c_str());
 
 	//Формируем имя файла JPEG
-	if (nBattleNumber != -1)
+	if (!bError)
 	{
-		strFileName.sprintf(L"Битва%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
+		strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
 	}
 	else
 	{
-		//Если nBattleNumber равен 0xFFFFFFFF (-1), записываем как причину аварийной остановки задачи
+		//Если bError, записываем как причину аварийной остановки задачи
 		strFileName.sprintf(L"Ошибка_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
 	}
 
@@ -837,8 +847,22 @@ void TFormMain::SaveResult(unsigned int nBattleNumber)
 	pImage->Width = FrameSize.Right;
 	pImage->Height = FrameSize.Bottom;
 	g_pRAIDWorker->CaptureFrame(pImage->Canvas, TSize(FrameSize.Right, FrameSize.Bottom));
-	pJPEGImage->Assign(pImage->Picture->Bitmap);
 
+	if (bError)
+	{
+		//Дополнительно указываем на скриншоте координату проверки в виде красного крестика
+		const unsigned int uMarkerIndent = 10;
+		TPoint ControlPoint = (nBattleNumber > 1)?(this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint):
+			(this->m_ActiveTaskInfo.Settings.STARTScreenControlPoint);
+		pImage->Canvas->Pen->Color = clRed;
+		pImage->Canvas->Pen->Width = 3;
+		pImage->Canvas->MoveTo(ControlPoint.x - uMarkerIndent , ControlPoint.y);
+		pImage->Canvas->LineTo(ControlPoint.x + uMarkerIndent, ControlPoint.y);
+		pImage->Canvas->MoveTo(ControlPoint.x, ControlPoint.y - uMarkerIndent);
+		pImage->Canvas->LineTo(ControlPoint.x, ControlPoint.y + uMarkerIndent);
+	}
+
+	pJPEGImage->Assign(pImage->Picture->Bitmap);
 	pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
 }
 

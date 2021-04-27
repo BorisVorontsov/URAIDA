@@ -20,19 +20,20 @@ class TFormPickPoint : public TForm
 {
 __published:	// IDE-managed Components
 	TPanel *PanelCapturedFrame;
-	TLabel *LabelColorInfo;
-	TLabel *LabelX;
-	TLabel *LabelXInfo;
-	TLabel *LabelY;
-	TLabel *LabelYInfo;
-	TPanel *PanelColor;
-	TLabel *LabelColorInRGB;
 	TImage *ImageCapturedFrame;
 	TPanel *PanelMenu;
 	TButton *ButtonSourceFromFile;
 	TButton *ButtonSourceFromGame;
 	TLabel *LabelSource;
 	TFileOpenDialog *FileOpenDialog1;
+	TPanel *PanelCPInfo;
+	TLabel *LabelColorInfo;
+	TLabel *LabelYInfo;
+	TLabel *LabelXInfo;
+	TPanel *PanelColor;
+	TLabel *LabelColorInRGB;
+	TLabel *LabelY;
+	TLabel *LabelX;
 	void __fastcall ImageCapturedFrameClick(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall ButtonSourceFromGameClick(TObject *Sender);
