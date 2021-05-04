@@ -21,7 +21,7 @@ TRAIDWorker *g_pRAIDWorker;
 
 const String TFormMain::m_strButtonRTRunCaption = L"Старт";
 const String TFormMain::m_strButtonRTPauseCaption = L"Пауза";
-const String TFormMain::m_strButtonRTResumeCaption = L"Продолжить";
+const String TFormMain::m_strButtonRTResumeCaption = L"Далее";
 
 //---------------------------------------------------------------------------
 __fastcall TFormMain::TFormMain(TComponent* Owner)
@@ -32,20 +32,9 @@ __fastcall TFormMain::TFormMain(TComponent* Owner)
 	m_ActiveTaskInfo.CurrentState = TaskState::tsStopped;
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::ButtonRunTaskClick(TObject *Sender)
-{
-	m_bForceStopTask = false;
-	this->StartTask();
-}
-//---------------------------------------------------------------------------
-void __fastcall TFormMain::ButtonStopTaskClick(TObject *Sender)
-{
-	m_bForceStopTask = true;
-}
-//---------------------------------------------------------------------------
 void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 {
-    static unsigned int nCycleCounter = 0;
+	static unsigned int nCycleCounter = 0;
 	static unsigned int uBattleTimeout = 0;
 	static unsigned int uBattleDelayInSeconds = 0;
 	static unsigned int nScreenCheckFailures = 0;
@@ -103,8 +92,13 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
         return;
     }
 
-    //Обновляем прогресс текущего боя
-	ProgressBarBattle->Position = 100.0f * (static_cast<float>(uBattleTimeout) / static_cast<float>(uBattleDelayInSeconds));
+	if (bScreenCheckPassed)
+	{
+		//Обновляем прогресс текущего боя
+		ProgressBarBattle->Position = 100.0f * (static_cast<float>(uBattleTimeout) /
+			static_cast<float>(uBattleDelayInSeconds));
+		TaskbarApp->ProgressValue = ProgressBarBattle->Position;
+	}
 
     //Начало каждого боя
 	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
@@ -119,9 +113,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			String strTrayHint;
 			strTrayHint.sprintf(L"%s (%i/%i)", Application->Title.c_str(), nCycleCounter,
 				m_ActiveTaskInfo.Settings.nNumberOfBattles);
+			TrayIconApp->BalloonHint = L"";
 			TrayIconApp->Hint = strTrayHint;
 		}
 		LabelBattlesCounter->Font->Color = clSilver;
+		ProgressBarBattle->Style = TProgressBarStyle::pbstMarquee;
 
 		nScreenCheckFailures = 0;
 		bScreenCheckPassed = false;
@@ -131,61 +127,93 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 	//Тут 90% магии
 	//Если мы сюда попали не потому, что это самое начало, а потому, что были ошибки, ждём до заданного периода
-	if (!nScreenCheckFailures || (nScreenCheckFailures && (uScreenCheckingTiomeout == g_pSettingsManager->ScreenCheckingPeriod)))
+	if ((!nScreenCheckFailures || (nScreenCheckFailures && (uScreenCheckingTiomeout == g_pSettingsManager->ScreenCheckingPeriod))) &&
+		!bScreenCheckPassed)
 	{
+		bool bEnergyDialogProcessed;
+
+		g_pRAIDWorker->ValidateGameWindow();
+
 		uScreenCheckingTiomeout = 0;
 
-		//Если задан этот параметр, сначала проверяем кнопку "Начать", подразумевая, что перед нами экран начала боя
-		bool bSTARTMenuPassed = false;
-		if (nCycleCounter == 1 && m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst)
-		{
-			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.STARTScreenControlPoint, m_ActiveTaskInfo.Settings.STARTScreenControlPointColor))
+		//Прерыватель задачи: диалог пополнения энергии
+		//Появляется при её нехватке после попытки запуска боя
+		//Вызываем после попыток запустить бой
+		auto EnergyDialogTest {
+			[=, &bEnergyDialogProcessed](bool& bExitTimer)
 			{
-				//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
-				g_pRAIDWorker->SendKey(VK_RETURN);
-				LabelBattlesCounter->Font->Color = clBlack;
-				bScreenCheckPassed = true;
-			}
-		}
+				bEnergyDialogProcessed = false;
 
-		//Проверяем прерыватели выполнения задачи
-
-		//Диалог пополнения энергии
-		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->EnergyDialogControlPoint, g_pSettingsManager->EnergyDialogControlPointColor))
-		{
-			switch (g_pSettingsManager->EnergyDialogPreferredAction)
-			{
-				case PromptDialogAction::pdaAccept:
-					//Кликаем, куда задал пользователь (предполагается кнопка "Получить")
-					g_pRAIDWorker->SendMouseClick(g_pSettingsManager->EnergyDialogGETButtonPoint);
-					break;
-				case PromptDialogAction::pdaSkip:
-					g_pRAIDWorker->SendKey(VK_ESCAPE);
-					break;
-				case PromptDialogAction::pdaAbort:
+				if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->EnergyDialogControlPoint,
+					g_pSettingsManager->EnergyDialogControlPointColor, g_pSettingsManager->EnergyDialogControlPointColorTolerance))
 				{
-					//Если задано, просто заканчиваем задачу
-					nCycleCounter = 0;
-					this->StopTask(TaskStoppingReason::tsrSuccessfulCompletion);
+					switch (g_pSettingsManager->EnergyDialogPreferredAction)
+					{
+						case PromptDialogAction::pdaAccept:
+							//Кликаем, куда задал пользователь (предполагается кнопка "Получить")
+							g_pRAIDWorker->SendMouseClick(g_pSettingsManager->EnergyDialogGETButtonPoint);
+							bExitTimer = false;
+							break;
+						case PromptDialogAction::pdaSkip:
+							g_pRAIDWorker->SendKey(VK_ESCAPE);
+							bExitTimer = false;
+							break;
+						case PromptDialogAction::pdaAbort:
+						{
+							//Если задано, просто заканчиваем задачу
+							nCycleCounter = 0;
+							this->StopTask(TaskStoppingReason::tsrUser);
+							bExitTimer = true;
+							break;
+						}
+					}
 
-					return;
+					bEnergyDialogProcessed = true;
 				}
-			}
-		}
 
-		//Диалог работ на сервере
-		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->SMDialogControlPoint, g_pSettingsManager->SMDialogControlPointColor))
+				return bEnergyDialogProcessed;
+			}
+		};
+
+		//Прерыватель задачи: диалог работ на сервере
+		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->SMDialogControlPoint,
+			g_pSettingsManager->SMDialogControlPointColor, g_pSettingsManager->SMDialogControlPointColorTolerance))
 		{
 			//Просто игнорируем
 			g_pRAIDWorker->SendKey(VK_ESCAPE);
 		}
 
+		//Если задан этот параметр, сначала проверяем кнопку "Начать", подразумевая, что перед нами экран начала боя
+		if (nCycleCounter == 1 && m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst)
+		{
+			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.STARTScreenControlPoint.Coordinates,
+				m_ActiveTaskInfo.Settings.STARTScreenControlPoint.PixelColor, m_ActiveTaskInfo.Settings.STARTScreenControlPoint.uTolerance))
+			{
+				//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
+				g_pRAIDWorker->SendKey(VK_RETURN);
+
+				bool bExitTimer;
+				if (EnergyDialogTest(bExitTimer))
+				{
+					if (bExitTimer)
+						return;
+				}
+				else
+				{
+					LabelBattlesCounter->Font->Color = clBlack;
+					ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
+					bScreenCheckPassed = true;
+                }
+			}
+		}
+
 		//Если мы прошли первый бой или если не удалось найти кнопку "Начать", подразумеваем, что перед нами экран
 		//результатов боя и пытаемся нажать кнопку "Повтор"
-		if (!m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst || (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && nCycleCounter > 1)
-			|| (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && !bScreenCheckPassed))
+		if (!bEnergyDialogProcessed && (!m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst || (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && nCycleCounter > 1)
+			|| (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && !bScreenCheckPassed)))
 		{
-			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint, m_ActiveTaskInfo.Settings.REPLAYScreenControlPointColor))
+			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.Coordinates,
+				m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.PixelColor, m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.uTolerance))
 			{
 				//Отчёт, если задано создание скриншота по завершению каждого боя
 				if ((nCycleCounter > 1) && g_pSettingsManager->SaveResults &&
@@ -198,12 +226,34 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				//просто ждём экрана результатов
 				if (nCycleCounter <= m_ActiveTaskInfo.Settings.nNumberOfBattles)
 				{
-					//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
-					g_pRAIDWorker->SendKey('R');
-					LabelBattlesCounter->Font->Color = clBlack;
+					if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaReplay)
+					{
+						//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
+						g_pRAIDWorker->SendKey('R');
+					}
+					else if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaGoNext)
+					{
+						//Последовательное нажатие пробела и клавиши ввода запускает бой следующего уровня,
+						//эквивалентно нажатию кнопки "Далее"
+						g_pRAIDWorker->SendKey(VK_SPACE);
+						g_pRAIDWorker->SendKey(VK_RETURN);
+					}
+
+					bool bExitTimer;
+					if (EnergyDialogTest(bExitTimer))
+					{
+						if (bExitTimer)
+							return;
+					}
+					else
+					{
+						LabelBattlesCounter->Font->Color = clBlack;
+						ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
+					}
 				}
 
-				bScreenCheckPassed = true;
+				if (!bEnergyDialogProcessed)
+					bScreenCheckPassed = true;
 			}
 			else
 				nScreenCheckFailures++;
@@ -234,7 +284,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::ShowHideAutomatizer1Click(TObject *Sender)
+void __fastcall TFormMain::MenuItemShowHideAutomatizerClick(TObject *Sender)
 {
 	this->Visible = !this->Visible;
 	if (this->WindowState != wsNormal)
@@ -243,7 +293,7 @@ void __fastcall TFormMain::ShowHideAutomatizer1Click(TObject *Sender)
 		SetForegroundWindow(this->Handle);
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::OpenResults1Click(TObject *Sender)
+void __fastcall TFormMain::MenuItemOpenResultsClick(TObject *Sender)
 {
 	if (!g_pSettingsManager->PathForResults.IsEmpty() && !DirectoryExists(g_pSettingsManager->PathForResults))
 	{
@@ -267,14 +317,14 @@ void __fastcall TFormMain::OpenResults1Click(TObject *Sender)
 	ShellExecute(NULL, L"OPEN", strPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::Exit1Click(TObject *Sender)
+void __fastcall TFormMain::MenuItemExitClick(TObject *Sender)
 {
 	this->Close();
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::TrayIconAppDblClick(TObject *Sender)
 {
-	this->ShowHideAutomatizer1Click(this);
+	this->MenuItemShowHideAutomatizerClick(this);
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::FormCreate(TObject *Sender)
@@ -282,11 +332,23 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	g_pSettingsManager = new TSettingsManager;
 	g_pSettingsManager->ReadINI();
 
+	this->Left = g_pSettingsManager->MainWindowPosition.x;
+	this->Top = g_pSettingsManager->MainWindowPosition.y;
+
+	if (g_pSettingsManager->StayOnTop)
+	{
+		MenuItemStayOnTop->Checked = true;
+		this->FormStyle = TFormStyle::fsStayOnTop;
+	}
+
 	g_pRAIDWorker = new TRAIDWorker;
 
 	PageControlURAIDASettings->ActivePageIndex = g_pSettingsManager->RecentActivePage;
 	this->PageControlURAIDASettingsChange(this);
-	ButtonRunTask->Caption = m_strButtonRTRunCaption;
+	BitBtnRunTask->Caption = m_strButtonRTRunCaption;
+	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
+	ImageListRTButton->GetBitmap(0, pGlyph.get());
+	BitBtnRunTask->Glyph = pGlyph.get();
 
 	//Вывод названия и версии программы
 	String strAppVersion;
@@ -299,12 +361,12 @@ void __fastcall TFormMain::BitBtnSSPickPointClick(TObject *Sender)
 {
 	FormPickPoint->OnlyCoordinates = false;
 
-	if (FormPickPoint->Execute())
+	if (FormPickPoint->Execute(this))
 	{
 		PickPointData PPResults = FormPickPoint->GetResults();
 
-		UpDownSSXPos->Position = PPResults.XY.x;
-		UpDownSSYPos->Position = PPResults.XY.y;
+		UpDownSSX->Position = PPResults.XY.x;
+		UpDownSSY->Position = PPResults.XY.y;
 		PanelSSColor->Color = PPResults.Color;
 	}
 }
@@ -319,6 +381,9 @@ void __fastcall TFormMain::ButtonApplyGWSizeClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TFormMain::UpdateGMSpecSettingsFrame(TTabSheet *pPage)
 {
+	//Чтение настроек
+	g_pSettingsManager->ReadINI();
+
 	GameModeSpecSettings GMSpecSettings;
 
 	if (pPage == TabSheetCampaign)
@@ -335,12 +400,25 @@ void TFormMain::UpdateGMSpecSettingsFrame(TTabSheet *pPage)
 	}
 
 	CheckBoxProcessSTARTScreen->Checked = GMSpecSettings.bProcessSTARTScreenFirst;
-	UpDownSSXPos->Position = GMSpecSettings.STARTScreenControlPoint.x;
-	UpDownSSYPos->Position = GMSpecSettings.STARTScreenControlPoint.y;
-	PanelSSColor->Color = GMSpecSettings.STARTScreenControlPointColor;
-	UpDownRSXPos->Position = GMSpecSettings.REPLAYScreenControlPoint.x;
-	UpDownRSYPos->Position = GMSpecSettings.REPLAYScreenControlPoint.y;
-	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPointColor;
+	UpDownSSX->Position = GMSpecSettings.STARTScreenControlPoint.Coordinates.x;
+	UpDownSSY->Position = GMSpecSettings.STARTScreenControlPoint.Coordinates.y;
+	PanelSSColor->Color = GMSpecSettings.STARTScreenControlPoint.PixelColor;
+	UpDownSSColorTolerance->Position = GMSpecSettings.STARTScreenControlPoint.uTolerance;
+	UpDownRSX->Position = GMSpecSettings.REPLAYScreenControlPoint.Coordinates.x;
+	UpDownRSY->Position = GMSpecSettings.REPLAYScreenControlPoint.Coordinates.y;
+	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPoint.PixelColor;
+	UpDownRSColorTolerance->Position = GMSpecSettings.REPLAYScreenControlPoint.uTolerance;
+
+	switch (GMSpecSettings.REPLAYScreenPreferredAction)
+	{
+		case REPLAYScreenAction::rsaReplay:
+			RadioButtonRSActionReplay->Checked = true;
+			break;
+		case REPLAYScreenAction::rsaGoNext:
+			RadioButtonRSActionNext->Checked = true;
+            break;
+	}
+
 	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.uDelay);
 	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.uDelay);
 	UpDownNumberofBattles->Position = GMSpecSettings.nNumberOfBattles;
@@ -350,12 +428,24 @@ GameModeSpecSettings TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 {
 	GameModeSpecSettings GMSpecSettings;
 	GMSpecSettings.bProcessSTARTScreenFirst = CheckBoxProcessSTARTScreen->Checked;
-	GMSpecSettings.STARTScreenControlPoint.x = UpDownSSXPos->Position;
-	GMSpecSettings.STARTScreenControlPoint.y = UpDownSSYPos->Position;
-	GMSpecSettings.STARTScreenControlPointColor = PanelSSColor->Color;
-	GMSpecSettings.REPLAYScreenControlPoint.x = UpDownRSXPos->Position;
-	GMSpecSettings.REPLAYScreenControlPoint.y = UpDownRSYPos->Position;
-	GMSpecSettings.REPLAYScreenControlPointColor = PanelRSColor->Color;
+	GMSpecSettings.STARTScreenControlPoint.Coordinates.x = UpDownSSX->Position;
+	GMSpecSettings.STARTScreenControlPoint.Coordinates.y = UpDownSSY->Position;
+	GMSpecSettings.STARTScreenControlPoint.PixelColor = PanelSSColor->Color;
+	GMSpecSettings.STARTScreenControlPoint.uTolerance = UpDownSSColorTolerance->Position;
+	GMSpecSettings.REPLAYScreenControlPoint.Coordinates.x = UpDownRSX->Position;
+	GMSpecSettings.REPLAYScreenControlPoint.Coordinates.y = UpDownRSY->Position;
+	GMSpecSettings.REPLAYScreenControlPoint.PixelColor = PanelRSColor->Color;
+	GMSpecSettings.REPLAYScreenControlPoint.uTolerance = UpDownRSColorTolerance->Position;
+
+	if (RadioButtonRSActionReplay->Checked)
+	{
+		GMSpecSettings.REPLAYScreenPreferredAction = REPLAYScreenAction::rsaReplay;
+	}
+	else if (RadioButtonRSActionNext->Checked)
+	{
+		GMSpecSettings.REPLAYScreenPreferredAction = REPLAYScreenAction::rsaGoNext;
+	}
+
 	GMSpecSettings.uDelay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
 	GMSpecSettings.nNumberOfBattles = UpDownNumberofBattles->Position;
 
@@ -383,10 +473,13 @@ GameModeSpecSettings TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 //---------------------------------------------------------------------------
 void TFormMain::UpdateCommonSettingsFrame()
 {
+	//Чтение настроек
+	g_pSettingsManager->ReadINI();
+
 	UpDownGWWidth->Position = g_pSettingsManager->RAIDWindowSize.cx;
 	UpDownGWHeight->Position = g_pSettingsManager->RAIDWindowSize.cy;
 	CheckBoxSaveResults->Checked = g_pSettingsManager->SaveResults;
-	OpenResults1->Enabled = CheckBoxSaveResults->Checked;
+	MenuItemOpenResults->Enabled = CheckBoxSaveResults->Checked;
 
 	switch (g_pSettingsManager->ResultSavingMethod)
 	{
@@ -400,6 +493,7 @@ void TFormMain::UpdateCommonSettingsFrame()
 
 	UpDownSRPeriodically->Position = g_pSettingsManager->ResultSavingPeriod;
 	EditSRPath->Text = g_pSettingsManager->PathForResults;
+	CheckBoxClearOldResults->Checked = g_pSettingsManager->ClearOldResults;
 
 	ComboBoxTaskEndAction->ItemIndex = static_cast<int>(g_pSettingsManager->TaskEndBehavior);
 	CheckBoxTEAExit->Checked = g_pSettingsManager->ExitOnTaskEnding;
@@ -407,14 +501,14 @@ void TFormMain::UpdateCommonSettingsFrame()
 
 	UpDownTriesBeforeFTE->Position = g_pSettingsManager->TriesBeforeForceTaskEnding;
 	UpDownScreenCheckingInterval->Position = g_pSettingsManager->ScreenCheckingPeriod;
-	UpDownColorTolerance->Position = g_pSettingsManager->ColorTolerance;
 
-	UpDownEDXPos->Position = g_pSettingsManager->EnergyDialogControlPoint.x;
-	UpDownEDYPos->Position = g_pSettingsManager->EnergyDialogControlPoint.y;
+	UpDownEDX->Position = g_pSettingsManager->EnergyDialogControlPoint.x;
+	UpDownEDY->Position = g_pSettingsManager->EnergyDialogControlPoint.y;
 	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPointColor;
+	UpDownEDColorTolerance->Position = g_pSettingsManager->EnergyDialogControlPointColorTolerance;
 
-	UpDownEDGETXPos->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.x;
-	UpDownEDGETYPos->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.y;
+	UpDownEDGETX->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.x;
+	UpDownEDGETY->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.y;
 
 	switch (g_pSettingsManager->EnergyDialogPreferredAction)
 	{
@@ -429,9 +523,10 @@ void TFormMain::UpdateCommonSettingsFrame()
 			break;
 	}
 
-	UpDownSMXPos->Position = g_pSettingsManager->SMDialogControlPoint.x;
-	UpDownSMYPos->Position = g_pSettingsManager->SMDialogControlPoint.y;
+	UpDownSMX->Position = g_pSettingsManager->SMDialogControlPoint.x;
+	UpDownSMY->Position = g_pSettingsManager->SMDialogControlPoint.y;
 	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPointColor;
+	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPointColorTolerance;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromCommonSettingsFrame()
@@ -466,10 +561,10 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
 		g_pSettingsManager->FactionWarsSettings = GMSpecSettings;
 
-		this->UpDownEDXPos->Position *= fWidthCoeff;
-		this->UpDownEDYPos->Position *= fHeightCoeff;
-		this->UpDownSMXPos->Position *= fWidthCoeff;
-		this->UpDownSMYPos->Position *= fHeightCoeff;
+		this->UpDownEDX->Position *= fWidthCoeff;
+		this->UpDownEDY->Position *= fHeightCoeff;
+		this->UpDownSMX->Position *= fWidthCoeff;
+		this->UpDownSMY->Position *= fHeightCoeff;
 
 		g_pSettingsManager->RAIDWindowSize = NewGWSize;
 	}
@@ -487,6 +582,7 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->ResultSavingPeriod = UpDownSRPeriodically->Position;
 	g_pSettingsManager->PathForResults = EditSRPath->Text;
+	g_pSettingsManager->ClearOldResults = CheckBoxClearOldResults->Checked;
 
 	g_pSettingsManager->TaskEndBehavior = static_cast<TaskEndAction>(ComboBoxTaskEndAction->ItemIndex);
 	g_pSettingsManager->ExitOnTaskEnding = CheckBoxTEAExit->Checked;
@@ -494,11 +590,11 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->TriesBeforeForceTaskEnding = UpDownTriesBeforeFTE->Position;
 	g_pSettingsManager->ScreenCheckingPeriod = UpDownScreenCheckingInterval->Position;
-	g_pSettingsManager->ColorTolerance = UpDownColorTolerance->Position;
 
-	g_pSettingsManager->EnergyDialogControlPoint = TPoint(UpDownEDXPos->Position, UpDownEDYPos->Position);
+	g_pSettingsManager->EnergyDialogControlPoint = TPoint(UpDownEDX->Position, UpDownEDY->Position);
 	g_pSettingsManager->EnergyDialogControlPointColor = PanelEDColor->Color;
-	g_pSettingsManager->EnergyDialogGETButtonPoint = TPoint(UpDownEDGETXPos->Position, UpDownEDGETYPos->Position);
+	g_pSettingsManager->EnergyDialogControlPointColorTolerance = UpDownEDColorTolerance->Position;
+	g_pSettingsManager->EnergyDialogGETButtonPoint = TPoint(UpDownEDGETX->Position, UpDownEDGETY->Position);
 
 	if (RadioButtonEDAccept->Checked)
 	{
@@ -513,11 +609,22 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaAbort;
 	}
 
-	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMXPos->Position, UpDownSMYPos->Position);
+	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMX->Position, UpDownSMY->Position);
 	g_pSettingsManager->SMDialogControlPointColor = PanelSMColor->Color;
+	g_pSettingsManager->SMDialogControlPointColorTolerance = UpDownSMColorTolerance->Position;
 
 	//Запись в файл
 	g_pSettingsManager->UpdateINI();
+}
+//---------------------------------------------------------------------------
+void TFormMain::UpdateApplicationFrame()
+{
+	//
+}
+//---------------------------------------------------------------------------
+void TFormMain::SaveSettingsFromApplicationFrame()
+{
+	//
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
@@ -534,12 +641,12 @@ void __fastcall TFormMain::BitBtnRSPickPointClick(TObject *Sender)
 {
 	FormPickPoint->OnlyCoordinates = false;
 
-	if (FormPickPoint->Execute())
+	if (FormPickPoint->Execute(this))
 	{
 		PickPointData PPResults = FormPickPoint->GetResults();
 
-		UpDownRSXPos->Position = PPResults.XY.x;
-		UpDownRSYPos->Position = PPResults.XY.y;
+		UpDownRSX->Position = PPResults.XY.x;
+		UpDownRSY->Position = PPResults.XY.y;
 		PanelRSColor->Color = PPResults.Color;
     }
 }
@@ -574,7 +681,7 @@ void __fastcall TFormMain::TrayIconAppBalloonClick(TObject *Sender)
 {
 	if (g_pSettingsManager->SaveResults)
 	{
-		this->OpenResults1Click(this);
+		this->MenuItemOpenResultsClick(this);
 	}
 	else
 	{
@@ -582,7 +689,7 @@ void __fastcall TFormMain::TrayIconAppBalloonClick(TObject *Sender)
 		if (this->WindowState != wsNormal)
 			this->WindowState = wsNormal;
 		SetForegroundWindow(this->Handle);
-    }
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::FormShow(TObject *Sender)
@@ -607,20 +714,25 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 	this->SaveSettingsFromGMSpecSettingsFrame();
 	this->SaveSettingsFromCommonSettingsFrame();
 
+	g_pSettingsManager->StayOnTop = MenuItemStayOnTop->Checked;
 	g_pSettingsManager->RecentActivePage = PageControlURAIDASettings->ActivePageIndex;
+	g_pSettingsManager->MainWindowPosition = TPoint(this->Left, this->Top);
+
     g_pSettingsManager->UpdateINI();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::PageControlURAIDASettingsChange(TObject *Sender)
 {
-	if (PageControlURAIDASettings->ActivePage != TabSheetCommon)
+	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
 	{
 		if (ScrollBoxGMSpecSettings->Parent != PageControlURAIDASettings->ActivePage)
 			ScrollBoxGMSpecSettings->Parent = PageControlURAIDASettings->ActivePage;
 		this->UpdateGMSpecSettingsFrame(PageControlURAIDASettings->ActivePage);
 	}
-	else /*TabSheetCommon*/
+	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
 	{
 		this->UpdateCommonSettingsFrame();
 	}
@@ -629,11 +741,13 @@ void __fastcall TFormMain::PageControlURAIDASettingsChange(TObject *Sender)
 
 void __fastcall TFormMain::PageControlURAIDASettingsChanging(TObject *Sender, bool &AllowChange)
 {
-	if (PageControlURAIDASettings->ActivePage != TabSheetCommon)
+	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
 	{
 		this->SaveSettingsFromGMSpecSettingsFrame();
 	}
-	else
+	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
 	{
 		this->SaveSettingsFromCommonSettingsFrame();
 	}
@@ -686,30 +800,48 @@ void TFormMain::StartTask()
 			return;
 		}
 
-		g_pRAIDWorker->ValidateGameWindow();
+        //Очищаем папку результатов перед началом выполнения задачи, если указана такая опция
+		if (g_pSettingsManager->ClearOldResults)
+		{
+			if (!g_pSettingsManager->PathForResults.IsEmpty() && DirectoryExists(g_pSettingsManager->PathForResults) &&
+				!TDirectory::IsEmpty(g_pSettingsManager->PathForResults))
+			{
+				TDirectory::Delete(g_pSettingsManager->PathForResults, true);
+			}
+		}
 
 		//Запускаем таймер задачи по указанным параметрам
 		//Параметры будут применены только при старте новой задачи
 		m_ActiveTaskInfo.Settings = this->SaveSettingsFromGMSpecSettingsFrame();
 
-		ProgressBarBattle->Position = 0;
 		LabelBattlesCounter->Font->Color = clBlack;
+		ProgressBarBattle->Position = 0;
+		TaskbarApp->ProgressValue = 0;
 
 		m_ActiveTaskInfo.StartTime = Now();
 	}
 
+	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
 	switch (m_ActiveTaskInfo.CurrentState)
 	{
 		case TaskState::tsStopped:
 		case TaskState::tsPaused:
 			m_ActiveTaskInfo.CurrentState = TaskState::tsRunning;
-			ButtonRunTask->Caption = m_strButtonRTPauseCaption;
+			BitBtnRunTask->Caption = m_strButtonRTPauseCaption;
+			ImageListRTButton->GetBitmap(1, pGlyph.get());
+			BitBtnRunTask->Glyph = pGlyph.get();
+			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 
 			TimerMain->Enabled = true;
 			break;
 		case TaskState::tsRunning:
 			m_ActiveTaskInfo.CurrentState = TaskState::tsPaused;
-			ButtonRunTask->Caption = m_strButtonRTResumeCaption;
+			BitBtnRunTask->Caption = m_strButtonRTResumeCaption;
+			ImageListRTButton->GetBitmap(2, pGlyph.get());
+			BitBtnRunTask->Glyph = pGlyph.get();
+			ProgressBarBattle->State = TProgressBarState::pbsPaused;
+			TaskbarApp->ProgressState = TTaskBarProgressState::Paused;
 
 			TimerMain->Enabled = false;
 			break;
@@ -724,24 +856,42 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 		return;
 
 	TimerMain->Enabled = false;
+    ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
 	ProgressBarBattle->Position = 100;
+	TaskbarApp->ProgressValue = 100;
 
 	m_ActiveTaskInfo.CurrentState = TaskState::tsStopped;
-	ButtonRunTask->Caption = m_strButtonRTRunCaption;
+	BitBtnRunTask->Caption = m_strButtonRTRunCaption;
+	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
+	ImageListRTButton->GetBitmap(0, pGlyph.get());
+	BitBtnRunTask->Glyph = pGlyph.get();
 
-    TrayIconApp->Hint = Application->Title;
+	TrayIconApp->BalloonHint = L"";
+	TrayIconApp->Hint = Application->Title;
 
 	switch (Reason)
 	{
 		case TaskStoppingReason::tsrUser:
+		{
 			LabelBattlesCounter->Font->Color = clGray;
+			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 			break;
+		}
 		case TaskStoppingReason::tsrSuccessfulCompletion:
+		{
 			LabelBattlesCounter->Font->Color = clGreen;
+			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 			break;
+		}
 		case TaskStoppingReason::tsrError:
+		{
 			LabelBattlesCounter->Font->Color = clRed;
+			ProgressBarBattle->State = TProgressBarState::pbsError;
+			TaskbarApp->ProgressState = TTaskBarProgressState::Error;
 			break;
+		}
 	}
 
     //Если это не пользователь нажал кнопку..
@@ -760,10 +910,12 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 				if (Reason == TaskStoppingReason::tsrSuccessfulCompletion)
 				{
 					TrayIconApp->BalloonHint = L"Задача успешно завершена";
+					TrayIconApp->BalloonFlags = TBalloonFlags::bfInfo;
 				}
 				else if (Reason == TaskStoppingReason::tsrError)
 				{
 					TrayIconApp->BalloonHint = L"Принудительное завершение задачи из-за ошибок";
+                    TrayIconApp->BalloonFlags = TBalloonFlags::bfError;
 				}
 				TrayIconApp->ShowBalloonHint();
 				break;
@@ -852,8 +1004,16 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	{
 		//Дополнительно указываем на скриншоте координату проверки в виде красного крестика
 		const unsigned int uMarkerIndent = 10;
-		TPoint ControlPoint = (nBattleNumber > 1)?(this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint):
-			(this->m_ActiveTaskInfo.Settings.STARTScreenControlPoint);
+		TPoint ControlPoint;
+		if (nBattleNumber > 1)
+		{
+			ControlPoint = this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.Coordinates;
+		}
+		else
+		{
+			ControlPoint = this->m_ActiveTaskInfo.Settings.STARTScreenControlPoint.Coordinates;
+		}
+
 		pImage->Canvas->Pen->Color = clRed;
 		pImage->Canvas->Pen->Width = 3;
 		pImage->Canvas->MoveTo(ControlPoint.x - uMarkerIndent , ControlPoint.y);
@@ -870,7 +1030,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 
 void __fastcall TFormMain::CheckBoxSaveResultsClick(TObject *Sender)
 {
-	OpenResults1->Enabled = CheckBoxSaveResults->Checked;
+	MenuItemOpenResults->Enabled = CheckBoxSaveResults->Checked;
 }
 //---------------------------------------------------------------------------
 
@@ -878,12 +1038,12 @@ void __fastcall TFormMain::BitBtnEDPickPointClick(TObject *Sender)
 {
 	FormPickPoint->OnlyCoordinates = false;
 
-	if (FormPickPoint->Execute())
+	if (FormPickPoint->Execute(this))
 	{
 		PickPointData PPResults = FormPickPoint->GetResults();
 
-		UpDownEDXPos->Position = PPResults.XY.x;
-		UpDownEDYPos->Position = PPResults.XY.y;
+		UpDownEDX->Position = PPResults.XY.x;
+		UpDownEDY->Position = PPResults.XY.y;
 		PanelEDColor->Color = PPResults.Color;
 	}
 }
@@ -893,12 +1053,12 @@ void __fastcall TFormMain::BitBtnEDGETPickPointClick(TObject *Sender)
 {
 	FormPickPoint->OnlyCoordinates = true;
 
-	if (FormPickPoint->Execute())
+	if (FormPickPoint->Execute(this))
 	{
 		PickPointData PPResults = FormPickPoint->GetResults();
 
-		UpDownEDGETXPos->Position = PPResults.XY.x;
-		UpDownEDGETYPos->Position = PPResults.XY.y;
+		UpDownEDGETX->Position = PPResults.XY.x;
+		UpDownEDGETY->Position = PPResults.XY.y;
 	}
 }
 //---------------------------------------------------------------------------
@@ -907,12 +1067,12 @@ void __fastcall TFormMain::BitBtnSMPickColorClick(TObject *Sender)
 {
 	FormPickPoint->OnlyCoordinates = false;
 
-	if (FormPickPoint->Execute())
+	if (FormPickPoint->Execute(this))
 	{
 		PickPointData PPResults = FormPickPoint->GetResults();
 
-		UpDownSMXPos->Position = PPResults.XY.x;
-		UpDownSMYPos->Position = PPResults.XY.y;
+		UpDownSMX->Position = PPResults.XY.x;
+		UpDownSMY->Position = PPResults.XY.y;
 		PanelSMColor->Color = PPResults.Color;
 	}
 }
@@ -955,6 +1115,47 @@ void __fastcall TFormMain::PanelSMColorClick(TObject *Sender)
 	{
 		PanelSMColor->Color = ColorDialogCPColor->Color;
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::LinkLabelReleasesClick(TObject *Sender)
+{
+	ShellExecute(NULL, L"OPEN", L"https://github.com/BorisVorontsov/URAIDA/releases/", NULL, NULL, SW_SHOWNORMAL);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::MenuItemStayOnTopClick(TObject *Sender)
+{
+	MenuItemStayOnTop->Checked = !MenuItemStayOnTop->Checked;
+	this->FormStyle = (MenuItemStayOnTop->Checked)?TFormStyle::fsStayOnTop:TFormStyle::fsNormal;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::MenuItemMoveToCenterClick(TObject *Sender)
+{
+	this->Left = (Screen->Width - this->Width) / 2;
+	this->Top = (Screen->Height - this->Height) / 2;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnRunTaskClick(TObject *Sender)
+{
+	m_bForceStopTask = false;
+	this->StartTask();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnStopTaskClick(TObject *Sender)
+{
+	m_bForceStopTask = true;
+	if (m_ActiveTaskInfo.CurrentState == TaskState::tsPaused)
+		this->TimerMainTimer(this);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::PopupMenuTrayPopup(TObject *Sender)
+{
+    MenuItemMoveToCenter->Enabled = this->Visible;
 }
 //---------------------------------------------------------------------------
 

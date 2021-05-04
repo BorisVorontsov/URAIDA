@@ -30,10 +30,12 @@ __published:	// IDE-managed Components
 	TLabel *LabelColorInfo;
 	TLabel *LabelYInfo;
 	TLabel *LabelXInfo;
-	TPanel *PanelColor;
 	TLabel *LabelColorInRGB;
 	TLabel *LabelY;
 	TLabel *LabelX;
+	TPanel *PanelColor;
+	TBevel *Bevel1;
+	TBevel *Bevel2;
 	void __fastcall ImageCapturedFrameClick(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall ButtonSourceFromGameClick(TObject *Sender);
@@ -41,6 +43,8 @@ __published:	// IDE-managed Components
 	void __fastcall ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y);
 	void __fastcall FormShow(TObject *Sender);
+	void __fastcall PanelCPInfoMouseMove(TObject *Sender, TShiftState Shift, int X,
+          int Y);
 
 private:	// User declarations
 	PickPointData m_Data;
@@ -53,7 +57,7 @@ public:		// User declarations
 
 	__property bool OnlyCoordinates = { read = m_bOnlyCoordinates, write = m_bOnlyCoordinates };
 
-	bool Execute();
+	bool Execute(TForm* pParent);
 	PickPointData GetResults() { return m_Data; }
 };
 //---------------------------------------------------------------------------

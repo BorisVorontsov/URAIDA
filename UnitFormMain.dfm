@@ -9,7 +9,7 @@ object FormMain: TFormMain
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -19
+  Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
@@ -18,7 +18,7 @@ object FormMain: TFormMain
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 23
+  TextHeight = 19
   object Bevel1: TBevel
     Left = 8
     Top = 529
@@ -30,7 +30,7 @@ object FormMain: TFormMain
     Left = 8
     Top = 557
     Width = 305
-    Height = 18
+    Height = 22
     AutoSize = False
     Caption = '#'
     Font.Charset = DEFAULT_CHARSET
@@ -44,7 +44,7 @@ object FormMain: TFormMain
     Left = 8
     Top = 577
     Width = 140
-    Height = 18
+    Height = 22
     AutoSize = False
     Caption = #1041#1086#1088#1080#1089#1072' '#1042#1086#1088#1086#1085#1094#1086#1074#1072
     Font.Charset = DEFAULT_CHARSET
@@ -256,12 +256,6 @@ object FormMain: TFormMain
     Width = 561
     Height = 437
     ActivePage = TabSheetCampaign
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
     TabOrder = 2
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
@@ -854,9 +848,9 @@ object FormMain: TFormMain
         end
         object Bevel2: TBevel
           Left = 8
-          Top = 1028
+          Top = 1023
           Width = 537
-          Height = 46
+          Height = 43
           Shape = bsBottomLine
         end
         object LabelPreferredGWSize: TLabel
@@ -1820,7 +1814,7 @@ object FormMain: TFormMain
   object LinkLabelReleases: TLinkLabel
     Left = 154
     Top = 577
-    Width = 48
+    Width = 55
     Height = 22
     AutoSize = False
     Caption = '<a>GitHub</a>'
@@ -2485,6 +2479,7 @@ object FormMain: TFormMain
     Top = 416
   end
   object PopupMenuTray: TPopupMenu
+    OnPopup = PopupMenuTrayPopup
     Left = 520
     Top = 416
     object MenuItemShowHideAutomatizer: TMenuItem

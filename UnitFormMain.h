@@ -16,6 +16,8 @@
 #include <Vcl.ImgList.hpp>
 #include <Vcl.Dialogs.hpp>
 #include <Vcl.Imaging.pngimage.hpp>
+#include <System.Win.TaskbarCore.hpp>
+#include <Vcl.Taskbar.hpp>
 //---------------------------------------------------------------------------
 
 typedef enum tagTaskState
@@ -47,17 +49,14 @@ __published:	// IDE-managed Components
 	TTabSheet *TabSheetCampaign;
 	TTabSheet *TabSheetDungeons;
 	TTabSheet *TabSheetFactionWars;
-	TButton *ButtonRunTask;
-	TButton *ButtonStopTask;
 	TTabSheet *TabSheetCommon;
 	TBevel *Bevel1;
 	TTimer *TimerMain;
-	TLabel *LabelBattlesCounter;
 	TTrayIcon *TrayIconApp;
 	TLabel *LabelCopyright1;
 	TPopupMenu *PopupMenuTray;
-	TMenuItem *ShowHideAutomatizer1;
-	TMenuItem *Exit1;
+	TMenuItem *MenuItemShowHideAutomatizer;
+	TMenuItem *MenuItemExit;
 	TScrollBox *ScrollBox1;
 	TLabel *LabelGWWidth;
 	TEdit *EditGWWidth;
@@ -98,21 +97,20 @@ __published:	// IDE-managed Components
 	TLabel *LabelSSX;
 	TLabel *LabelSSColor;
 	TEdit *EditRSY;
-	TUpDown *UpDownRSYPos;
-	TUpDown *UpDownRSXPos;
+	TUpDown *UpDownRSY;
+	TUpDown *UpDownRSX;
 	TEdit *EditRSX;
 	TPanel *PanelRSColor;
 	TBitBtn *BitBtnRSPickPoint;
 	TEdit *EditSSY;
 	TBitBtn *BitBtnSSPickPoint;
-	TUpDown *UpDownSSYPos;
+	TUpDown *UpDownSSY;
 	TPanel *PanelSSColor;
-	TUpDown *UpDownSSXPos;
+	TUpDown *UpDownSSX;
 	TEdit *EditSSX;
 	TCheckBox *CheckBoxProcessSTARTScreen;
 	TLinkLabel *LinkLabel1;
 	TLinkLabel *LinkLabel2;
-	TBevel *Bevel3;
 	TButton *ButtonApplyGWSize;
 	TButton *ButtonUseCurrentGWSize;
 	TProgressBar *ProgressBarBattle;
@@ -120,7 +118,7 @@ __published:	// IDE-managed Components
 	TPanel *PanelCover;
 	TImage *ImageAppIcon;
 	TMenuItem *N1;
-	TMenuItem *OpenResults1;
+	TMenuItem *MenuItemOpenResults;
 	TGroupBox *GroupBoxTaskBreakers;
 	TGroupBox *GroupBoxEnergyDialog;
 	TLabel *LabelEDY;
@@ -129,9 +127,9 @@ __published:	// IDE-managed Components
 	TLabel *LabelEDCP;
 	TEdit *EditEDY;
 	TBitBtn *BitBtnEDPickPoint;
-	TUpDown *UpDownEDYPos;
+	TUpDown *UpDownEDY;
 	TPanel *PanelEDColor;
-	TUpDown *UpDownEDXPos;
+	TUpDown *UpDownEDX;
 	TEdit *EditEDX;
 	TLabel *LabelEDAction;
 	TRadioButton *RadioButtonEDAccept;
@@ -143,22 +141,19 @@ __published:	// IDE-managed Components
 	TLabel *LabelSMCP;
 	TEdit *EditSMY;
 	TBitBtn *BitBtnSMPickColor;
-	TUpDown *UpDownSMYPos;
+	TUpDown *UpDownSMY;
 	TPanel *PanelSMColor;
-	TUpDown *UpDownSMXPos;
+	TUpDown *UpDownSMX;
 	TEdit *EditSMX;
-	TLabel *LabelColorTolerance;
-	TEdit *EditColorTolerance;
-	TUpDown *UpDownColorTolerance;
 	TColorDialog *ColorDialogCPColor;
 	TLabel *LabelPreferredGWSize;
 	TLabel *LabelEDGETButton;
 	TLabel *LabelEDGETX;
 	TEdit *EditEDGETX;
-	TUpDown *UpDownEDGETXPos;
+	TUpDown *UpDownEDGETX;
 	TLabel *LabelEDGETY;
 	TEdit *EditEDGETY;
-	TUpDown *UpDownEDGETYPos;
+	TUpDown *UpDownEDGETY;
 	TBitBtn *BitBtnEDGETPickPoint;
 	TRadioButton *RadioButtonEDAbort;
 	TGroupBox *GroupBoxTaskParameters;
@@ -171,11 +166,36 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownBTMinutes;
 	TLabel *LabelBT;
 	TLabel *LabelNumberofBattles;
-	void __fastcall ButtonRunTaskClick(TObject *Sender);
-	void __fastcall ButtonStopTaskClick(TObject *Sender);
+	TLabel *LabelRSAction;
+	TRadioButton *RadioButtonRSActionReplay;
+	TRadioButton *RadioButtonRSActionNext;
+	TTaskbar *TaskbarApp;
+	TPanel *PanelBattles;
+	TLabel *LabelBattlesCounter;
+	TLabel *LabelSSColorTolerance;
+	TEdit *EditSSColorTolerance;
+	TUpDown *UpDownSSColorTolerance;
+	TLabel *LabelRSColorTolerance;
+	TEdit *EditRSColorTolerance;
+	TUpDown *UpDownRSColorTolerance;
+	TLabel *LabelEDColorTolerance;
+	TEdit *EditEDColorTolerance;
+	TUpDown *UpDownEDColorTolerance;
+	TLabel *LabelSMColorTolerance;
+	TEdit *EditSMColorTolerance;
+	TUpDown *UpDownSMColorTolerance;
+	TLinkLabel *LinkLabelReleases;
+	TMenuItem *MenuItemMainWindow;
+	TMenuItem *N2;
+	TMenuItem *MenuItemStayOnTop;
+	TMenuItem *MenuItemMoveToCenter;
+	TCheckBox *CheckBoxClearOldResults;
+	TBitBtn *BitBtnStopTask;
+	TBitBtn *BitBtnRunTask;
+	TImageList *ImageListRTButton;
 	void __fastcall TimerMainTimer(TObject *Sender);
-	void __fastcall ShowHideAutomatizer1Click(TObject *Sender);
-	void __fastcall Exit1Click(TObject *Sender);
+	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
+	void __fastcall MenuItemExitClick(TObject *Sender);
 	void __fastcall TrayIconAppDblClick(TObject *Sender);
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall BitBtnSSPickPointClick(TObject *Sender);
@@ -192,7 +212,7 @@ __published:	// IDE-managed Components
 	void __fastcall ButtonSRBrowsePathClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall ButtonClearAllResultsClick(TObject *Sender);
-	void __fastcall OpenResults1Click(TObject *Sender);
+	void __fastcall MenuItemOpenResultsClick(TObject *Sender);
 	void __fastcall CheckBoxSaveResultsClick(TObject *Sender);
 	void __fastcall BitBtnEDPickPointClick(TObject *Sender);
 	void __fastcall BitBtnSMPickColorClick(TObject *Sender);
@@ -201,6 +221,12 @@ __published:	// IDE-managed Components
 	void __fastcall PanelEDColorClick(TObject *Sender);
 	void __fastcall PanelSMColorClick(TObject *Sender);
 	void __fastcall BitBtnEDGETPickPointClick(TObject *Sender);
+	void __fastcall LinkLabelReleasesClick(TObject *Sender);
+	void __fastcall MenuItemStayOnTopClick(TObject *Sender);
+	void __fastcall MenuItemMoveToCenterClick(TObject *Sender);
+	void __fastcall BitBtnRunTaskClick(TObject *Sender);
+	void __fastcall BitBtnStopTaskClick(TObject *Sender);
+	void __fastcall PopupMenuTrayPopup(TObject *Sender);
 
 
 private:	// User declarations
@@ -220,6 +246,8 @@ private:	// User declarations
 	GameModeSpecSettings SaveSettingsFromGMSpecSettingsFrame();
 	void UpdateCommonSettingsFrame();
 	void SaveSettingsFromCommonSettingsFrame();
+	void UpdateApplicationFrame();
+    void SaveSettingsFromApplicationFrame();
 
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);

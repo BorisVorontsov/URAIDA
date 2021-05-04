@@ -27,23 +27,22 @@ void __fastcall TFormPickPoint::ImageCapturedFrameClick(TObject *Sender)
 	this->Close();
 }
 //---------------------------------------------------------------------------
-bool TFormPickPoint::Execute()
+bool TFormPickPoint::Execute(TForm* pParent)
 {
 	if (m_bOnlyCoordinates)
 	{
 		LabelColorInfo->Visible = false;
 		PanelColor->Visible = false;
 		LabelColorInRGB->Visible = false;
-		PanelCPInfo->Height = PanelCPInfo->Constraints->MinHeight;
 	}
 	else
 	{
 		LabelColorInfo->Visible = true;
 		PanelColor->Visible = true;
-		LabelColorInRGB->Visible = true;
-		PanelCPInfo->Height = PanelCPInfo->Constraints->MaxHeight;
 	}
 
+	this->PopupParent = nullptr; // остыль дл€ обхода проблемы заблокированного модального окна с формой OnTop
+	this->PopupParent = pParent;
 	this->ShowModal();
 
 	return !m_bCancelled;
@@ -63,13 +62,24 @@ void __fastcall TFormPickPoint::ButtonSourceFromGameClick(TObject *Sender)
 {
 	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 	PanelMenu->Visible = false;
+	PanelCPInfo->Visible = true;
 
 	g_pRAIDWorker->ValidateGameWindow();
 
 	this->ResizeAndAlignWindow();
 
-	ImageCapturedFrame->Picture->Bitmap->SetSize(this->ClientWidth, this->ClientHeight);
-	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, TSize(this->ClientWidth, this->ClientHeight));
+    //≈сли надо выводить и помещаемс€ по ширине, делаем видимым..
+	if (!m_bOnlyCoordinates)
+	{
+		LabelColorInRGB->Visible = (PanelCPInfo->ClientWidth > LabelColorInRGB->BoundsRect.Right);
+	}
+	else
+	{
+		LabelColorInRGB->Visible = false;
+	}
+
+	ImageCapturedFrame->Picture->Bitmap->SetSize(ImageCapturedFrame->Width, ImageCapturedFrame->Height);
+	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, ImageCapturedFrame->BoundsRect.Size);
 }
 //---------------------------------------------------------------------------
 
@@ -103,6 +113,7 @@ void __fastcall TFormPickPoint::ButtonSourceFromFileClick(TObject *Sender)
 		if (!pBitmap->Empty)
 		{
 			PanelMenu->Visible = false;
+			PanelCPInfo->Visible = true;
 
 			this->ResizeAndAlignWindow();
 
@@ -130,7 +141,7 @@ void __fastcall TFormPickPoint::ImageCapturedFrameMouseMove(TObject *Sender, TSh
 	{
 		TColor PixelColor = ImageCapturedFrame->Canvas->Pixels[m_Data.XY.x][m_Data.XY.y];
 		String strRGBValues;
-		strRGBValues.sprintf(L"R: %i G: %i B: %i", GetRValue(PixelColor), GetGValue(PixelColor), GetBValue(PixelColor));
+		strRGBValues.sprintf(L"(R: %i G: %i B: %i)", GetRValue(PixelColor), GetGValue(PixelColor), GetBValue(PixelColor));
 		PanelColor->Color = PixelColor;
 		LabelColorInRGB->Caption = strRGBValues;
 	}
@@ -141,10 +152,10 @@ void __fastcall TFormPickPoint::FormShow(TObject *Sender)
 {
 	this->ClientWidth = this->Constraints->MinWidth;
 	this->ClientHeight = this->Constraints->MinHeight;
-
 	this->Left = (Screen->Width - this->ClientWidth) / 2;
 	this->Top = (Screen->Height - this->ClientHeight) / 2;
 
+    PanelCPInfo->Visible = false;
 	PanelMenu->Visible = true;
 }
 //---------------------------------------------------------------------------
@@ -152,10 +163,21 @@ void TFormPickPoint::ResizeAndAlignWindow()
 {
 	TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
 
-	this->Left = (Screen->Width - GWSizeFromSettings.cx) / 2;
-	this->Top = (Screen->Height - GWSizeFromSettings.cy) / 2;
 	this->ClientWidth = GWSizeFromSettings.cx;
-	this->ClientHeight = GWSizeFromSettings.cy;
+	this->ClientHeight = GWSizeFromSettings.cy + PanelCPInfo->Height;
+	this->Left = (Screen->Width - this->ClientWidth) / 2;
+	this->Top = (Screen->Height - this->ClientHeight) / 2;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormPickPoint::PanelCPInfoMouseMove(TObject *Sender, TShiftState Shift,
+          int X, int Y)
+{
+	if (Shift.Contains(ssLeft))
+	{
+		ReleaseCapture();
+		SendMessage(this->Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+	}
 }
 //---------------------------------------------------------------------------
 

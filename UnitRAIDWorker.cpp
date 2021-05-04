@@ -54,7 +54,7 @@ bool TRAIDWorker::CaptureFrame(TCanvas *pDestination, const TSize& Size)
 	return true;
 }
 //---------------------------------------------------------------------------
-bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor)
+bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor, unsigned int uTolerance)
 {
 	this->GainGameWindow();
 	if (!this->IsGameRunning())
@@ -67,7 +67,7 @@ bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor)
 		(GetGValue(FramePixel) - GetGValue(KeyColor)) ^ 2 +
 		(GetBValue(FramePixel) - GetBValue(KeyColor)) ^ 2;
 	uDistance = sqrt(uDistance);
-	return (uDistance <= g_pSettingsManager->ColorTolerance);
+	return (uDistance <= uTolerance);
 }
 //---------------------------------------------------------------------------
 TRect TRAIDWorker::GetGameWindowSize(bool bClient)

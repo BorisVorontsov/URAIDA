@@ -14,7 +14,7 @@ public:
 
 	bool IsGameRunning();
 	bool CaptureFrame(TCanvas *pDestination, const TSize& Size);
-	bool ComparePixels(const TPoint& PositionInFrame, TColor KeyColor);
+	bool ComparePixels(const TPoint& PositionInFrame, TColor KeyColor, unsigned int uTolerance = 1);
 	TRect GetGameWindowSize(bool bClient = false);
 	void ResizeGameWindow(const TSize& NewSize);
 	void SendKey(System::WideChar Key);
