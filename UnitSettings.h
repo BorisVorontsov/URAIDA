@@ -5,6 +5,8 @@
 //---------------------------------------------------------------------------
 #include <System.Classes.hpp>
 #include <System.IniFiles.hpp>
+#include <memory>
+#include <array>
 
 //Тип сохранения результата
 typedef enum tagResultSavingMode
@@ -30,14 +32,79 @@ typedef enum tagSupportedGameModes
 	gmFactionWars
 } SupportedGameModes;
 
-typedef struct tagControlPoint
+//Интерфейс сериализации для классов настроек
+class IIniSerialization
 {
-	TPoint Coordinates;
-	TColor PixelColor;
-	unsigned int uTolerance;
+public:
+	virtual void Load(TIniFile* pIniFile, String strSection) = 0;
+	virtual void Load(String strIniFile, String strSection) = 0;
+	virtual void Serialize(TIniFile* pIniFile, String strSection) = 0;
+	virtual void Serialize(String strIniFile, String strSection) = 0;
+};
 
-	tagControlPoint() { ZeroMemory(this, sizeof(*this)); }
-} ControlPoint;
+const unsigned int g_uMaxControlPoints = 3; //Максимальное количество контрольных точек для задания
+
+//Описатель контрольной точки
+class TControlPoint : public IIniSerialization
+{
+public:
+	TControlPoint()
+	{
+		m_Coordinates.SetLocation(0, 0);
+		m_PixelColor = clBlack;
+		m_uTolerance = 0;
+		m_strControlPointName = L"";
+	}
+	~TControlPoint() { /* */ }
+
+	void ShiftCoordinates(float fXCoeff, float fYCoeff)
+	{
+		m_Coordinates.x *= fXCoeff;
+		m_Coordinates.y *= fYCoeff;
+	}
+
+	void Load(TIniFile* pIniFile, String strSection) override
+	{
+		m_Coordinates.x = pIniFile->ReadInteger(strSection, m_strControlPointName + L"X", 0);
+		m_Coordinates.y = pIniFile->ReadInteger(strSection, m_strControlPointName + L"Y", 0);
+		m_PixelColor = static_cast<TColor>(pIniFile->ReadInteger(strSection, m_strControlPointName + L"Color", clWhite));
+		m_uTolerance = pIniFile->ReadInteger(strSection, m_strControlPointName + L"Tolerance", 1);
+		m_bEnabled = pIniFile->ReadBool(strSection, m_strControlPointName + L"Enabled", false);
+	}
+	void Load(String strIniFile, String strSection) override
+	{
+		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		this->Load(pOutput.get(), strSection);
+	}
+
+	void Serialize(TIniFile* pIniFile, String strSection) override
+	{
+		pIniFile->WriteInteger(strSection, m_strControlPointName + L"X", m_Coordinates.x);
+		pIniFile->WriteInteger(strSection, m_strControlPointName + L"Y", m_Coordinates.y);
+		pIniFile->WriteInteger(strSection, m_strControlPointName + L"Color", m_PixelColor);
+		pIniFile->WriteInteger(strSection, m_strControlPointName + L"Tolerance", m_uTolerance);
+		pIniFile->WriteBool(strSection, m_strControlPointName + L"Enabled", m_bEnabled);
+	}
+	void Serialize(String strIniFile, String strSection) override
+	{
+		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		this->Serialize(pOutput.get(), strSection);
+	}
+
+	//Свойства
+	__property TPoint Coordinates = { read = m_Coordinates, write = m_Coordinates };
+	__property TColor PixelColor = { read = m_PixelColor, write = m_PixelColor };
+	__property unsigned int Tolerance = { read = m_uTolerance, write = m_uTolerance };
+	__property bool Enabled = { read = m_bEnabled, write = m_bEnabled };
+	__property String Name = { read = m_strControlPointName, write = m_strControlPointName };
+
+private:
+	TPoint m_Coordinates;
+	TColor m_PixelColor;
+	unsigned int m_uTolerance;
+	bool m_bEnabled;
+	String m_strControlPointName;
+};
 
 //Действия на экране ПОВТОР/ДАЛЕЕ
 typedef enum tagREPLAYScreenAction
@@ -47,25 +114,80 @@ typedef enum tagREPLAYScreenAction
 } REPLAYScreenAction;
 
 //ООбщие настройки для отдельных игровых режимов
-typedef struct tagGameModeSpecSettings
+class TGameModeSpecSettings : public IIniSerialization
 {
-    SupportedGameModes GameMode;
-	bool bProcessSTARTScreenFirst;
-	ControlPoint STARTScreenControlPoint;
-	ControlPoint REPLAYScreenControlPoint;
-	REPLAYScreenAction REPLAYScreenPreferredAction;
-	unsigned int uDelay;
-	unsigned int nNumberOfBattles;
-
-	tagGameModeSpecSettings() { ZeroMemory(this, sizeof(*this)); }
-	void ShiftCoordinates(float fXCoeff, float fYCoeff)
+public:
+	TGameModeSpecSettings()
 	{
-		STARTScreenControlPoint.Coordinates.x *= fXCoeff;
-		STARTScreenControlPoint.Coordinates.y *= fYCoeff;
-		REPLAYScreenControlPoint.Coordinates.x *= fXCoeff;
-		REPLAYScreenControlPoint.Coordinates.y *= fYCoeff;
-	};
-} GameModeSpecSettings;
+		for (int i = 0; i < m_STARTScreenControlPoints.size(); i++)
+			m_STARTScreenControlPoints[i].Name = String(L"STARTScreenControlPoint") + IntToStr(i + 1);
+		for (int i = 0; i < m_REPLAYScreenControlPoints.size(); i++)
+			m_REPLAYScreenControlPoints[i].Name = String(L"REPLAYScreenControlPoint") + IntToStr(i + 1);
+	}
+	~TGameModeSpecSettings() { /* */ }
+
+	void Load(TIniFile* pIniFile, String strSection) override
+	{
+		m_bProcessSTARTScreenFirst = pIniFile->ReadBool(strSection, L"ProcessSTARTScreenFirst", true);
+		for (auto& ControlPoint : m_STARTScreenControlPoints)
+			ControlPoint.Load(pIniFile, strSection);
+		m_uSTARTScreenControlPointIndex = pIniFile->ReadInteger(strSection, L"STARTScreenControlPointIndex", 0);
+		for (auto& ControlPoint : m_REPLAYScreenControlPoints)
+			ControlPoint.Load(pIniFile, strSection);
+		m_uREPLAYScreenControlPointIndex = pIniFile->ReadInteger(strSection, L"REPLAYScreenControlPointIndex", 0);
+		m_REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pIniFile->ReadInteger(strSection, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
+		m_uDelay = pIniFile->ReadInteger(strSection, L"Delay", 10);
+		m_nNumberOfBattles = pIniFile->ReadInteger(strSection, L"NumberOfBattles", 1);
+	}
+	void Load(String strIniFile, String strSection) override
+	{
+		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		this->Load(pOutput.get(), strSection);
+	}
+
+	void Serialize(TIniFile* pIniFile, String strSection) override
+	{
+		pIniFile->WriteBool(strSection, L"ProcessSTARTScreenFirst", m_bProcessSTARTScreenFirst);
+		for (auto& ControlPoint : m_STARTScreenControlPoints)
+			ControlPoint.Serialize(pIniFile, strSection);
+		//m_STARTScreenControlPoints[m_uSTARTScreenControlPointIndex].Serialize(pIniFile, strSection);
+		pIniFile->WriteInteger(strSection, L"STARTScreenControlPointIndex", m_uSTARTScreenControlPointIndex);
+		for (auto& ControlPoint : m_REPLAYScreenControlPoints)
+			ControlPoint.Serialize(pIniFile, strSection);
+		//m_REPLAYScreenControlPoints[m_uREPLAYScreenControlPointIndex].Serialize(pIniFile, strSection);
+		pIniFile->WriteInteger(strSection, L"REPLAYScreenControlPointIndex", m_uREPLAYScreenControlPointIndex);
+		pIniFile->WriteInteger(strSection, L"REPLAYScreenAction", m_REPLAYScreenPreferredAction);
+		pIniFile->WriteInteger(strSection, L"Delay", m_uDelay);
+		pIniFile->WriteInteger(strSection, L"NumberOfBattles", m_nNumberOfBattles);
+	}
+	void Serialize(String strIniFile, String strSection) override
+	{
+		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		this->Serialize(pOutput.get(), strSection);
+	}
+
+	//Свойства
+	__property SupportedGameModes GameMode = { read = m_GameMode, write = m_GameMode };
+	__property bool ProcessSTARTScreenFirst = { read = m_bProcessSTARTScreenFirst, write = m_bProcessSTARTScreenFirst };
+	__property std::array<TControlPoint, g_uMaxControlPoints>& STARTScreenControlPoints = { read = m_STARTScreenControlPoints, write = m_STARTScreenControlPoints };
+	__property unsigned int STARTScreenControlPointIndex = { read = m_uSTARTScreenControlPointIndex, write = m_uSTARTScreenControlPointIndex };
+	__property std::array<TControlPoint, g_uMaxControlPoints>& REPLAYScreenControlPoints = { read = m_REPLAYScreenControlPoints, write = m_REPLAYScreenControlPoints };
+	__property unsigned int REPLAYScreenControlPointIndex = { read = m_uREPLAYScreenControlPointIndex, write = m_uREPLAYScreenControlPointIndex };
+	__property REPLAYScreenAction REPLAYScreenPreferredAction = { read = m_REPLAYScreenPreferredAction, write = m_REPLAYScreenPreferredAction };
+	__property unsigned int Delay = { read = m_uDelay, write = m_uDelay };
+	__property unsigned int NumberOfBattles = { read = m_nNumberOfBattles, write = m_nNumberOfBattles };
+
+private:
+	SupportedGameModes m_GameMode;
+	bool m_bProcessSTARTScreenFirst;
+	std::array<TControlPoint, g_uMaxControlPoints> m_STARTScreenControlPoints;
+	unsigned int m_uSTARTScreenControlPointIndex;
+	std::array<TControlPoint, g_uMaxControlPoints> m_REPLAYScreenControlPoints;
+	unsigned int m_uREPLAYScreenControlPointIndex;
+	REPLAYScreenAction m_REPLAYScreenPreferredAction;
+	unsigned int m_uDelay;
+	unsigned int m_nNumberOfBattles;
+};
 
 //Возможные действия с диалогами, прерывающими выполнение задачи
 typedef enum tagPromptDialogAction
@@ -87,38 +209,40 @@ public:
 	bool ReadINI(); //Чтение всех настроек из *.ini
 	bool UpdateINI(); //Запись всех настроек в *.ini
 
-	__property GameModeSpecSettings CampaignSettings = { read = GetCampaignSettings, write = SetCampaignSettings };
-	__property GameModeSpecSettings DungeonsSettings = { read = GetDungeonsSettings, write = SetDungeonsSettings };
-	__property GameModeSpecSettings FactionWarsSettings = { read = GetFactionWarsSettings, write = SetFactionWarsSettings };
+    //Все настройки
+	__property TGameModeSpecSettings& CampaignSettings = { read = m_CampaignSettings, write = m_CampaignSettings };
+	__property TGameModeSpecSettings& DungeonsSettings = { read = m_DungeonsSettings, write = m_DungeonsSettings };
+	__property TGameModeSpecSettings& FactionWarsSettings = { read = m_FactionWarsSettings, write = m_FactionWarsSettings };
 
-	__property TSize RAIDWindowSize = { read = GetGameWindowSize, write = SetGameWindowSize };
+	__property TSize RAIDWindowSize = { read = m_GameWindowSize, write = m_GameWindowSize };
 
-	__property bool SaveResults = { read = GetSaveResults, write = SetSaveResults };
-	__property ResultSavingMode ResultSavingMethod = { read = GetResultSavingMode, write = SetResultSavingMode };
-	__property unsigned int ResultSavingPeriod = { read = GetResultSavingPeriod, write = SetResultSavingPeriod };
-	__property String PathForResults = { read = GetPathForResults, write = SetPathForResults };
-	__property bool ClearOldResults = { read = GetClearOldResults, write = SetClearOldResults };
+	__property bool SaveResults = { read = m_bSaveResults, write = m_bSaveResults };
+	__property ResultSavingMode ResultSavingMethod = { read = m_ResultSavingMode, write = m_ResultSavingMode };
+	__property unsigned int ResultSavingPeriod = { read = m_uResultSavingPeriod, write = m_uResultSavingPeriod };
+	__property String PathForResults = { read = m_strPathForResults, write = m_strPathForResults };
+	__property bool ClearOldResults = { read = m_bClearOldResults, write = m_bClearOldResults };
 
-	__property TaskEndAction TaskEndBehavior = { read = GetTaskEndBehavior, write = SetTaskEndBehavior };
-	__property bool ExitOnTaskEnding = { read = GetExitOnTaskEnding, write = SetExitOnTaskEnding };
-	__property bool CloseGameOnTaskEnding = { read = GetCloseGameOnTaskEnding, write = SetCloseGameOnTaskEnding };
+	__property TaskEndAction TaskEndBehavior = { read = m_TaskEndAction, write = m_TaskEndAction };
+	__property bool ExitOnTaskEnding = { read = m_bExitOnTaskEnding, write = m_bExitOnTaskEnding };
+	__property bool CloseGameOnTaskEnding = { read = m_bCloseGameOnTaskEnding, write = m_bCloseGameOnTaskEnding };
 
-	__property unsigned int TriesBeforeForceTaskEnding = { read = GetTriesBeforeForceTaskEnding, write = SetTriesBeforeForceTaskEnding };
-	__property unsigned int ScreenCheckingPeriod = { read = GetScreenCheckingPeriod, write = SetScreenCheckingPeriod };
+	__property unsigned int TriesBeforeForceTaskEnding = { read = m_uTriesBeforeForceTaskEnding, write = m_uTriesBeforeForceTaskEnding };
+	__property unsigned int ScreenCheckingPeriod = { read = m_uScreenCheckingPeriod, write = m_uScreenCheckingPeriod };
 
-	__property TPoint EnergyDialogControlPoint = { read = GetEDControlPoint, write = SetEDControlPoint };
-	__property TColor EnergyDialogControlPointColor = { read = GetEDControlPointColor, write = SetEDControlPointColor };
-	__property unsigned int EnergyDialogControlPointColorTolerance = { read = GetEDControlPointColorTolerance, write = SetEDControlPointColorTolerance };
-	__property TPoint EnergyDialogGETButtonPoint = { read = GetEDGETButtonPoint, write = SetEDGETButtonPoint };
-	__property PromptDialogAction EnergyDialogPreferredAction = { read = GetEDPreferredAction, write = SetEDPreferredAction };
+	__property std::array<TControlPoint, g_uMaxControlPoints> EnergyDialogControlPoints = { read = m_EnergyDialogControlPoints, write = m_EnergyDialogControlPoints };
+	__property unsigned int EnergyDialogControlPointIndex = { read = m_uEnergyDialogControlPointIndex, write = m_uEnergyDialogControlPointIndex };
+	__property TPoint EnergyDialogGETButtonPoint = { read = m_EnergyDialogGETButtonPoint, write = m_EnergyDialogGETButtonPoint };
+	__property PromptDialogAction EnergyDialogPreferredAction = { read = m_EnergyDialogAction, write = m_EnergyDialogAction };
 
-	__property TPoint SMDialogControlPoint = { read = GetSMDControlPoint, write = SetSMDControlPoint };
-	__property TColor SMDialogControlPointColor = { read = GetSMDControlPointColor, write = SetSMDControlPointColor };
-	__property unsigned int SMDialogControlPointColorTolerance = { read = GetSMDControlPointColorTolerance, write = SetSMDControlPointColorTolerance };
+	__property std::array<TControlPoint, g_uMaxControlPoints> SMDialogControlPoints = { read = m_SMDialogControlPoints, write = m_SMDialogControlPoints };
+	__property unsigned int SMDialogControlPointIndex = { read = m_uSMDialogControlPointIndex, write = m_uSMDialogControlPointIndex };
 
-	__property TPoint MainWindowPosition = { read = GetMainWindowPosition, write = SetMainWindowPosition };
-	__property unsigned int RecentActivePage = { read = GetRecentActivePage, write = SetRecentActivePage };
-	__property bool StayOnTop = { read = GetStayOnTop, write = SetStayOnTop };
+	__property TPoint MainWindowPosition = { read = m_MainWindowPosition, write = m_MainWindowPosition };
+	__property unsigned int RecentActivePage = { read = m_uRecentActivePageIndex, write = m_uRecentActivePageIndex };
+	__property bool StayOnTop = { read = m_bStayOnTop, write = m_bStayOnTop };
+
+	__property bool EnableLogging = { read = m_bEnableLogging, write = m_bEnableLogging };
+	__property unsigned int MaxLogEntries = { read = m_uMaxLogEntries, write = m_uMaxLogEntries };
 
 private:
 	static const String m_strSettingsFileName;
@@ -129,9 +253,9 @@ private:
 	static const String m_strSectionCommon;
 	static const String m_strSectionInternal;
 
-	GameModeSpecSettings m_CampaignSettings;
-	GameModeSpecSettings m_DungeonsSettings;
-	GameModeSpecSettings m_FactionWarsSettings;
+	TGameModeSpecSettings m_CampaignSettings;
+	TGameModeSpecSettings m_DungeonsSettings;
+	TGameModeSpecSettings m_FactionWarsSettings;
 
 	TSize m_GameWindowSize;
 
@@ -139,7 +263,7 @@ private:
 	ResultSavingMode m_ResultSavingMode;
 	unsigned int m_uResultSavingPeriod;
 	String m_strPathForResults;
-    bool m_bClearOldResults;
+	bool m_bClearOldResults;
 
 	TaskEndAction m_TaskEndAction;
 	bool m_bExitOnTaskEnding;
@@ -148,72 +272,19 @@ private:
 	unsigned int m_uTriesBeforeForceTaskEnding;
 	unsigned int m_uScreenCheckingPeriod;
 
-	ControlPoint m_EnergyDialogControlPoint;
+	std::array<TControlPoint, g_uMaxControlPoints> m_EnergyDialogControlPoints;
+	unsigned int m_uEnergyDialogControlPointIndex;
 	TPoint m_EnergyDialogGETButtonPoint;
 	PromptDialogAction m_EnergyDialogAction;
-	ControlPoint m_SMDialogControlPoint;
+	std::array<TControlPoint, g_uMaxControlPoints> m_SMDialogControlPoints;
+	unsigned int m_uSMDialogControlPointIndex;
 
 	TPoint m_MainWindowPosition;
 	unsigned int m_uRecentActivePageIndex;
 	bool m_bStayOnTop;
 
-	GameModeSpecSettings GetCampaignSettings() { return m_CampaignSettings; }
-	void SetCampaignSettings(GameModeSpecSettings NewValue) { m_CampaignSettings = NewValue; }
-	GameModeSpecSettings GetDungeonsSettings() { return m_DungeonsSettings; }
-	void SetDungeonsSettings(GameModeSpecSettings NewValue) { m_DungeonsSettings = NewValue; }
-	GameModeSpecSettings GetFactionWarsSettings() { return m_FactionWarsSettings; }
-	void SetFactionWarsSettings(GameModeSpecSettings NewValue) { m_FactionWarsSettings = NewValue; }
-
-	TSize GetGameWindowSize() { return m_GameWindowSize; }
-	void SetGameWindowSize(TSize NewValue) { m_GameWindowSize = NewValue; }
-
-	bool GetSaveResults() { return m_bSaveResults; }
-	void SetSaveResults(bool bNewValue) { m_bSaveResults = bNewValue; }
-	ResultSavingMode GetResultSavingMode() { return m_ResultSavingMode; }
-	void SetResultSavingMode(ResultSavingMode NewValue) { m_ResultSavingMode = NewValue; }
-	unsigned int GetResultSavingPeriod() { return m_uResultSavingPeriod; }
-	void SetResultSavingPeriod(unsigned int uNewValue) { m_uResultSavingPeriod = uNewValue; }
-	String GetPathForResults() { return m_strPathForResults; }
-	void SetPathForResults(String strNewValue) { m_strPathForResults = strNewValue; }
-	bool GetClearOldResults() { return m_bClearOldResults; }
-	void SetClearOldResults(bool bNewValue) { m_bClearOldResults = bNewValue; }
-
-	TaskEndAction GetTaskEndBehavior() { return m_TaskEndAction; }
-	void SetTaskEndBehavior(TaskEndAction NewValue) { m_TaskEndAction = NewValue; }
-	bool GetExitOnTaskEnding() { return m_bExitOnTaskEnding; }
-	void SetExitOnTaskEnding(bool bNewValue) { m_bExitOnTaskEnding = bNewValue; }
-	bool GetCloseGameOnTaskEnding() { return m_bCloseGameOnTaskEnding; }
-	void SetCloseGameOnTaskEnding(bool bNewValue) { m_bCloseGameOnTaskEnding = bNewValue; }
-
-	unsigned int GetTriesBeforeForceTaskEnding() { return m_uTriesBeforeForceTaskEnding; }
-	void SetTriesBeforeForceTaskEnding(unsigned int uNewValue) { m_uTriesBeforeForceTaskEnding = uNewValue; }
-	unsigned int GetScreenCheckingPeriod() { return m_uScreenCheckingPeriod; }
-	void SetScreenCheckingPeriod(unsigned int uNewValue) { m_uScreenCheckingPeriod = uNewValue; }
-
-	TPoint GetEDControlPoint() { return m_EnergyDialogControlPoint.Coordinates; }
-	void SetEDControlPoint(TPoint NewValue) { m_EnergyDialogControlPoint.Coordinates = NewValue; }
-	TColor GetEDControlPointColor() { return m_EnergyDialogControlPoint.PixelColor; }
-	void SetEDControlPointColor(TColor NewValue) { m_EnergyDialogControlPoint.PixelColor = NewValue; }
-	unsigned int GetEDControlPointColorTolerance() { return m_EnergyDialogControlPoint.uTolerance; }
-	void SetEDControlPointColorTolerance(unsigned int uNewValue) { m_EnergyDialogControlPoint.uTolerance = uNewValue; }
-	TPoint GetEDGETButtonPoint() { return m_EnergyDialogGETButtonPoint; }
-	void SetEDGETButtonPoint(TPoint NewValue) { m_EnergyDialogGETButtonPoint = NewValue; }
-	PromptDialogAction GetEDPreferredAction() { return m_EnergyDialogAction; }
-	void SetEDPreferredAction(PromptDialogAction NewValue) { m_EnergyDialogAction = NewValue; }
-
-	TPoint GetSMDControlPoint() { return m_SMDialogControlPoint.Coordinates; }
-	void SetSMDControlPoint(TPoint NewValue) { m_SMDialogControlPoint.Coordinates = NewValue; }
-	TColor GetSMDControlPointColor() { return m_SMDialogControlPoint.PixelColor; }
-	void SetSMDControlPointColor(TColor NewValue) { m_SMDialogControlPoint.PixelColor = NewValue; }
-	unsigned int GetSMDControlPointColorTolerance() { return m_SMDialogControlPoint.uTolerance; }
-	void SetSMDControlPointColorTolerance(unsigned int uNewValue) { m_SMDialogControlPoint.uTolerance = uNewValue; }
-
-	TPoint GetMainWindowPosition() { return m_MainWindowPosition; }
-	void SetMainWindowPosition(TPoint NewValue) { m_MainWindowPosition = NewValue; }
-	unsigned int GetRecentActivePage() { return m_uRecentActivePageIndex; }
-	void SetRecentActivePage(unsigned int uNewValue) { m_uRecentActivePageIndex = uNewValue; }
-	bool GetStayOnTop() { return m_bStayOnTop; }
-	void SetStayOnTop(bool bNewValue) { m_bStayOnTop = bNewValue; }
+    bool m_bEnableLogging;
+	unsigned int m_uMaxLogEntries;
 };
 
 //---------------------------------------------------------------------------

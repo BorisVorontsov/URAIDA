@@ -16,7 +16,6 @@ object FormMain: TFormMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 19
   object Bevel1: TBevel
@@ -278,14 +277,14 @@ object FormMain: TFormMain
           Caption = #1069#1082#1088#1072#1085#1099
           TabOrder = 0
           object LabelRSY: TLabel
-            Left = 133
+            Left = 155
             Top = 132
             Width = 16
             Height = 19
             Caption = 'Y:'
           end
           object LabelRSX: TLabel
-            Left = 32
+            Left = 54
             Top = 132
             Width = 15
             Height = 19
@@ -297,38 +296,38 @@ object FormMain: TFormMain
             Width = 306
             Height = 19
             AutoSize = False
-            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1072' '#1101#1082#1088#1072#1085#1072' '#1055#1054#1042#1058#1054#1056'/'#1044#1040#1051#1045#1045':'
+            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1080' '#1101#1082#1088#1072#1085#1072' '#1055#1054#1042#1058#1054#1056'/'#1044#1040#1051#1045#1045':'
           end
           object LabelRSColor: TLabel
-            Left = 235
+            Left = 257
             Top = 132
             Width = 41
             Height = 19
             Caption = #1062#1074#1077#1090':'
           end
           object LabelSSY: TLabel
-            Left = 133
+            Left = 155
             Top = 61
             Width = 16
             Height = 19
             Caption = 'Y:'
           end
           object LabelSSX: TLabel
-            Left = 32
+            Left = 54
             Top = 61
             Width = 15
             Height = 19
             Caption = 'X:'
           end
           object LabelSSColor: TLabel
-            Left = 235
+            Left = 257
             Top = 61
             Width = 41
             Height = 19
             Caption = #1062#1074#1077#1090':'
           end
           object LabelRSAction: TLabel
-            Left = 48
+            Left = 32
             Top = 184
             Width = 80
             Height = 19
@@ -336,23 +335,23 @@ object FormMain: TFormMain
             Caption = #1044#1077#1081#1089#1090#1074#1080#1077':'
           end
           object LabelSSColorTolerance: TLabel
-            Left = 317
+            Left = 339
             Top = 61
-            Width = 62
+            Width = 44
             Height = 19
             AutoSize = False
-            Caption = #1044#1086#1087#1091#1089#1082':'
+            Caption = #1055#1086#1075'.:'
           end
           object LabelRSColorTolerance: TLabel
-            Left = 317
+            Left = 339
             Top = 132
-            Width = 62
+            Width = 44
             Height = 19
             AutoSize = False
-            Caption = #1044#1086#1087#1091#1089#1082':'
+            Caption = #1055#1086#1075'.:'
           end
           object EditRSY: TEdit
-            Left = 155
+            Left = 177
             Top = 129
             Width = 52
             Height = 27
@@ -361,29 +360,29 @@ object FormMain: TFormMain
             ParentShowHint = False
             ReadOnly = True
             ShowHint = True
-            TabOrder = 11
+            TabOrder = 15
             Text = '0'
           end
           object UpDownRSY: TUpDown
-            Left = 207
+            Left = 229
             Top = 129
             Width = 16
             Height = 27
             Associate = EditRSY
             Max = 9999
-            TabOrder = 12
+            TabOrder = 16
           end
           object UpDownRSX: TUpDown
-            Left = 105
+            Left = 127
             Top = 129
             Width = 16
             Height = 27
             Associate = EditRSX
             Max = 9999
-            TabOrder = 10
+            TabOrder = 14
           end
           object EditRSX: TEdit
-            Left = 53
+            Left = 75
             Top = 129
             Width = 52
             Height = 27
@@ -392,11 +391,11 @@ object FormMain: TFormMain
             ParentShowHint = False
             ReadOnly = True
             ShowHint = True
-            TabOrder = 9
+            TabOrder = 13
             Text = '0'
           end
           object PanelRSColor: TPanel
-            Left = 285
+            Left = 307
             Top = 132
             Width = 20
             Height = 20
@@ -405,7 +404,7 @@ object FormMain: TFormMain
             BorderWidth = 1
             Color = clWhite
             ParentBackground = False
-            TabOrder = 13
+            TabOrder = 17
             StyleElements = []
             OnClick = PanelRSColorClick
           end
@@ -489,11 +488,11 @@ object FormMain: TFormMain
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-            TabOrder = 16
+            TabOrder = 20
             OnClick = BitBtnRSPickPointClick
           end
           object EditSSY: TEdit
-            Left = 155
+            Left = 177
             Top = 58
             Width = 52
             Height = 27
@@ -502,7 +501,7 @@ object FormMain: TFormMain
             ParentShowHint = False
             ReadOnly = True
             ShowHint = True
-            TabOrder = 3
+            TabOrder = 5
             Text = '0'
           end
           object BitBtnSSPickPoint: TBitBtn
@@ -585,20 +584,20 @@ object FormMain: TFormMain
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
               FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-            TabOrder = 8
+            TabOrder = 10
             OnClick = BitBtnSSPickPointClick
           end
           object UpDownSSY: TUpDown
-            Left = 207
+            Left = 229
             Top = 58
             Width = 16
             Height = 27
             Associate = EditSSY
             Max = 9999
-            TabOrder = 4
+            TabOrder = 6
           end
           object PanelSSColor: TPanel
-            Left = 285
+            Left = 307
             Top = 61
             Width = 20
             Height = 20
@@ -607,21 +606,21 @@ object FormMain: TFormMain
             BorderWidth = 1
             Color = clWhite
             ParentBackground = False
-            TabOrder = 5
+            TabOrder = 7
             StyleElements = []
             OnClick = PanelSSColorClick
           end
           object UpDownSSX: TUpDown
-            Left = 105
+            Left = 127
             Top = 58
             Width = 16
             Height = 27
             Associate = EditSSX
             Max = 9999
-            TabOrder = 2
+            TabOrder = 4
           end
           object EditSSX: TEdit
-            Left = 53
+            Left = 75
             Top = 58
             Width = 52
             Height = 27
@@ -630,47 +629,47 @@ object FormMain: TFormMain
             ParentShowHint = False
             ReadOnly = True
             ShowHint = True
-            TabOrder = 1
+            TabOrder = 3
             Text = '0'
           end
           object CheckBoxProcessSTARTScreen: TCheckBox
             Left = 16
-            Top = 34
+            Top = 35
             Width = 306
             Height = 17
-            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1072' '#1101#1082#1088#1072#1085#1072' '#1053#1040#1063#1040#1058#1068':'
+            Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1080' '#1101#1082#1088#1072#1085#1072' '#1053#1040#1063#1040#1058#1068':'
             TabOrder = 0
           end
           object RadioButtonRSActionReplay: TRadioButton
-            Left = 134
+            Left = 118
             Top = 182
             Width = 80
             Height = 25
             Caption = #1055#1086#1074#1090#1086#1088
             Checked = True
-            TabOrder = 17
+            TabOrder = 21
             TabStop = True
           end
           object RadioButtonRSActionNext: TRadioButton
-            Left = 214
+            Left = 198
             Top = 184
             Width = 74
             Height = 19
             Caption = #1044#1072#1083#1077#1077
-            TabOrder = 18
+            TabOrder = 22
           end
           object EditSSColorTolerance: TEdit
-            Left = 383
+            Left = 387
             Top = 58
             Width = 38
             Height = 27
             Alignment = taCenter
             ReadOnly = True
-            TabOrder = 6
+            TabOrder = 8
             Text = '1'
           end
           object UpDownSSColorTolerance: TUpDown
-            Left = 421
+            Left = 425
             Top = 58
             Width = 16
             Height = 27
@@ -678,20 +677,20 @@ object FormMain: TFormMain
             Min = 1
             Max = 255
             Position = 1
-            TabOrder = 7
+            TabOrder = 9
           end
           object EditRSColorTolerance: TEdit
-            Left = 383
+            Left = 386
             Top = 129
             Width = 38
             Height = 27
             Alignment = taCenter
             ReadOnly = True
-            TabOrder = 14
+            TabOrder = 18
             Text = '1'
           end
           object UpDownRSColorTolerance: TUpDown
-            Left = 421
+            Left = 424
             Top = 129
             Width = 16
             Height = 27
@@ -699,7 +698,49 @@ object FormMain: TFormMain
             Min = 1
             Max = 255
             Position = 1
-            TabOrder = 15
+            TabOrder = 19
+          end
+          object ButtonGroupSSCPIndex: TButtonGroup
+            Left = 317
+            Top = 25
+            Width = 176
+            Height = 27
+            BevelEdges = []
+            BevelInner = bvNone
+            BevelOuter = bvNone
+            BorderStyle = bsNone
+            ButtonOptions = [gboGroupStyle, gboShowCaptions]
+            Items = <>
+            TabOrder = 1
+            OnButtonClicked = ButtonGroupSSCPIndexButtonClicked
+          end
+          object ButtonGroupRSCPIndex: TButtonGroup
+            Left = 317
+            Top = 96
+            Width = 176
+            Height = 27
+            BevelEdges = []
+            BevelInner = bvNone
+            BevelOuter = bvNone
+            BorderStyle = bsNone
+            ButtonOptions = [gboGroupStyle, gboShowCaptions]
+            Items = <>
+            TabOrder = 11
+            OnButtonClicked = ButtonGroupRSCPIndexButtonClicked
+          end
+          object CheckBoxSSCPState: TCheckBox
+            Left = 32
+            Top = 63
+            Width = 24
+            Height = 17
+            TabOrder = 2
+          end
+          object CheckBoxRSCPState: TCheckBox
+            Left = 32
+            Top = 134
+            Width = 24
+            Height = 17
+            TabOrder = 12
           end
         end
         object GroupBoxTaskParameters: TGroupBox
@@ -1114,17 +1155,17 @@ object FormMain: TFormMain
           end
         end
         object ButtonApplyGWSize: TButton
-          Left = 431
-          Top = 80
-          Width = 111
+          Left = 359
+          Top = 83
+          Width = 142
           Height = 33
           Caption = #1055#1088#1080#1084#1077#1085#1080#1090#1100
           TabOrder = 5
           OnClick = ButtonApplyGWSizeClick
         end
         object ButtonUseCurrentGWSize: TButton
-          Left = 283
-          Top = 80
+          Left = 359
+          Top = 44
           Width = 142
           Height = 33
           Caption = #1042#1079#1103#1090#1100' '#1090#1077#1082#1091#1097#1080#1077
@@ -1139,28 +1180,28 @@ object FormMain: TFormMain
           Caption = #1055#1088#1077#1088#1099#1074#1072#1090#1077#1083#1080' '#1079#1072#1076#1072#1095#1080
           TabOrder = 11
           object GroupBoxEnergyDialog: TGroupBox
-            Left = 8
-            Top = 21
+            Left = 13
+            Top = 24
             Width = 521
             Height = 260
             Caption = #1044#1080#1072#1083#1086#1075' '#1087#1086#1082#1091#1087#1082#1080' '#1101#1085#1077#1088#1075#1080#1080
             TabOrder = 0
             object LabelEDY: TLabel
-              Left = 133
+              Left = 155
               Top = 60
               Width = 16
               Height = 19
               Caption = 'Y:'
             end
             object LabelEDX: TLabel
-              Left = 32
+              Left = 54
               Top = 60
               Width = 15
               Height = 19
               Caption = 'X:'
             end
             object LabelEDColor: TLabel
-              Left = 235
+              Left = 257
               Top = 60
               Width = 41
               Height = 19
@@ -1172,7 +1213,7 @@ object FormMain: TFormMain
               Width = 305
               Height = 19
               AutoSize = False
-              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1072#1103' '#1090#1086#1095#1082#1072':'
+              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1099#1077' '#1090#1086#1095#1082#1080':'
             end
             object LabelEDAction: TLabel
               Left = 16
@@ -1204,15 +1245,15 @@ object FormMain: TFormMain
               Caption = 'Y:'
             end
             object LabelEDColorTolerance: TLabel
-              Left = 317
+              Left = 339
               Top = 60
-              Width = 62
+              Width = 44
               Height = 19
               AutoSize = False
-              Caption = #1044#1086#1087#1091#1089#1082':'
+              Caption = #1055#1086#1075'.:'
             end
             object EditEDY: TEdit
-              Left = 155
+              Left = 177
               Top = 57
               Width = 52
               Height = 27
@@ -1221,7 +1262,7 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 2
+              TabOrder = 4
               Text = '0'
             end
             object BitBtnEDPickPoint: TBitBtn
@@ -1304,20 +1345,20 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 7
+              TabOrder = 9
               OnClick = BitBtnEDPickPointClick
             end
             object UpDownEDY: TUpDown
-              Left = 207
+              Left = 229
               Top = 57
               Width = 16
               Height = 27
               Associate = EditEDY
               Max = 9999
-              TabOrder = 3
+              TabOrder = 5
             end
             object PanelEDColor: TPanel
-              Left = 285
+              Left = 307
               Top = 60
               Width = 20
               Height = 20
@@ -1326,21 +1367,21 @@ object FormMain: TFormMain
               BorderWidth = 1
               Color = clWhite
               ParentBackground = False
-              TabOrder = 4
+              TabOrder = 6
               StyleElements = []
               OnClick = PanelEDColorClick
             end
             object UpDownEDX: TUpDown
-              Left = 105
+              Left = 127
               Top = 57
               Width = 16
               Height = 27
               Associate = EditEDX
               Max = 9999
-              TabOrder = 1
+              TabOrder = 3
             end
             object EditEDX: TEdit
-              Left = 53
+              Left = 75
               Top = 57
               Width = 52
               Height = 27
@@ -1349,7 +1390,7 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 0
+              TabOrder = 2
               Text = '0'
             end
             object RadioButtonEDAccept: TRadioButton
@@ -1359,7 +1400,7 @@ object FormMain: TFormMain
               Height = 25
               Caption = #1055#1086#1083#1091#1095#1080#1090#1100' '#1101#1085#1077#1088#1075#1080#1102
               Checked = True
-              TabOrder = 13
+              TabOrder = 15
               TabStop = True
             end
             object RadioButtonEDSkip: TRadioButton
@@ -1368,7 +1409,7 @@ object FormMain: TFormMain
               Width = 219
               Height = 19
               Caption = #1054#1090#1082#1083#1086#1085#1080#1090#1100' '#1080' '#1087#1088#1086#1076#1086#1083#1078#1080#1090#1100
-              TabOrder = 14
+              TabOrder = 16
             end
             object EditEDGETX: TEdit
               Left = 53
@@ -1380,7 +1421,7 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 8
+              TabOrder = 10
               Text = '0'
             end
             object UpDownEDGETX: TUpDown
@@ -1390,7 +1431,7 @@ object FormMain: TFormMain
               Height = 27
               Associate = EditEDGETX
               Max = 9999
-              TabOrder = 9
+              TabOrder = 11
             end
             object EditEDGETY: TEdit
               Left = 155
@@ -1402,7 +1443,7 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 10
+              TabOrder = 12
               Text = '0'
             end
             object UpDownEDGETY: TUpDown
@@ -1412,7 +1453,7 @@ object FormMain: TFormMain
               Height = 27
               Associate = EditEDGETY
               Max = 9999
-              TabOrder = 11
+              TabOrder = 13
             end
             object BitBtnEDGETPickPoint: TBitBtn
               Left = 452
@@ -1494,7 +1535,7 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 12
+              TabOrder = 14
               OnClick = BitBtnEDGETPickPointClick
             end
             object RadioButtonEDAbort: TRadioButton
@@ -1503,20 +1544,20 @@ object FormMain: TFormMain
               Width = 219
               Height = 19
               Caption = #1055#1088#1077#1088#1074#1072#1090#1100' '#1079#1072#1076#1072#1095#1091
-              TabOrder = 15
+              TabOrder = 17
             end
             object EditEDColorTolerance: TEdit
-              Left = 383
+              Left = 388
               Top = 57
               Width = 38
               Height = 27
               Alignment = taCenter
               ReadOnly = True
-              TabOrder = 5
+              TabOrder = 7
               Text = '1'
             end
             object UpDownEDColorTolerance: TUpDown
-              Left = 421
+              Left = 426
               Top = 57
               Width = 16
               Height = 27
@@ -1524,7 +1565,28 @@ object FormMain: TFormMain
               Min = 1
               Max = 255
               Position = 1
-              TabOrder = 6
+              TabOrder = 8
+            end
+            object ButtonGroupEDCPIndex: TButtonGroup
+              Left = 312
+              Top = 24
+              Width = 176
+              Height = 27
+              BevelEdges = []
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              BorderStyle = bsNone
+              ButtonOptions = [gboGroupStyle, gboShowCaptions]
+              Items = <>
+              TabOrder = 0
+              OnButtonClicked = ButtonGroupEDCPIndexButtonClicked
+            end
+            object CheckBoxEDCPState: TCheckBox
+              Left = 32
+              Top = 62
+              Width = 24
+              Height = 17
+              TabOrder = 1
             end
           end
           object GroupBoxMaintenanceDialog: TGroupBox
@@ -1532,24 +1594,24 @@ object FormMain: TFormMain
             Top = 303
             Width = 521
             Height = 114
-            Caption = #1044#1080#1072#1083#1086#1075' '#1089#1077#1088#1074#1080#1089#1085#1099#1093' '#1088#1072#1073#1086#1090
+            Caption = #1044#1080#1072#1083#1086#1075' '#1088#1072#1073#1086#1090' '#1085#1072' '#1089#1077#1088#1074#1077#1088#1077
             TabOrder = 1
             object LabelSMY: TLabel
-              Left = 133
+              Left = 160
               Top = 60
               Width = 16
               Height = 19
               Caption = 'Y:'
             end
             object LabelSMX: TLabel
-              Left = 32
+              Left = 59
               Top = 60
               Width = 15
               Height = 19
               Caption = 'X:'
             end
             object LabelSMColor: TLabel
-              Left = 235
+              Left = 262
               Top = 60
               Width = 41
               Height = 19
@@ -1558,20 +1620,20 @@ object FormMain: TFormMain
             object LabelSMCP: TLabel
               Left = 16
               Top = 32
-              Width = 149
+              Width = 153
               Height = 19
-              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1072#1103' '#1090#1086#1095#1082#1072':'
+              Caption = #1050#1086#1085#1090#1088#1086#1083#1100#1085#1099#1077' '#1090#1086#1095#1082#1080':'
             end
             object LabelSMColorTolerance: TLabel
-              Left = 317
+              Left = 343
               Top = 60
-              Width = 62
+              Width = 45
               Height = 19
               AutoSize = False
-              Caption = #1044#1086#1087#1091#1089#1082':'
+              Caption = #1055#1086#1075'.:'
             end
             object EditSMY: TEdit
-              Left = 155
+              Left = 182
               Top = 57
               Width = 52
               Height = 27
@@ -1580,11 +1642,11 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 2
+              TabOrder = 4
               Text = '0'
             end
             object BitBtnSMPickColor: TBitBtn
-              Left = 452
+              Left = 457
               Top = 50
               Width = 41
               Height = 41
@@ -1663,20 +1725,20 @@ object FormMain: TFormMain
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
                 FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-              TabOrder = 7
+              TabOrder = 9
               OnClick = BitBtnSMPickColorClick
             end
             object UpDownSMY: TUpDown
-              Left = 207
+              Left = 234
               Top = 57
               Width = 16
               Height = 27
               Associate = EditSMY
               Max = 9999
-              TabOrder = 3
+              TabOrder = 5
             end
             object PanelSMColor: TPanel
-              Left = 285
+              Left = 312
               Top = 60
               Width = 20
               Height = 20
@@ -1685,21 +1747,21 @@ object FormMain: TFormMain
               BorderWidth = 1
               Color = clWhite
               ParentBackground = False
-              TabOrder = 4
+              TabOrder = 6
               StyleElements = []
               OnClick = PanelSMColorClick
             end
             object UpDownSMX: TUpDown
-              Left = 105
+              Left = 132
               Top = 57
               Width = 16
               Height = 27
               Associate = EditSMX
               Max = 9999
-              TabOrder = 1
+              TabOrder = 3
             end
             object EditSMX: TEdit
-              Left = 53
+              Left = 80
               Top = 57
               Width = 52
               Height = 27
@@ -1708,21 +1770,21 @@ object FormMain: TFormMain
               ParentShowHint = False
               ReadOnly = True
               ShowHint = True
-              TabOrder = 0
+              TabOrder = 2
               Text = '0'
             end
             object EditSMColorTolerance: TEdit
-              Left = 383
+              Left = 393
               Top = 57
               Width = 38
               Height = 27
               Alignment = taCenter
               ReadOnly = True
-              TabOrder = 5
+              TabOrder = 7
               Text = '1'
             end
             object UpDownSMColorTolerance: TUpDown
-              Left = 421
+              Left = 431
               Top = 57
               Width = 16
               Height = 27
@@ -1730,7 +1792,28 @@ object FormMain: TFormMain
               Min = 1
               Max = 255
               Position = 1
-              TabOrder = 6
+              TabOrder = 8
+            end
+            object ButtonGroupSMDCPIndex: TButtonGroup
+              Left = 317
+              Top = 24
+              Width = 176
+              Height = 27
+              BevelEdges = []
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              BorderStyle = bsNone
+              ButtonOptions = [gboGroupStyle, gboShowCaptions]
+              Items = <>
+              TabOrder = 0
+              OnButtonClicked = ButtonGroupSMDCPIndexButtonClicked
+            end
+            object CheckBoxSMDCPState: TCheckBox
+              Left = 37
+              Top = 62
+              Width = 24
+              Height = 17
+              TabOrder = 1
             end
           end
         end

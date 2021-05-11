@@ -3,6 +3,7 @@
 #ifndef UnitCommonH
 #define UnitCommonH
 //---------------------------------------------------------------------------
+#include <System.Classes.hpp>
 
 typedef enum tagFVFormat
 {

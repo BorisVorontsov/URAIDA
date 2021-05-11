@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 #include "URAIDAPCH.h"
-#include <memory>
 #pragma hdrstop
 
 #include "UnitSettings.h"
@@ -18,12 +17,19 @@ const String TSettingsManager::m_strSectionInternal = L"Internal Settings";
 //---------------------------------------------------------------------------
 TSettingsManager::TSettingsManager()
 {
-	//TODO
+	m_CampaignSettings.GameMode = SupportedGameModes::gmCampaign;
+	m_DungeonsSettings.GameMode = SupportedGameModes::gmDungeons;
+	m_FactionWarsSettings.GameMode = SupportedGameModes::gmFactionWars;
+
+	for (int i = 0; i < m_EnergyDialogControlPoints.size(); i++)
+		m_EnergyDialogControlPoints[i].Name = String(L"EnergyDialogControlPoint") + IntToStr(i + 1);
+	for (int i = 0; i < m_SMDialogControlPoints.size(); i++)
+		m_SMDialogControlPoints[i].Name = String(L"SMDialogControlPoint") + IntToStr(i + 1);
 }
 //---------------------------------------------------------------------------
 TSettingsManager::~TSettingsManager()
 {
-	//TODO
+	//
 }
 //---------------------------------------------------------------------------
 bool TSettingsManager::ReadINI()
@@ -34,49 +40,13 @@ bool TSettingsManager::ReadINI()
 	std::shared_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
 
 	//Кампания
-	m_CampaignSettings.GameMode = SupportedGameModes::gmCampaign;
-	m_CampaignSettings.bProcessSTARTScreenFirst = pSettings->ReadBool(m_strSectionCampaign, L"ProcessSTARTScreenFirst", true);
-	m_CampaignSettings.STARTScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionCampaign, L"STARTScreenControlPointX", 0);
-	m_CampaignSettings.STARTScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionCampaign, L"STARTScreenControlPointY", 0);
-	m_CampaignSettings.STARTScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCampaign, L"STARTScreenControlPointColor", clWhite));
-	m_CampaignSettings.STARTScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionCampaign, L"STARTScreenControlPointColorTolerance", 1);
-	m_CampaignSettings.REPLAYScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionCampaign, L"REPLAYScreenControlPointX", 0);
-	m_CampaignSettings.REPLAYScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionCampaign, L"REPLAYScreenControlPointY", 0);
-	m_CampaignSettings.REPLAYScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCampaign, L"REPLAYScreenControlPointColor", clWhite));
-	m_CampaignSettings.REPLAYScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionCampaign, L"REPLAYScreenControlPointColorTolerance", 1);
-	m_CampaignSettings.REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pSettings->ReadInteger(m_strSectionCampaign, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
-	m_CampaignSettings.uDelay = pSettings->ReadInteger(m_strSectionCampaign, L"Delay", 10);
-	m_CampaignSettings.nNumberOfBattles = pSettings->ReadInteger(m_strSectionCampaign, L"NumberOfBattles", 1);
+	m_CampaignSettings.Load(pSettings.get(), m_strSectionCampaign);
 
 	//Подземелья
-	m_CampaignSettings.GameMode = SupportedGameModes::gmDungeons;
-	m_DungeonsSettings.bProcessSTARTScreenFirst = pSettings->ReadBool(m_strSectionDungeons, L"ProcessSTARTScreenFirst", true);
-	m_DungeonsSettings.STARTScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionDungeons, L"STARTScreenControlPointX", 0);
-	m_DungeonsSettings.STARTScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionDungeons, L"STARTScreenControlPointY", 0);
-	m_DungeonsSettings.STARTScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionDungeons, L"STARTScreenControlPointColor", clWhite));
-	m_DungeonsSettings.STARTScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionDungeons, L"STARTScreenControlPointColorTolerance", 1);
-	m_DungeonsSettings.REPLAYScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionDungeons, L"REPLAYScreenControlPointX", 0);
-	m_DungeonsSettings.REPLAYScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionDungeons, L"REPLAYScreenControlPointY", 0);
-	m_DungeonsSettings.REPLAYScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionDungeons, L"REPLAYScreenControlPointColor", clWhite));
-	m_DungeonsSettings.REPLAYScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionDungeons, L"REPLAYScreenControlPointColorTolerance", 1);
-	m_DungeonsSettings.REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pSettings->ReadInteger(m_strSectionDungeons, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
-	m_DungeonsSettings.uDelay = pSettings->ReadInteger(m_strSectionDungeons, L"Delay", 10);
-	m_DungeonsSettings.nNumberOfBattles = pSettings->ReadInteger(m_strSectionDungeons, L"NumberOfBattles", 1);
+	m_DungeonsSettings.Load(pSettings.get(), m_strSectionDungeons);
 
 	//Войны фракций
-	m_CampaignSettings.GameMode = SupportedGameModes::gmFactionWars;
-	m_FactionWarsSettings.bProcessSTARTScreenFirst = pSettings->ReadBool(m_strSectionFactionWars, L"ProcessSTARTScreenFirst", true);
-	m_FactionWarsSettings.STARTScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionFactionWars, L"STARTScreenControlPointX", 0);
-	m_FactionWarsSettings.STARTScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionFactionWars, L"STARTScreenControlPointY", 0);
-	m_FactionWarsSettings.STARTScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionFactionWars, L"STARTScreenControlPointColor", clWhite));
-	m_FactionWarsSettings.STARTScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionFactionWars, L"STARTScreenControlPointColorTolerance", 1);
-	m_FactionWarsSettings.REPLAYScreenControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointX", 0);
-	m_FactionWarsSettings.REPLAYScreenControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointY", 0);
-	m_FactionWarsSettings.REPLAYScreenControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointColor", clWhite));
-	m_FactionWarsSettings.REPLAYScreenControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointColorTolerance", 1);
-	m_FactionWarsSettings.REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pSettings->ReadInteger(m_strSectionFactionWars, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
-	m_FactionWarsSettings.uDelay = pSettings->ReadInteger(m_strSectionFactionWars, L"Delay", 10);
-	m_FactionWarsSettings.nNumberOfBattles = pSettings->ReadInteger(m_strSectionFactionWars, L"NumberOfBattles", 1);
+	m_FactionWarsSettings.Load(pSettings.get(), m_strSectionFactionWars);
 
 	//Общие настройки
 	m_GameWindowSize.cx = pSettings->ReadInteger(m_strSectionCommon, L"GameWindowWidth", 1280);
@@ -95,24 +65,24 @@ bool TSettingsManager::ReadINI()
 	m_uTriesBeforeForceTaskEnding = pSettings->ReadInteger(m_strSectionCommon, L"TriesBeforeForceTaskEnding", 20);
 	m_uScreenCheckingPeriod = pSettings->ReadInteger(m_strSectionCommon, L"ScreenCheckingPeriod", 5);
 
-	m_EnergyDialogControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointX", 0);
-	m_EnergyDialogControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointY", 0);
-	m_EnergyDialogControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", clWhite));
-	m_EnergyDialogControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointColorTolerance", 1);
+	for (auto& ControlPoint : m_EnergyDialogControlPoints)
+		ControlPoint.Load(pSettings.get(), m_strSectionCommon);
+	m_uEnergyDialogControlPointIndex = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogControlPointIndex", 0);
 	m_EnergyDialogGETButtonPoint.x = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointX", 0);
 	m_EnergyDialogGETButtonPoint.y = pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointY", 0);
 	m_EnergyDialogAction = static_cast<PromptDialogAction>(pSettings->ReadInteger(m_strSectionCommon, L"EnergyDialogAction", PromptDialogAction::pdaSkip));
 
-	m_SMDialogControlPoint.Coordinates.x = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointX", 0);
-	m_SMDialogControlPoint.Coordinates.y = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointY", 0);
-	m_SMDialogControlPoint.PixelColor = static_cast<TColor>(pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointColor", clWhite));
-	m_SMDialogControlPoint.uTolerance = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointColorTolerance", 1);
+	for (auto& ControlPoint : m_SMDialogControlPoints)
+		ControlPoint.Load(pSettings.get(), m_strSectionCommon);
+	m_uSMDialogControlPointIndex = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointIndex", 0);
 
 	//Внутренние
 	m_MainWindowPosition.x = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowLeft", 100);
 	m_MainWindowPosition.y = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowTop", 100);
 	m_uRecentActivePageIndex = pSettings->ReadInteger(m_strSectionInternal, L"RecentActivePage", 0);
-	m_bStayOnTop = pSettings->ReadInteger(m_strSectionInternal, L"StayOnTop", false);
+	m_bStayOnTop = pSettings->ReadBool(m_strSectionInternal, L"StayOnTop", false);
+	m_bEnableLogging = pSettings->ReadBool(m_strSectionInternal, L"EnableLogging", false);
+	m_uMaxLogEntries = pSettings->ReadInteger(m_strSectionInternal, L"MaxLogEntries", 1000);
 
 	if (!FileExists(strSettingsFile))
 		this->UpdateINI();
@@ -128,46 +98,13 @@ bool TSettingsManager::UpdateINI()
 	std::shared_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
 
 	//Кампания
-	pSettings->WriteBool(m_strSectionCampaign, L"ProcessSTARTScreenFirst", m_CampaignSettings.bProcessSTARTScreenFirst);
-	pSettings->WriteInteger(m_strSectionCampaign, L"STARTScreenControlPointX", m_CampaignSettings.STARTScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionCampaign, L"STARTScreenControlPointY", m_CampaignSettings.STARTScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionCampaign, L"STARTScreenControlPointColor", m_CampaignSettings.STARTScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionCampaign, L"STARTScreenControlPointColorTolerance", m_CampaignSettings.STARTScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionCampaign, L"REPLAYScreenControlPointX", m_CampaignSettings.REPLAYScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionCampaign, L"REPLAYScreenControlPointY", m_CampaignSettings.REPLAYScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionCampaign, L"REPLAYScreenControlPointColor", m_CampaignSettings.REPLAYScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionCampaign, L"REPLAYScreenControlPointColorTolerance", m_CampaignSettings.REPLAYScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionCampaign, L"REPLAYScreenAction", m_CampaignSettings.REPLAYScreenPreferredAction);
-	pSettings->WriteInteger(m_strSectionCampaign, L"Delay", m_CampaignSettings.uDelay);
-	pSettings->WriteInteger(m_strSectionCampaign, L"NumberOfBattles", m_CampaignSettings.nNumberOfBattles);
+	m_CampaignSettings.Serialize(pSettings.get(), m_strSectionCampaign);
 
 	//Подземелья
-	pSettings->WriteBool(m_strSectionDungeons, L"ProcessSTARTScreenFirst", m_DungeonsSettings.bProcessSTARTScreenFirst);
-	pSettings->WriteInteger(m_strSectionDungeons, L"STARTScreenControlPointX", m_DungeonsSettings.STARTScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionDungeons, L"STARTScreenControlPointY", m_DungeonsSettings.STARTScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionDungeons, L"STARTScreenControlPointColor", m_DungeonsSettings.STARTScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionDungeons, L"STARTScreenControlPointColorTolerance", m_DungeonsSettings.STARTScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionDungeons, L"REPLAYScreenControlPointX", m_DungeonsSettings.REPLAYScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionDungeons, L"REPLAYScreenControlPointY", m_DungeonsSettings.REPLAYScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionDungeons, L"REPLAYScreenControlPointColor", m_DungeonsSettings.REPLAYScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionDungeons, L"REPLAYScreenControlPointColorTolerance", m_DungeonsSettings.REPLAYScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionDungeons, L"REPLAYScreenAction", m_DungeonsSettings.REPLAYScreenPreferredAction);
-	pSettings->WriteInteger(m_strSectionDungeons, L"Delay", m_DungeonsSettings.uDelay);
-	pSettings->WriteInteger(m_strSectionDungeons, L"NumberOfBattles", m_DungeonsSettings.nNumberOfBattles);
+	m_DungeonsSettings.Serialize(pSettings.get(), m_strSectionDungeons);
 
 	//Войны фракций
-	pSettings->WriteBool(m_strSectionFactionWars, L"ProcessSTARTScreenFirst", m_FactionWarsSettings.bProcessSTARTScreenFirst);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"STARTScreenControlPointX", m_FactionWarsSettings.STARTScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"STARTScreenControlPointY", m_FactionWarsSettings.STARTScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"STARTScreenControlPointColor", m_FactionWarsSettings.STARTScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"STARTScreenControlPointColorTolerance", m_FactionWarsSettings.STARTScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointX", m_FactionWarsSettings.REPLAYScreenControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointY", m_FactionWarsSettings.REPLAYScreenControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointColor", m_FactionWarsSettings.REPLAYScreenControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"REPLAYScreenControlPointColorTolerance", m_FactionWarsSettings.REPLAYScreenControlPoint.uTolerance);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"REPLAYScreenAction", m_FactionWarsSettings.REPLAYScreenPreferredAction);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"Delay", m_FactionWarsSettings.uDelay);
-	pSettings->WriteInteger(m_strSectionFactionWars, L"NumberOfBattles", m_FactionWarsSettings.nNumberOfBattles);
+	m_FactionWarsSettings.Serialize(pSettings.get(), m_strSectionFactionWars);
 
 	//Общие
 	pSettings->WriteInteger(m_strSectionCommon, L"GameWindowWidth", m_GameWindowSize.cx);
@@ -186,24 +123,24 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteInteger(m_strSectionCommon, L"TriesBeforeForceTaskEnding", m_uTriesBeforeForceTaskEnding);
 	pSettings->WriteInteger(m_strSectionCommon, L"ScreenCheckingPeriod", m_uScreenCheckingPeriod);
 
-	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointX", m_EnergyDialogControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointY", m_EnergyDialogControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointColor", m_EnergyDialogControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointColorTolerance", m_EnergyDialogControlPoint.uTolerance);
+	for (auto& ControlPoint : m_EnergyDialogControlPoints)
+		ControlPoint.Serialize(pSettings.get(), m_strSectionCommon);
+	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogControlPointIndex", m_uEnergyDialogControlPointIndex);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointX", m_EnergyDialogGETButtonPoint.x);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogGETButtonPointY", m_EnergyDialogGETButtonPoint.y);
 	pSettings->WriteInteger(m_strSectionCommon, L"EnergyDialogAction", m_EnergyDialogAction);
 
-	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointX", m_SMDialogControlPoint.Coordinates.x);
-	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointY", m_SMDialogControlPoint.Coordinates.y);
-	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointColor", m_SMDialogControlPoint.PixelColor);
-	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointColorTolerance", m_SMDialogControlPoint.uTolerance);
+	for (auto& ControlPoint : m_SMDialogControlPoints)
+		ControlPoint.Serialize(pSettings.get(), m_strSectionCommon);
+	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointIndex", m_uSMDialogControlPointIndex);
 
 	//Внутренние
 	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowLeft", m_MainWindowPosition.x);
 	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowTop", m_MainWindowPosition.y);
 	pSettings->WriteInteger(m_strSectionInternal, L"RecentActivePage", m_uRecentActivePageIndex);
-	pSettings->WriteInteger(m_strSectionInternal, L"StayOnTop", m_bStayOnTop);
+	pSettings->WriteBool(m_strSectionInternal, L"StayOnTop", m_bStayOnTop);
+	pSettings->WriteBool(m_strSectionInternal, L"EnableLogging", m_bEnableLogging);
+	pSettings->WriteInteger(m_strSectionInternal, L"MaxLogEntries", m_uMaxLogEntries);
 
     return true;
 }

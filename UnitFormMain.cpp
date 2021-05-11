@@ -6,11 +6,13 @@
 #include <Jpeg.hpp>
 #include <IOUtils.hpp>
 #include <memory>
+#include <array>
 #pragma hdrstop
 
 #include "UnitFormMain.h"
 #include "UnitFormPickPoint.h"
 #include "UnitCommon.h"
+#include "UnitLogManager.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -18,6 +20,7 @@ TFormMain *FormMain;
 
 TSettingsManager *g_pSettingsManager;
 TRAIDWorker *g_pRAIDWorker;
+TLogManager *g_pLogManager;
 
 const String TFormMain::m_strButtonRTRunCaption = L"Старт";
 const String TFormMain::m_strButtonRTPauseCaption = L"Пауза";
@@ -64,7 +67,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	if (!nCycleCounter)
 	{
 		//Кешируем значение времени задачи в секундах один раз, в начале первого боя
-		uBattleDelayInSeconds = (HIWORD(m_ActiveTaskInfo.Settings.uDelay) * 60) + LOWORD(m_ActiveTaskInfo.Settings.uDelay);
+		uBattleDelayInSeconds = (HIWORD(m_ActiveTaskInfo.Settings.Delay) * 60) + LOWORD(m_ActiveTaskInfo.Settings.Delay);
 
 		if (!uBattleDelayInSeconds)
 		{
@@ -75,7 +78,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
         }
 	}
 
-	if ((nCycleCounter > m_ActiveTaskInfo.Settings.nNumberOfBattles) && bScreenCheckPassed)
+	if ((nCycleCounter > m_ActiveTaskInfo.Settings.NumberOfBattles) && bScreenCheckPassed)
 	{
 		//Успешное завершение задачи
 		nCycleCounter = 0;
@@ -104,15 +107,15 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
 	{
 		nCycleCounter++;
-		if (nCycleCounter <= m_ActiveTaskInfo.Settings.nNumberOfBattles)
+		if (nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles)
 		{
 			uBattleTimeout = 0;
 			LabelBattlesCounter->Caption = String(nCycleCounter) + L"/" +
-				String(m_ActiveTaskInfo.Settings.nNumberOfBattles);
+				String(m_ActiveTaskInfo.Settings.NumberOfBattles);
 
 			String strTrayHint;
 			strTrayHint.sprintf(L"%s (%i/%i)", Application->Title.c_str(), nCycleCounter,
-				m_ActiveTaskInfo.Settings.nNumberOfBattles);
+				m_ActiveTaskInfo.Settings.NumberOfBattles);
 			TrayIconApp->BalloonHint = L"";
 			TrayIconApp->Hint = strTrayHint;
 		}
@@ -130,23 +133,68 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	if ((!nScreenCheckFailures || (nScreenCheckFailures && (uScreenCheckingTiomeout == g_pSettingsManager->ScreenCheckingPeriod))) &&
 		!bScreenCheckPassed)
 	{
-		bool bEnergyDialogProcessed;
+		bool bEnergyDialogProcessed = false;
 
 		g_pRAIDWorker->ValidateGameWindow();
 
 		uScreenCheckingTiomeout = 0;
 
+		//Цикл сравнения контрольных точек с кадром
+		auto CompareControlPoints
+		{
+			[](std::array<TControlPoint, g_uMaxControlPoints>& ControlPoints)
+			{
+				unsigned int nEnabledCPs = 0;
+				for (auto& ControlPoint : ControlPoints)
+				{
+					if (ControlPoint.Enabled)
+					{
+						nEnabledCPs++;
+						if (!g_pRAIDWorker->ComparePixels(ControlPoint.Coordinates, ControlPoint.PixelColor,
+							ControlPoint.Tolerance))
+						{
+							if (g_pSettingsManager->EnableLogging)
+							{
+								g_pLogManager->Append(L"Сравнение КТ провалено ( X: %i, Y: %i Цвет: %i Погрешность: %i )",
+									ControlPoint.Coordinates.x, ControlPoint.Coordinates.y, ControlPoint.PixelColor,
+									ControlPoint.Tolerance);
+							}
+							return false;
+						}
+					}
+				}
+
+				if (!nEnabledCPs)
+				{
+					if (g_pSettingsManager->EnableLogging)
+						g_pLogManager->Append(L"Активных КТ не обнаружено, пропуск");
+
+					return false;
+				}
+
+				if (g_pSettingsManager->EnableLogging)
+					g_pLogManager->Append(L"Сравнение всех активных КТ завершено успешно");
+				return true;
+			}
+		};
+
 		//Прерыватель задачи: диалог пополнения энергии
 		//Появляется при её нехватке после попытки запуска боя
 		//Вызываем после попыток запустить бой
-		auto EnergyDialogTest {
-			[=, &bEnergyDialogProcessed](bool& bExitTimer)
+		auto EnergyDialogTest
+		{
+			[=, &bEnergyDialogProcessed] (bool& bExitTimer)
 			{
 				bEnergyDialogProcessed = false;
 
-				if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->EnergyDialogControlPoint,
-					g_pSettingsManager->EnergyDialogControlPointColor, g_pSettingsManager->EnergyDialogControlPointColorTolerance))
+				if (g_pSettingsManager->EnableLogging)
+					g_pLogManager->Append(L"Цикл %i: начало тестирования КТ диалога пополнения энергии", nCycleCounter);
+
+				if (CompareControlPoints(g_pSettingsManager->EnergyDialogControlPoints))
 				{
+					if (g_pSettingsManager->EnableLogging)
+						g_pLogManager->Append(L"Выполнение действий для диалога пополнения энергии");
+
 					switch (g_pSettingsManager->EnergyDialogPreferredAction)
 					{
 						case PromptDialogAction::pdaAccept:
@@ -176,19 +224,29 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		};
 
 		//Прерыватель задачи: диалог работ на сервере
-		if (g_pRAIDWorker->ComparePixels(g_pSettingsManager->SMDialogControlPoint,
-			g_pSettingsManager->SMDialogControlPointColor, g_pSettingsManager->SMDialogControlPointColorTolerance))
+		if (g_pSettingsManager->EnableLogging)
+			g_pLogManager->Append(L"Цикл %i: начало тестирования КТ диалога работ на сервере", nCycleCounter);
+
+		if (CompareControlPoints(g_pSettingsManager->SMDialogControlPoints))
 		{
+			if (g_pSettingsManager->EnableLogging)
+				g_pLogManager->Append(L"Выполнение действий для диалога работ на сервере");
+
 			//Просто игнорируем
 			g_pRAIDWorker->SendKey(VK_ESCAPE);
 		}
 
 		//Если задан этот параметр, сначала проверяем кнопку "Начать", подразумевая, что перед нами экран начала боя
-		if (nCycleCounter == 1 && m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst)
+		if (nCycleCounter == 1 && m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
 		{
-			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.STARTScreenControlPoint.Coordinates,
-				m_ActiveTaskInfo.Settings.STARTScreenControlPoint.PixelColor, m_ActiveTaskInfo.Settings.STARTScreenControlPoint.uTolerance))
+			if (g_pSettingsManager->EnableLogging)
+				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана НАЧАТЬ", nCycleCounter);
+
+			if (CompareControlPoints(m_ActiveTaskInfo.Settings.STARTScreenControlPoints))
 			{
+				if (g_pSettingsManager->EnableLogging)
+					g_pLogManager->Append(L"Выполнение действий для экрана НАЧАТЬ");
+
 				//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
 				g_pRAIDWorker->SendKey(VK_RETURN);
 
@@ -209,11 +267,13 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 		//Если мы прошли первый бой или если не удалось найти кнопку "Начать", подразумеваем, что перед нами экран
 		//результатов боя и пытаемся нажать кнопку "Повтор"
-		if (!bEnergyDialogProcessed && (!m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst || (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && nCycleCounter > 1)
-			|| (m_ActiveTaskInfo.Settings.bProcessSTARTScreenFirst && !bScreenCheckPassed)))
+		if (!bEnergyDialogProcessed && (!m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst || (m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst && nCycleCounter > 1)
+			|| (m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst && !bScreenCheckPassed)))
 		{
-			if (g_pRAIDWorker->ComparePixels(m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.Coordinates,
-				m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.PixelColor, m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.uTolerance))
+			if (g_pSettingsManager->EnableLogging)
+				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана ПОВТОР/ДАЛЕЕ", nCycleCounter);
+
+			if (CompareControlPoints(m_ActiveTaskInfo.Settings.REPLAYScreenControlPoints))
 			{
 				//Отчёт, если задано создание скриншота по завершению каждого боя
 				if ((nCycleCounter > 1) && g_pSettingsManager->SaveResults &&
@@ -224,8 +284,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 				//Если мы прошли последний бой (счётчик nCycleCounter будет равен nNumberOfBattles + 1),
 				//просто ждём экрана результатов
-				if (nCycleCounter <= m_ActiveTaskInfo.Settings.nNumberOfBattles)
+				if (nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles)
 				{
+					if (g_pSettingsManager->EnableLogging)
+						g_pLogManager->Append(L"Выполнение действий для экрана ПОВТОР/ДАЛЕЕ");
+
 					if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaReplay)
 					{
 						//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
@@ -262,6 +325,12 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		//Если превысили число ошибочных попыток сравнения, завершаем всю задачу
 		if (nScreenCheckFailures == g_pSettingsManager->TriesBeforeForceTaskEnding)
 		{
+			if (g_pSettingsManager->EnableLogging)
+			{
+				g_pLogManager->Append(L"Превышен лимит ошибочных тестирований экрана: %i/%i",
+					nScreenCheckFailures, g_pSettingsManager->TriesBeforeForceTaskEnding);
+            }
+
 			if (g_pSettingsManager->SaveResults)
 			{
 				this->SaveResult(nCycleCounter, true);
@@ -341,10 +410,29 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 		this->FormStyle = TFormStyle::fsStayOnTop;
 	}
 
+	auto FillButtonGroupControl
+	{
+		[this](TButtonGroup* pControl)
+		{
+			TGrpButtonItem *pNewItem;
+			for (int i = 0; i < g_uMaxControlPoints; i++)
+			{
+				pNewItem = pControl->Items->Add();
+				pNewItem->Index = i;
+				pNewItem->Caption = IntToStr(i + 1);
+			}
+		}
+	};
+
+	FillButtonGroupControl(ButtonGroupSSCPIndex);
+	FillButtonGroupControl(ButtonGroupRSCPIndex);
+	FillButtonGroupControl(ButtonGroupEDCPIndex);
+	FillButtonGroupControl(ButtonGroupSMDCPIndex);
+
 	g_pRAIDWorker = new TRAIDWorker;
 
 	PageControlURAIDASettings->ActivePageIndex = g_pSettingsManager->RecentActivePage;
-	this->PageControlURAIDASettingsChange(this);
+	this->UpdateNecessarySettings();
 	BitBtnRunTask->Caption = m_strButtonRTRunCaption;
 	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
 	ImageListRTButton->GetBitmap(0, pGlyph.get());
@@ -354,6 +442,17 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	String strAppVersion;
 	GetFileVersion(Application->ExeName, strAppVersion, fvfMajorMinor);
 	LabelCopyright1->Caption = Application->Title + L" вер." + strAppVersion + L" от";
+
+	g_pLogManager = new TLogManager;
+	if (g_pSettingsManager->EnableLogging)
+	{
+		String strLogFile, strExeName = Application->ExeName;
+		strLogFile = IncludeTrailingPathDelimiter(ExtractFilePath(strExeName)) +
+			TPath::GetFileNameWithoutExtension(strExeName) + L".log";
+		g_pLogManager->LogFile = strLogFile;
+		g_pLogManager->OpenLog();
+		g_pLogManager->MaximumEntries = g_pSettingsManager->MaxLogEntries;
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -363,11 +462,11 @@ void __fastcall TFormMain::BitBtnSSPickPointClick(TObject *Sender)
 
 	if (FormPickPoint->Execute(this))
 	{
-		PickPointData PPResults = FormPickPoint->GetResults();
+		PickPointData Results = FormPickPoint->GetResults();
 
-		UpDownSSX->Position = PPResults.XY.x;
-		UpDownSSY->Position = PPResults.XY.y;
-		PanelSSColor->Color = PPResults.Color;
+		UpDownSSX->Position = Results.XY.x;
+		UpDownSSY->Position = Results.XY.y;
+		PanelSSColor->Color = Results.Color;
 	}
 }
 //---------------------------------------------------------------------------
@@ -379,35 +478,58 @@ void __fastcall TFormMain::ButtonApplyGWSizeClick(TObject *Sender)
 	g_pRAIDWorker->ResizeGameWindow(TSize(UpDownGWWidth->Position, UpDownGWHeight->Position));
 }
 //---------------------------------------------------------------------------
-void TFormMain::UpdateGMSpecSettingsFrame(TTabSheet *pPage)
+void TFormMain::GetAppropriateGMSpecSettings(TGameModeSpecSettings& Result)
+{
+	if (PageControlURAIDASettings->ActivePage == TabSheetCampaign)
+	{
+		Result = g_pSettingsManager->CampaignSettings;
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetDungeons)
+	{
+		Result = g_pSettingsManager->DungeonsSettings;
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetFactionWars)
+	{
+		Result = g_pSettingsManager->FactionWarsSettings;
+	}
+}
+//---------------------------------------------------------------------------
+void TFormMain::ApplyAppropriateGMSpecSettings(const TGameModeSpecSettings& Input)
+{
+	if (PageControlURAIDASettings->ActivePage == TabSheetCampaign)
+	{
+		g_pSettingsManager->CampaignSettings = Input;
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetDungeons)
+	{
+		g_pSettingsManager->DungeonsSettings = Input;
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetFactionWars)
+	{
+		g_pSettingsManager->FactionWarsSettings = Input;
+	}
+}
+//---------------------------------------------------------------------------
+void TFormMain::UpdateGMSpecSettingsFrame()
 {
 	//Чтение настроек
-	g_pSettingsManager->ReadINI();
 
-	GameModeSpecSettings GMSpecSettings;
+	TGameModeSpecSettings GMSpecSettings;
+	this->GetAppropriateGMSpecSettings(GMSpecSettings);
 
-	if (pPage == TabSheetCampaign)
-	{
-		GMSpecSettings = g_pSettingsManager->CampaignSettings;
-	}
-	else if (pPage == TabSheetDungeons)
-	{
-		GMSpecSettings = g_pSettingsManager->DungeonsSettings;
-	}
-	else if (pPage == TabSheetFactionWars)
-	{
-		GMSpecSettings = g_pSettingsManager->FactionWarsSettings;
-	}
-
-	CheckBoxProcessSTARTScreen->Checked = GMSpecSettings.bProcessSTARTScreenFirst;
-	UpDownSSX->Position = GMSpecSettings.STARTScreenControlPoint.Coordinates.x;
-	UpDownSSY->Position = GMSpecSettings.STARTScreenControlPoint.Coordinates.y;
-	PanelSSColor->Color = GMSpecSettings.STARTScreenControlPoint.PixelColor;
-	UpDownSSColorTolerance->Position = GMSpecSettings.STARTScreenControlPoint.uTolerance;
-	UpDownRSX->Position = GMSpecSettings.REPLAYScreenControlPoint.Coordinates.x;
-	UpDownRSY->Position = GMSpecSettings.REPLAYScreenControlPoint.Coordinates.y;
-	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPoint.PixelColor;
-	UpDownRSColorTolerance->Position = GMSpecSettings.REPLAYScreenControlPoint.uTolerance;
+	CheckBoxProcessSTARTScreen->Checked = GMSpecSettings.ProcessSTARTScreenFirst;
+	ButtonGroupSSCPIndex->ItemIndex = GMSpecSettings.STARTScreenControlPointIndex;
+	CheckBoxSSCPState->Checked = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled;
+	UpDownSSX->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates.x;
+	UpDownSSY->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates.y;
+	PanelSSColor->Color = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].PixelColor;
+	UpDownSSColorTolerance->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Tolerance;
+	ButtonGroupRSCPIndex->ItemIndex = GMSpecSettings.REPLAYScreenControlPointIndex;
+	CheckBoxRSCPState->Checked = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled;
+	UpDownRSX->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates.x;
+	UpDownRSY->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates.y;
+	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor;
+	UpDownRSColorTolerance->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance;
 
 	switch (GMSpecSettings.REPLAYScreenPreferredAction)
 	{
@@ -419,23 +541,29 @@ void TFormMain::UpdateGMSpecSettingsFrame(TTabSheet *pPage)
             break;
 	}
 
-	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.uDelay);
-	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.uDelay);
-	UpDownNumberofBattles->Position = GMSpecSettings.nNumberOfBattles;
+	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.Delay);
+	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.Delay);
+	UpDownNumberofBattles->Position = GMSpecSettings.NumberOfBattles;
 }
 //---------------------------------------------------------------------------
-GameModeSpecSettings TFormMain::SaveSettingsFromGMSpecSettingsFrame()
+void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 {
-	GameModeSpecSettings GMSpecSettings;
-	GMSpecSettings.bProcessSTARTScreenFirst = CheckBoxProcessSTARTScreen->Checked;
-	GMSpecSettings.STARTScreenControlPoint.Coordinates.x = UpDownSSX->Position;
-	GMSpecSettings.STARTScreenControlPoint.Coordinates.y = UpDownSSY->Position;
-	GMSpecSettings.STARTScreenControlPoint.PixelColor = PanelSSColor->Color;
-	GMSpecSettings.STARTScreenControlPoint.uTolerance = UpDownSSColorTolerance->Position;
-	GMSpecSettings.REPLAYScreenControlPoint.Coordinates.x = UpDownRSX->Position;
-	GMSpecSettings.REPLAYScreenControlPoint.Coordinates.y = UpDownRSY->Position;
-	GMSpecSettings.REPLAYScreenControlPoint.PixelColor = PanelRSColor->Color;
-	GMSpecSettings.REPLAYScreenControlPoint.uTolerance = UpDownRSColorTolerance->Position;
+	TGameModeSpecSettings GMSpecSettings;
+	this->GetAppropriateGMSpecSettings(GMSpecSettings);
+
+	GMSpecSettings.ProcessSTARTScreenFirst = CheckBoxProcessSTARTScreen->Checked;
+	GMSpecSettings.STARTScreenControlPointIndex = ButtonGroupSSCPIndex->ItemIndex;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled = CheckBoxSSCPState->Checked;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates =
+		TPoint(UpDownSSX->Position, UpDownSSY->Position);
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].PixelColor = PanelSSColor->Color;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Tolerance = UpDownSSColorTolerance->Position;
+	GMSpecSettings.REPLAYScreenControlPointIndex = ButtonGroupRSCPIndex->ItemIndex;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled = CheckBoxRSCPState->Checked;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates =
+		TPoint(UpDownRSX->Position, UpDownRSY->Position);
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor = PanelRSColor->Color;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance = UpDownRSColorTolerance->Position;
 
 	if (RadioButtonRSActionReplay->Checked)
 	{
@@ -446,36 +574,14 @@ GameModeSpecSettings TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 		GMSpecSettings.REPLAYScreenPreferredAction = REPLAYScreenAction::rsaGoNext;
 	}
 
-	GMSpecSettings.uDelay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
-	GMSpecSettings.nNumberOfBattles = UpDownNumberofBattles->Position;
+	GMSpecSettings.Delay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
+	GMSpecSettings.NumberOfBattles = UpDownNumberofBattles->Position;
 
-	if (PageControlURAIDASettings->ActivePage == TabSheetCampaign)
-	{
-		GMSpecSettings.GameMode = SupportedGameModes::gmCampaign;
-		g_pSettingsManager->CampaignSettings = GMSpecSettings;
-	}
-	else if (PageControlURAIDASettings->ActivePage == TabSheetDungeons)
-	{
-		GMSpecSettings.GameMode = SupportedGameModes::gmDungeons;
-		g_pSettingsManager->DungeonsSettings = GMSpecSettings;
-	}
-	else if (PageControlURAIDASettings->ActivePage == TabSheetFactionWars)
-	{
-		GMSpecSettings.GameMode = SupportedGameModes::gmFactionWars;
-		g_pSettingsManager->FactionWarsSettings = GMSpecSettings;
-	}
-
-	//Запись в файл
-	g_pSettingsManager->UpdateINI();
-
-	return GMSpecSettings;
+	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 }
 //---------------------------------------------------------------------------
 void TFormMain::UpdateCommonSettingsFrame()
 {
-	//Чтение настроек
-	g_pSettingsManager->ReadINI();
-
 	UpDownGWWidth->Position = g_pSettingsManager->RAIDWindowSize.cx;
 	UpDownGWHeight->Position = g_pSettingsManager->RAIDWindowSize.cy;
 	CheckBoxSaveResults->Checked = g_pSettingsManager->SaveResults;
@@ -502,10 +608,12 @@ void TFormMain::UpdateCommonSettingsFrame()
 	UpDownTriesBeforeFTE->Position = g_pSettingsManager->TriesBeforeForceTaskEnding;
 	UpDownScreenCheckingInterval->Position = g_pSettingsManager->ScreenCheckingPeriod;
 
-	UpDownEDX->Position = g_pSettingsManager->EnergyDialogControlPoint.x;
-	UpDownEDY->Position = g_pSettingsManager->EnergyDialogControlPoint.y;
-	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPointColor;
-	UpDownEDColorTolerance->Position = g_pSettingsManager->EnergyDialogControlPointColorTolerance;
+	ButtonGroupEDCPIndex->ItemIndex = g_pSettingsManager->EnergyDialogControlPointIndex;
+	CheckBoxEDCPState->Checked = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled;
+	UpDownEDX->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates.x;
+	UpDownEDY->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates.y;
+	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].PixelColor;
+	UpDownEDColorTolerance->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Tolerance;
 
 	UpDownEDGETX->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.x;
 	UpDownEDGETY->Position = g_pSettingsManager->EnergyDialogGETButtonPoint.y;
@@ -523,10 +631,12 @@ void TFormMain::UpdateCommonSettingsFrame()
 			break;
 	}
 
-	UpDownSMX->Position = g_pSettingsManager->SMDialogControlPoint.x;
-	UpDownSMY->Position = g_pSettingsManager->SMDialogControlPoint.y;
-	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPointColor;
-	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPointColorTolerance;
+	ButtonGroupSMDCPIndex->ItemIndex = g_pSettingsManager->SMDialogControlPointIndex;
+	CheckBoxSMDCPState->Checked = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled;
+	UpDownSMX->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates.x;
+	UpDownSMY->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates.y;
+	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor;
+	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromCommonSettingsFrame()
@@ -539,26 +649,41 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 	if (NewGWSize != CurrentGWSize)
 	{
 		float fWidthCoeff, fHeightCoeff;
+		TGameModeSpecSettings GMSpecSettings;
 
-		if (NewGWSize.cx > CurrentGWSize.cx)
+		if (NewGWSize.cx < CurrentGWSize.cx)
 			fWidthCoeff = static_cast<float>(CurrentGWSize.cx) / static_cast<float>(NewGWSize.cx);
 		else
 			fWidthCoeff = static_cast<float>(NewGWSize.cx) / static_cast<float>(CurrentGWSize.cx);
 
-		if (NewGWSize.cy > CurrentGWSize.cy)
+		if (NewGWSize.cy < CurrentGWSize.cy)
 			fHeightCoeff = static_cast<float>(CurrentGWSize.cy) / static_cast<float>(NewGWSize.cy);
 		else
 			fHeightCoeff = static_cast<float>(NewGWSize.cy) / static_cast<float>(CurrentGWSize.cy);
 
-		GameModeSpecSettings GMSpecSettings;
+		auto GMSSShiftCoordinates
+		{
+			[fWidthCoeff, fHeightCoeff, &GMSpecSettings]()
+			{
+				for (auto& ControlPoint : GMSpecSettings.STARTScreenControlPoints)
+				{
+					ControlPoint.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+				}
+				for (auto& ControlPoint : GMSpecSettings.REPLAYScreenControlPoints)
+				{
+					ControlPoint.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+				}
+			}
+		};
+
 		GMSpecSettings = g_pSettingsManager->CampaignSettings;
-		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		GMSSShiftCoordinates();
 		g_pSettingsManager->CampaignSettings = GMSpecSettings;
 		GMSpecSettings = g_pSettingsManager->DungeonsSettings;
-		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		GMSSShiftCoordinates();
 		g_pSettingsManager->DungeonsSettings = GMSpecSettings;
 		GMSpecSettings = g_pSettingsManager->FactionWarsSettings;
-		GMSpecSettings.ShiftCoordinates(fWidthCoeff, fHeightCoeff);
+		GMSSShiftCoordinates();
 		g_pSettingsManager->FactionWarsSettings = GMSpecSettings;
 
 		this->UpDownEDX->Position *= fWidthCoeff;
@@ -591,9 +716,12 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 	g_pSettingsManager->TriesBeforeForceTaskEnding = UpDownTriesBeforeFTE->Position;
 	g_pSettingsManager->ScreenCheckingPeriod = UpDownScreenCheckingInterval->Position;
 
-	g_pSettingsManager->EnergyDialogControlPoint = TPoint(UpDownEDX->Position, UpDownEDY->Position);
-	g_pSettingsManager->EnergyDialogControlPointColor = PanelEDColor->Color;
-	g_pSettingsManager->EnergyDialogControlPointColorTolerance = UpDownEDColorTolerance->Position;
+	g_pSettingsManager->EnergyDialogControlPointIndex = ButtonGroupEDCPIndex->ItemIndex;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled = CheckBoxEDCPState->Checked;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates =
+		TPoint(UpDownEDX->Position, UpDownEDY->Position);
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].PixelColor = PanelEDColor->Color;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Tolerance = UpDownEDColorTolerance->Position;
 	g_pSettingsManager->EnergyDialogGETButtonPoint = TPoint(UpDownEDGETX->Position, UpDownEDGETY->Position);
 
 	if (RadioButtonEDAccept->Checked)
@@ -609,22 +737,42 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 		g_pSettingsManager->EnergyDialogPreferredAction = PromptDialogAction::pdaAbort;
 	}
 
-	g_pSettingsManager->SMDialogControlPoint = TPoint(UpDownSMX->Position, UpDownSMY->Position);
-	g_pSettingsManager->SMDialogControlPointColor = PanelSMColor->Color;
-	g_pSettingsManager->SMDialogControlPointColorTolerance = UpDownSMColorTolerance->Position;
-
-	//Запись в файл
-	g_pSettingsManager->UpdateINI();
+	g_pSettingsManager->SMDialogControlPointIndex = ButtonGroupSMDCPIndex->ItemIndex;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled = CheckBoxSMDCPState->Checked;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates =
+		TPoint(UpDownSMX->Position, UpDownSMY->Position);
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor = PanelSMColor->Color;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance = UpDownSMColorTolerance->Position;
 }
 //---------------------------------------------------------------------------
-void TFormMain::UpdateApplicationFrame()
+void TFormMain::UpdateNecessarySettings()
 {
-	//
+	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
+	{
+		if (ScrollBoxGMSpecSettings->Parent != PageControlURAIDASettings->ActivePage)
+			ScrollBoxGMSpecSettings->Parent = PageControlURAIDASettings->ActivePage;
+		this->UpdateGMSpecSettingsFrame();
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
+	{
+		this->UpdateCommonSettingsFrame();
+	}
 }
 //---------------------------------------------------------------------------
-void TFormMain::SaveSettingsFromApplicationFrame()
+void TFormMain::SaveNecessarySettings()
 {
-	//
+	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
+		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
+	{
+		this->SaveSettingsFromGMSpecSettingsFrame();
+	}
+	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
+	{
+		this->SaveSettingsFromCommonSettingsFrame();
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
@@ -643,11 +791,11 @@ void __fastcall TFormMain::BitBtnRSPickPointClick(TObject *Sender)
 
 	if (FormPickPoint->Execute(this))
 	{
-		PickPointData PPResults = FormPickPoint->GetResults();
+		PickPointData Results = FormPickPoint->GetResults();
 
-		UpDownRSX->Position = PPResults.XY.x;
-		UpDownRSY->Position = PPResults.XY.y;
-		PanelRSColor->Color = PPResults.Color;
+		UpDownRSX->Position = Results.XY.x;
+		UpDownRSY->Position = Results.XY.y;
+		PanelRSColor->Color = Results.Color;
     }
 }
 //---------------------------------------------------------------------------
@@ -692,12 +840,6 @@ void __fastcall TFormMain::TrayIconAppBalloonClick(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormMain::FormShow(TObject *Sender)
-{
-	this->UpdateGMSpecSettingsFrame(PageControlURAIDASettings->ActivePage);
-	this->UpdateCommonSettingsFrame();
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 {
@@ -711,46 +853,28 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 		}
 	}
 
-	this->SaveSettingsFromGMSpecSettingsFrame();
-	this->SaveSettingsFromCommonSettingsFrame();
+	this->SaveNecessarySettings();
 
 	g_pSettingsManager->StayOnTop = MenuItemStayOnTop->Checked;
 	g_pSettingsManager->RecentActivePage = PageControlURAIDASettings->ActivePageIndex;
 	g_pSettingsManager->MainWindowPosition = TPoint(this->Left, this->Top);
 
-    g_pSettingsManager->UpdateINI();
+	g_pSettingsManager->UpdateINI();
+
+	if (g_pSettingsManager->EnableLogging)
+		g_pLogManager->CloseLog();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::PageControlURAIDASettingsChange(TObject *Sender)
 {
-	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
-		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
-		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
-	{
-		if (ScrollBoxGMSpecSettings->Parent != PageControlURAIDASettings->ActivePage)
-			ScrollBoxGMSpecSettings->Parent = PageControlURAIDASettings->ActivePage;
-		this->UpdateGMSpecSettingsFrame(PageControlURAIDASettings->ActivePage);
-	}
-	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
-	{
-		this->UpdateCommonSettingsFrame();
-	}
+	this->UpdateNecessarySettings();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormMain::PageControlURAIDASettingsChanging(TObject *Sender, bool &AllowChange)
 {
-	if ((PageControlURAIDASettings->ActivePage == TabSheetCampaign) ||
-		(PageControlURAIDASettings->ActivePage == TabSheetDungeons) ||
-		(PageControlURAIDASettings->ActivePage == TabSheetFactionWars))
-	{
-		this->SaveSettingsFromGMSpecSettingsFrame();
-	}
-	else if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
-	{
-		this->SaveSettingsFromCommonSettingsFrame();
-	}
+	this->SaveNecessarySettings();
 }
 //---------------------------------------------------------------------------
 
@@ -800,6 +924,47 @@ void TFormMain::StartTask()
 			return;
 		}
 
+		//Запускаем таймер задачи по указанным параметрам
+		//Параметры будут применены только при старте новой задачи
+		this->SaveSettingsFromGMSpecSettingsFrame();
+		TGameModeSpecSettings GMSpecSettings;
+        this->GetAppropriateGMSpecSettings(GMSpecSettings);
+
+		//Проверяем, не забыл ли пользователь включить хотя бы одну контрольную точку
+		unsigned int nCPCount = 0;
+		if (GMSpecSettings.ProcessSTARTScreenFirst)
+		{
+			for (auto& ControlPoint : GMSpecSettings.STARTScreenControlPoints)
+			{
+				if (ControlPoint.Enabled)
+					nCPCount++;
+			}
+			if (!nCPCount)
+			{
+				MessageBox(this->Handle, L"Включите хотя бы одну контрольную точку экрана НАЧАТЬ!", L"Предупреждение",
+					MB_ICONEXCLAMATION);
+				return;
+			}
+		}
+        nCPCount = 0;
+		if ((GMSpecSettings.ProcessSTARTScreenFirst && GMSpecSettings.NumberOfBattles > 1) ||
+			!GMSpecSettings.ProcessSTARTScreenFirst)
+		{
+			for (auto& ControlPoint : GMSpecSettings.REPLAYScreenControlPoints)
+			{
+				if (ControlPoint.Enabled)
+					nCPCount++;
+			}
+			if (!nCPCount)
+			{
+				MessageBox(this->Handle, L"Включите хотя бы одну контрольную точку экрана ПОВТОР/ДАЛЕЕ!", L"Предупреждение",
+					MB_ICONEXCLAMATION);
+				return;
+			}
+		}
+
+		m_ActiveTaskInfo.Settings = GMSpecSettings;
+
         //Очищаем папку результатов перед началом выполнения задачи, если указана такая опция
 		if (g_pSettingsManager->ClearOldResults)
 		{
@@ -808,17 +973,16 @@ void TFormMain::StartTask()
 			{
 				TDirectory::Delete(g_pSettingsManager->PathForResults, true);
 			}
-		}
-
-		//Запускаем таймер задачи по указанным параметрам
-		//Параметры будут применены только при старте новой задачи
-		m_ActiveTaskInfo.Settings = this->SaveSettingsFromGMSpecSettingsFrame();
+		};
 
 		LabelBattlesCounter->Font->Color = clBlack;
 		ProgressBarBattle->Position = 0;
 		TaskbarApp->ProgressValue = 0;
 
 		m_ActiveTaskInfo.StartTime = Now();
+
+		if (g_pSettingsManager->EnableLogging)
+			g_pLogManager->Append(L"Новая задача");
 	}
 
 	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
@@ -869,6 +1033,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 	TrayIconApp->BalloonHint = L"";
 	TrayIconApp->Hint = Application->Title;
 
+	String strReason;
 	switch (Reason)
 	{
 		case TaskStoppingReason::tsrUser:
@@ -876,6 +1041,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			LabelBattlesCounter->Font->Color = clGray;
 			ProgressBarBattle->State = TProgressBarState::pbsNormal;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
+			strReason = L"::tsrUser";
 			break;
 		}
 		case TaskStoppingReason::tsrSuccessfulCompletion:
@@ -883,6 +1049,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			LabelBattlesCounter->Font->Color = clGreen;
 			ProgressBarBattle->State = TProgressBarState::pbsNormal;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
+			strReason = L"::tsrSuccessfulCompletion";
 			break;
 		}
 		case TaskStoppingReason::tsrError:
@@ -890,11 +1057,18 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			LabelBattlesCounter->Font->Color = clRed;
 			ProgressBarBattle->State = TProgressBarState::pbsError;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Error;
+			strReason = L"::tsrError";
 			break;
 		}
 	}
 
-    //Если это не пользователь нажал кнопку..
+	if (g_pSettingsManager->EnableLogging)
+	{
+		g_pLogManager->Append(L"Остановка задачи, причина: %s", strReason.c_str());
+		g_pLogManager->FlushToDisk();
+	}
+
+	//Если это не пользователь нажал кнопку..
 	if (Reason != TaskStoppingReason::tsrUser)
 	{
 		//Выполняем сценарий завершения задачи
@@ -945,6 +1119,12 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 {
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 		return;
+
+	if (g_pSettingsManager->EnableLogging)
+	{
+		g_pLogManager->Append(L"Сохранение прогресса боя %i (%s)", nBattleNumber,
+			(bError)?L"ошибка тестирования":L"кадр");
+	}
 
 	String strPathForResults = g_pSettingsManager->PathForResults;
 	String strGameMode, strActiveTaskSubDir, strFinalPath;
@@ -1002,24 +1182,27 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 
 	if (bError)
 	{
-		//Дополнительно указываем на скриншоте координату проверки в виде красного крестика
-		const unsigned int uMarkerIndent = 10;
-		TPoint ControlPoint;
-		if (nBattleNumber > 1)
+		for (int i = 0; i < g_uMaxControlPoints; i++)
 		{
-			ControlPoint = this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoint.Coordinates;
-		}
-		else
-		{
-			ControlPoint = this->m_ActiveTaskInfo.Settings.STARTScreenControlPoint.Coordinates;
-		}
+			//Дополнительно указываем на скриншоте координату проверки в виде красного крестика
+			const unsigned int uMarkerIndent = 10;
+			TPoint ControlPoint;
+			if (nBattleNumber > 1)
+			{
+				ControlPoint = this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoints[i].Coordinates;
+			}
+			else
+			{
+				ControlPoint = this->m_ActiveTaskInfo.Settings.STARTScreenControlPoints[i].Coordinates;
+			}
 
-		pImage->Canvas->Pen->Color = clRed;
-		pImage->Canvas->Pen->Width = 3;
-		pImage->Canvas->MoveTo(ControlPoint.x - uMarkerIndent , ControlPoint.y);
-		pImage->Canvas->LineTo(ControlPoint.x + uMarkerIndent, ControlPoint.y);
-		pImage->Canvas->MoveTo(ControlPoint.x, ControlPoint.y - uMarkerIndent);
-		pImage->Canvas->LineTo(ControlPoint.x, ControlPoint.y + uMarkerIndent);
+			pImage->Canvas->Pen->Color = clRed;
+			pImage->Canvas->Pen->Width = 3;
+			pImage->Canvas->MoveTo(ControlPoint.x - uMarkerIndent , ControlPoint.y);
+			pImage->Canvas->LineTo(ControlPoint.x + uMarkerIndent, ControlPoint.y);
+			pImage->Canvas->MoveTo(ControlPoint.x, ControlPoint.y - uMarkerIndent);
+			pImage->Canvas->LineTo(ControlPoint.x, ControlPoint.y + uMarkerIndent);
+		}
 	}
 
 	pJPEGImage->Assign(pImage->Picture->Bitmap);
@@ -1040,11 +1223,11 @@ void __fastcall TFormMain::BitBtnEDPickPointClick(TObject *Sender)
 
 	if (FormPickPoint->Execute(this))
 	{
-		PickPointData PPResults = FormPickPoint->GetResults();
+		PickPointData Results = FormPickPoint->GetResults();
 
-		UpDownEDX->Position = PPResults.XY.x;
-		UpDownEDY->Position = PPResults.XY.y;
-		PanelEDColor->Color = PPResults.Color;
+		UpDownEDX->Position = Results.XY.x;
+		UpDownEDY->Position = Results.XY.y;
+		PanelEDColor->Color = Results.Color;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1055,10 +1238,10 @@ void __fastcall TFormMain::BitBtnEDGETPickPointClick(TObject *Sender)
 
 	if (FormPickPoint->Execute(this))
 	{
-		PickPointData PPResults = FormPickPoint->GetResults();
+		PickPointData Results = FormPickPoint->GetResults();
 
-		UpDownEDGETX->Position = PPResults.XY.x;
-		UpDownEDGETY->Position = PPResults.XY.y;
+		UpDownEDGETX->Position = Results.XY.x;
+		UpDownEDGETY->Position = Results.XY.y;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1069,11 +1252,11 @@ void __fastcall TFormMain::BitBtnSMPickColorClick(TObject *Sender)
 
 	if (FormPickPoint->Execute(this))
 	{
-		PickPointData PPResults = FormPickPoint->GetResults();
+		PickPointData Results = FormPickPoint->GetResults();
 
-		UpDownSMX->Position = PPResults.XY.x;
-		UpDownSMY->Position = PPResults.XY.y;
-		PanelSMColor->Color = PPResults.Color;
+		UpDownSMX->Position = Results.XY.x;
+		UpDownSMY->Position = Results.XY.y;
+		PanelSMColor->Color = Results.Color;
 	}
 }
 //---------------------------------------------------------------------------
@@ -1155,7 +1338,117 @@ void __fastcall TFormMain::BitBtnStopTaskClick(TObject *Sender)
 
 void __fastcall TFormMain::PopupMenuTrayPopup(TObject *Sender)
 {
-    MenuItemMoveToCenter->Enabled = this->Visible;
+	MenuItemMoveToCenter->Enabled = this->Visible;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::ButtonGroupSSCPIndexButtonClicked(TObject *Sender, int Index)
+{
+	if (ButtonGroupSSCPIndex->ItemIndex == Index) return;
+
+	TGameModeSpecSettings GMSpecSettings;
+	this->GetAppropriateGMSpecSettings(GMSpecSettings);
+
+	//Сохраняем параметры контрольной точки по старому индексу
+	GMSpecSettings.STARTScreenControlPointIndex = ButtonGroupSSCPIndex->ItemIndex;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled = CheckBoxSSCPState->Checked;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates =
+		TPoint(UpDownSSX->Position, UpDownSSY->Position);
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].PixelColor = PanelSSColor->Color;
+	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Tolerance = UpDownSSColorTolerance->Position;
+
+	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
+
+	//Обновляем индекс и вычитываем параметры по выбранному индексу
+	GMSpecSettings.STARTScreenControlPointIndex = Index;
+
+	CheckBoxSSCPState->Checked = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled;
+	UpDownSSX->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates.x;
+	UpDownSSY->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates.y;
+	PanelSSColor->Color = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].PixelColor;
+	UpDownSSColorTolerance->Position = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Tolerance;
+
+	//ButtonGroupSSCPIndex->ItemIndex = Index;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::ButtonGroupRSCPIndexButtonClicked(TObject *Sender, int Index)
+{
+	if (ButtonGroupRSCPIndex->ItemIndex == Index) return;
+
+	TGameModeSpecSettings GMSpecSettings;
+	this->GetAppropriateGMSpecSettings(GMSpecSettings);
+
+	//Сохраняем параметры контрольной точки по старому индексу
+	GMSpecSettings.REPLAYScreenControlPointIndex = ButtonGroupRSCPIndex->ItemIndex;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled = CheckBoxRSCPState->Checked;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates =
+		TPoint(UpDownRSX->Position, UpDownRSY->Position);
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor = PanelRSColor->Color;
+	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance = UpDownRSColorTolerance->Position;
+
+	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
+
+	//Обновляем индекс и вычитываем параметры по выбранному индексу
+	GMSpecSettings.REPLAYScreenControlPointIndex = Index;
+
+	CheckBoxRSCPState->Checked = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled;
+	UpDownRSX->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates.x;
+	UpDownRSY->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates.y;
+	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor;
+	UpDownRSColorTolerance->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance;
+
+	//ButtonGroupRSCPIndex->ItemIndex = Index;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::ButtonGroupEDCPIndexButtonClicked(TObject *Sender, int Index)
+{
+	if (ButtonGroupEDCPIndex->ItemIndex == Index) return;
+
+	//Сохраняем параметры контрольной точки по старому индексу
+	g_pSettingsManager->EnergyDialogControlPointIndex = ButtonGroupEDCPIndex->ItemIndex;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled = CheckBoxEDCPState->Checked;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates =
+		TPoint(UpDownEDX->Position, UpDownEDY->Position);
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].PixelColor = PanelEDColor->Color;
+	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Tolerance = UpDownEDColorTolerance->Position;
+
+	//Обновляем по новому индексу
+	g_pSettingsManager->EnergyDialogControlPointIndex = Index;
+
+	CheckBoxEDCPState->Checked = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled;
+	UpDownEDX->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates.x;
+	UpDownEDY->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates.y;
+	PanelEDColor->Color = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].PixelColor;
+	UpDownEDColorTolerance->Position = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Tolerance;
+
+	//ButtonGroupEDCPIndex->ItemIndex = Index;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, int Index)
+{
+	if (ButtonGroupSMDCPIndex->ItemIndex == Index) return;
+
+	//Сохраняем параметры контрольной точки по старому индексу
+	g_pSettingsManager->SMDialogControlPointIndex = ButtonGroupSMDCPIndex->ItemIndex;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled = CheckBoxSMDCPState->Checked;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates =
+		TPoint(UpDownSMX->Position, UpDownSMY->Position);
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor = PanelSMColor->Color;
+	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance = UpDownSMColorTolerance->Position;
+
+	//Обновляем по новому индексу
+	g_pSettingsManager->SMDialogControlPointIndex = Index;
+
+	CheckBoxSMDCPState->Checked = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled;
+	UpDownSMX->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates.x;
+	UpDownSMY->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates.y;
+	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor;
+	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance;
+
+	//ButtonGroupSMDCPIndex->ItemIndex = Index;
 }
 //---------------------------------------------------------------------------
 

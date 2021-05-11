@@ -58,78 +58,7 @@ void __fastcall TFormPickPoint::FormKeyPress(TObject *Sender, System::WideChar &
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormPickPoint::ButtonSourceFromGameClick(TObject *Sender)
-{
-	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
-	PanelMenu->Visible = false;
-	PanelCPInfo->Visible = true;
 
-	g_pRAIDWorker->ValidateGameWindow();
-
-	this->ResizeAndAlignWindow();
-
-    //≈сли надо выводить и помещаемс€ по ширине, делаем видимым..
-	if (!m_bOnlyCoordinates)
-	{
-		LabelColorInRGB->Visible = (PanelCPInfo->ClientWidth > LabelColorInRGB->BoundsRect.Right);
-	}
-	else
-	{
-		LabelColorInRGB->Visible = false;
-	}
-
-	ImageCapturedFrame->Picture->Bitmap->SetSize(ImageCapturedFrame->Width, ImageCapturedFrame->Height);
-	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, ImageCapturedFrame->BoundsRect.Size);
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TFormPickPoint::ButtonSourceFromFileClick(TObject *Sender)
-{
-	if (FileOpenDialog1->Execute(this->Handle))
-	{
-		std::shared_ptr<TBitmap> pBitmap(new TBitmap());
-		switch (FileOpenDialog1->FileTypeIndex)
-		{
-			case 1:
-			{
-				std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
-				pJPEGImage->LoadFromFile(FileOpenDialog1->FileName);
-				pJPEGImage->DIBNeeded();
-				pBitmap->Assign(pJPEGImage.get());
-				break;
-			}
-			case 2:
-			{
-				std::shared_ptr<TPngImage> pPngImage(new TPngImage());
-				pPngImage->LoadFromFile(FileOpenDialog1->FileName);
-				pBitmap->Assign(pPngImage.get());
-				break;
-			}
-			case 3:
-				pBitmap->LoadFromFile(FileOpenDialog1->FileName);
-				break;
-		}
-
-		if (!pBitmap->Empty)
-		{
-			PanelMenu->Visible = false;
-			PanelCPInfo->Visible = true;
-
-			this->ResizeAndAlignWindow();
-
-			//ƒополнительна€ проверка размеров изображени€ и настройки игрового окна
-			//¬ажно, что бы они совпадали дл€ корректных координат
-			TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
-			if ((pBitmap->Width != GWSizeFromSettings.cx) || (pBitmap->Height != GWSizeFromSettings.cy))
-			{
-				ImageCapturedFrame->Canvas->StretchDraw(TRect(0, 0, GWSizeFromSettings.cx, GWSizeFromSettings.cy), pBitmap.get());
-			}
-			else
-				ImageCapturedFrame->Picture->Bitmap->Assign(pBitmap.get());
-		}
-	}
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TFormPickPoint::ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y)
@@ -177,6 +106,79 @@ void __fastcall TFormPickPoint::PanelCPInfoMouseMove(TObject *Sender, TShiftStat
 	{
 		ReleaseCapture();
 		SendMessage(this->Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormPickPoint::BitBtnSourceFromGameClick(TObject *Sender)
+{
+	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
+	PanelMenu->Visible = false;
+	PanelCPInfo->Visible = true;
+
+	g_pRAIDWorker->ValidateGameWindow();
+
+	this->ResizeAndAlignWindow();
+
+	//≈сли надо выводить и помещаемс€ по ширине, делаем видимым..
+	if (!m_bOnlyCoordinates)
+	{
+		LabelColorInRGB->Visible = (PanelCPInfo->ClientWidth > LabelColorInRGB->BoundsRect.Right);
+	}
+	else
+	{
+		LabelColorInRGB->Visible = false;
+	}
+
+	ImageCapturedFrame->Picture->Bitmap->SetSize(ImageCapturedFrame->Width, ImageCapturedFrame->Height);
+	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, ImageCapturedFrame->BoundsRect.Size);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormPickPoint::BitBtnSourceFromFileClick(TObject *Sender)
+{
+	if (FileOpenDialog1->Execute(this->Handle))
+	{
+		std::shared_ptr<TBitmap> pBitmap(new TBitmap());
+		switch (FileOpenDialog1->FileTypeIndex)
+		{
+			case 1:
+			{
+				std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
+				pJPEGImage->LoadFromFile(FileOpenDialog1->FileName);
+				pJPEGImage->DIBNeeded();
+				pBitmap->Assign(pJPEGImage.get());
+				break;
+			}
+			case 2:
+			{
+				std::shared_ptr<TPngImage> pPngImage(new TPngImage());
+				pPngImage->LoadFromFile(FileOpenDialog1->FileName);
+				pBitmap->Assign(pPngImage.get());
+				break;
+			}
+			case 3:
+				pBitmap->LoadFromFile(FileOpenDialog1->FileName);
+				break;
+		}
+
+		if (!pBitmap->Empty)
+		{
+			PanelMenu->Visible = false;
+			PanelCPInfo->Visible = true;
+
+			this->ResizeAndAlignWindow();
+
+			//ƒополнительна€ проверка размеров изображени€ и настройки игрового окна
+			//¬ажно, что бы они совпадали дл€ корректных координат
+			TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
+			if ((pBitmap->Width != GWSizeFromSettings.cx) || (pBitmap->Height != GWSizeFromSettings.cy))
+			{
+				ImageCapturedFrame->Canvas->StretchDraw(TRect(0, 0, GWSizeFromSettings.cx, GWSizeFromSettings.cy), pBitmap.get());
+			}
+			else
+				ImageCapturedFrame->Picture->Bitmap->Assign(pBitmap.get());
+		}
 	}
 }
 //---------------------------------------------------------------------------

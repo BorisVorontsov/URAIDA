@@ -18,6 +18,9 @@
 #include <Vcl.Imaging.pngimage.hpp>
 #include <System.Win.TaskbarCore.hpp>
 #include <Vcl.Taskbar.hpp>
+
+#include "UnitSettings.h"
+#include <Vcl.ButtonGroup.hpp>
 //---------------------------------------------------------------------------
 
 typedef enum tagTaskState
@@ -30,9 +33,9 @@ typedef enum tagTaskState
 typedef struct tagTaskInfo
 {
 	TaskState CurrentState;
-	GameModeSpecSettings Settings;
+	TGameModeSpecSettings Settings;
 	TDateTime StartTime;
-	tagTaskInfo() { ZeroMemory(this, sizeof(*this)); }
+	tagTaskInfo() { CurrentState = TaskState::tsStopped; }
 } TaskInfo;
 
 typedef enum tagTaskStoppingReason
@@ -193,6 +196,14 @@ __published:	// IDE-managed Components
 	TBitBtn *BitBtnStopTask;
 	TBitBtn *BitBtnRunTask;
 	TImageList *ImageListRTButton;
+	TButtonGroup *ButtonGroupSSCPIndex;
+	TButtonGroup *ButtonGroupRSCPIndex;
+	TButtonGroup *ButtonGroupEDCPIndex;
+	TButtonGroup *ButtonGroupSMDCPIndex;
+	TCheckBox *CheckBoxSSCPState;
+	TCheckBox *CheckBoxRSCPState;
+	TCheckBox *CheckBoxEDCPState;
+	TCheckBox *CheckBoxSMDCPState;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -210,7 +221,6 @@ __published:	// IDE-managed Components
 	void __fastcall PageControlURAIDASettingsChange(TObject *Sender);
 	void __fastcall PageControlURAIDASettingsChanging(TObject *Sender, bool &AllowChange);
 	void __fastcall ButtonSRBrowsePathClick(TObject *Sender);
-	void __fastcall FormShow(TObject *Sender);
 	void __fastcall ButtonClearAllResultsClick(TObject *Sender);
 	void __fastcall MenuItemOpenResultsClick(TObject *Sender);
 	void __fastcall CheckBoxSaveResultsClick(TObject *Sender);
@@ -227,6 +237,10 @@ __published:	// IDE-managed Components
 	void __fastcall BitBtnRunTaskClick(TObject *Sender);
 	void __fastcall BitBtnStopTaskClick(TObject *Sender);
 	void __fastcall PopupMenuTrayPopup(TObject *Sender);
+	void __fastcall ButtonGroupSSCPIndexButtonClicked(TObject *Sender, int Index);
+	void __fastcall ButtonGroupRSCPIndexButtonClicked(TObject *Sender, int Index);
+	void __fastcall ButtonGroupEDCPIndexButtonClicked(TObject *Sender, int Index);
+	void __fastcall ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, int Index);
 
 
 private:	// User declarations
@@ -242,12 +256,15 @@ private:	// User declarations
 
 	void SaveResult(unsigned int nBattleNumber, bool bError = false);
 
-	void UpdateGMSpecSettingsFrame(TTabSheet *pPage);
-	GameModeSpecSettings SaveSettingsFromGMSpecSettingsFrame();
+	void GetAppropriateGMSpecSettings(TGameModeSpecSettings& Result);
+	void ApplyAppropriateGMSpecSettings(const TGameModeSpecSettings& Input);
+	void UpdateGMSpecSettingsFrame();
+	void SaveSettingsFromGMSpecSettingsFrame();
 	void UpdateCommonSettingsFrame();
 	void SaveSettingsFromCommonSettingsFrame();
-	void UpdateApplicationFrame();
-    void SaveSettingsFromApplicationFrame();
+
+	void UpdateNecessarySettings();
+	void SaveNecessarySettings();
 
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
