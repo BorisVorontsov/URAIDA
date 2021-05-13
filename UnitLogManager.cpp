@@ -102,7 +102,7 @@ void TLogManager::CloseLog()
 //---------------------------------------------------------------------------
 void TLogManager::SetMaxEntries(unsigned int uNewValue)
 {
-	m_uMaxEntries = std::min(1, static_cast<int>(uNewValue));
+	m_uMaxEntries = std::max(1, static_cast<int>(uNewValue));
 
 	if (!m_pData || !m_pData->Count)
 		return;

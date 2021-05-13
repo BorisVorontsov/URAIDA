@@ -146,6 +146,8 @@ void TRAIDWorker::SendMouseClick(const TPoint& Coordinates)
 //---------------------------------------------------------------------------
 bool TRAIDWorker::GainGameWindow()
 {
+	if (IsWindow(m_hGameWindow)) return true;
+
 	m_hGameWindow = FindWindow(m_strRAIDWindowClass.c_str(), m_strRAIDWindowTitle.c_str());
 
 	return (m_hGameWindow != 0);
@@ -203,6 +205,7 @@ TRect TRAIDWorker::UpdateRecentFrame()
 	}
 
 	//PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY);
+	RedrawWindow(m_hGameWindow, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
 	BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
 		hRAIDDC, 0, 0, SRCCOPY);
 

@@ -175,8 +175,8 @@
         <UWP_CppLogo150>Resources\Icon (full sized).png</UWP_CppLogo150>
         <VerInfo_MinorVer>2</VerInfo_MinorVer>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.0.33;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.2.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Build>33</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.2.0.35;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.2.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Build>35</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <CppCompile Include="UnitCommon.cpp">
