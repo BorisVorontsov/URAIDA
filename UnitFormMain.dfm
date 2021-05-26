@@ -4,7 +4,7 @@ object FormMain: TFormMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Ultimate RAID Automatizer'
-  ClientHeight = 602
+  ClientHeight = 617
   ClientWidth = 577
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,14 +20,14 @@ object FormMain: TFormMain
   TextHeight = 19
   object Bevel1: TBevel
     Left = 8
-    Top = 529
+    Top = 545
     Width = 561
     Height = 11
     Shape = bsBottomLine
   end
   object LabelCopyright1: TLabel
     Left = 8
-    Top = 557
+    Top = 573
     Width = 305
     Height = 22
     AutoSize = False
@@ -41,7 +41,7 @@ object FormMain: TFormMain
   end
   object LabelCopyright2: TLabel
     Left = 8
-    Top = 577
+    Top = 593
     Width = 140
     Height = 22
     AutoSize = False
@@ -57,14 +57,14 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 561
-    Height = 437
+    Height = 455
     BevelOuter = bvNone
-    TabOrder = 3
+    TabOrder = 4
     object ImageAppIcon: TImage
       Left = 0
       Top = 0
       Width = 561
-      Height = 437
+      Height = 455
       Align = alClient
       Center = True
       Picture.Data = {
@@ -253,9 +253,9 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 561
-    Height = 437
+    Height = 459
     ActivePage = TabSheetCampaign
-    TabOrder = 2
+    TabOrder = 3
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
@@ -264,7 +264,7 @@ object FormMain: TFormMain
         Left = 0
         Top = 0
         Width = 553
-        Height = 403
+        Height = 425
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
@@ -745,7 +745,7 @@ object FormMain: TFormMain
         end
         object GroupBoxTaskParameters: TGroupBox
           Left = 8
-          Top = 266
+          Top = 244
           Width = 537
           Height = 113
           Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1079#1072#1076#1072#1095#1080
@@ -765,7 +765,7 @@ object FormMain: TFormMain
             AutoSize = False
             Caption = #1047#1072#1076#1077#1088#1078#1082#1072' ('#1089#1088#1077#1076#1085#1103#1103' '#1087#1088#1086#1076#1086#1083#1078#1080#1090#1077#1083#1100#1085#1086#1089#1090#1100' '#1073#1086#1103'):'
           end
-          object LabelNumberofBattles: TLabel
+          object LabelNumberOfBattles: TLabel
             Left = 16
             Top = 64
             Width = 345
@@ -786,18 +786,18 @@ object FormMain: TFormMain
             TabOrder = 0
             Text = '0'
           end
-          object UpDownNumberofBattles: TUpDown
+          object UpDownNumberOfBattles: TUpDown
             Left = 505
             Top = 61
             Width = 16
             Height = 27
-            Associate = EditNumberofBattles
+            Associate = EditNumberOfBattles
             Min = 1
             Max = 999
             Position = 1
             TabOrder = 1
           end
-          object EditNumberofBattles: TEdit
+          object EditNumberOfBattles: TEdit
             Left = 467
             Top = 61
             Width = 38
@@ -846,31 +846,19 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ScrollBox1: TScrollBox
         Left = 0
         Top = 0
         Width = 553
-        Height = 403
+        Height = 425
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
@@ -893,7 +881,7 @@ object FormMain: TFormMain
         end
         object LabelTaskEndAction: TLabel
           Left = 8
-          Top = 367
+          Top = 330
           Width = 267
           Height = 19
           AutoSize = False
@@ -901,7 +889,7 @@ object FormMain: TFormMain
         end
         object Bevel2: TBevel
           Left = 8
-          Top = 1023
+          Top = 929
           Width = 537
           Height = 43
           Shape = bsBottomLine
@@ -964,7 +952,7 @@ object FormMain: TFormMain
         end
         object GroupBoxResults: TGroupBox
           Left = 8
-          Top = 133
+          Top = 118
           Width = 537
           Height = 209
           Caption = #1056#1077#1079#1091#1083#1100#1090#1072#1090#1099
@@ -1067,7 +1055,7 @@ object FormMain: TFormMain
         end
         object ComboBoxTaskEndAction: TComboBox
           Left = 24
-          Top = 392
+          Top = 355
           Width = 235
           Height = 27
           Style = csDropDownList
@@ -1083,7 +1071,7 @@ object FormMain: TFormMain
         end
         object CheckBoxTEAExit: TCheckBox
           Left = 273
-          Top = 397
+          Top = 360
           Width = 71
           Height = 17
           Caption = #1042#1099#1081#1090#1080
@@ -1091,7 +1079,7 @@ object FormMain: TFormMain
         end
         object CheckBoxTEACloseTheGame: TCheckBox
           Left = 346
-          Top = 393
+          Top = 356
           Width = 129
           Height = 25
           Caption = #1047#1072#1082#1088#1099#1090#1100' '#1080#1075#1088#1091
@@ -1099,7 +1087,7 @@ object FormMain: TFormMain
         end
         object GroupBoxErrorHandling: TGroupBox
           Left = 8
-          Top = 447
+          Top = 386
           Width = 537
           Height = 113
           Caption = #1054#1073#1088#1072#1073#1086#1090#1082#1072' '#1086#1096#1080#1073#1086#1082
@@ -1168,31 +1156,31 @@ object FormMain: TFormMain
         end
         object ButtonApplyGWSize: TButton
           Left = 359
-          Top = 83
+          Top = 84
           Width = 142
-          Height = 33
+          Height = 31
           Caption = #1055#1088#1080#1084#1077#1085#1080#1090#1100
           TabOrder = 5
           OnClick = ButtonApplyGWSizeClick
         end
         object ButtonUseCurrentGWSize: TButton
           Left = 359
-          Top = 44
+          Top = 45
           Width = 142
-          Height = 33
+          Height = 31
           Caption = #1042#1079#1103#1090#1100' '#1090#1077#1082#1091#1097#1080#1077
           TabOrder = 4
           OnClick = ButtonUseCurrentGWSizeClick
         end
         object GroupBoxTaskBreakers: TGroupBox
           Left = 8
-          Top = 586
+          Top = 502
           Width = 537
-          Height = 439
+          Height = 424
           Caption = #1055#1088#1077#1088#1099#1074#1072#1090#1077#1083#1080' '#1079#1072#1076#1072#1095#1080
           TabOrder = 11
           object GroupBoxEnergyDialog: TGroupBox
-            Left = 13
+            Left = 8
             Top = 24
             Width = 521
             Height = 260
@@ -1603,7 +1591,7 @@ object FormMain: TFormMain
           end
           object GroupBoxMaintenanceDialog: TGroupBox
             Left = 8
-            Top = 303
+            Top = 287
             Width = 521
             Height = 114
             Caption = #1044#1080#1072#1083#1086#1075' '#1088#1072#1073#1086#1090' '#1085#1072' '#1089#1077#1088#1074#1077#1088#1077
@@ -1834,7 +1822,7 @@ object FormMain: TFormMain
   end
   object LinkLabel1: TLinkLabel
     Left = 419
-    Top = 557
+    Top = 573
     Width = 150
     Height = 22
     Alignment = taRightJustify
@@ -1846,12 +1834,12 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 8
     OnClick = LinkLabel1Click
   end
   object LinkLabel2: TLinkLabel
     Left = 450
-    Top = 577
+    Top = 593
     Width = 119
     Height = 22
     Alignment = taRightJustify
@@ -1863,27 +1851,27 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 9
     OnClick = LinkLabel2Click
   end
   object ProgressBarBattle: TProgressBar
     Left = 8
-    Top = 457
+    Top = 473
     Width = 561
     Height = 8
     Hint = #1055#1088#1086#1075#1088#1077#1089#1089' '#1073#1086#1103
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 4
+    TabOrder = 5
   end
   object PanelBattles: TPanel
     Left = 230
-    Top = 479
+    Top = 495
     Width = 117
     Height = 41
     BevelKind = bkFlat
     BevelOuter = bvNone
-    TabOrder = 5
+    TabOrder = 6
     DesignSize = (
       113
       37)
@@ -1908,7 +1896,7 @@ object FormMain: TFormMain
   end
   object LinkLabelReleases: TLinkLabel
     Left = 154
-    Top = 577
+    Top = 593
     Width = 55
     Height = 22
     AutoSize = False
@@ -1919,12 +1907,12 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 7
     OnClick = LinkLabelReleasesClick
   end
   object BitBtnStopTask: TBitBtn
     Left = 428
-    Top = 479
+    Top = 495
     Width = 117
     Height = 41
     Caption = #1057#1090#1086#1087
@@ -2009,12 +1997,12 @@ object FormMain: TFormMain
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 2
     OnClick = BitBtnStopTaskClick
   end
   object BitBtnRunTask: TBitBtn
     Left = 31
-    Top = 479
+    Top = 495
     Width = 117
     Height = 41
     Caption = '#'
@@ -2027,11 +2015,94 @@ object FormMain: TFormMain
     TabOrder = 0
     OnClick = BitBtnRunTaskClick
   end
+  object BitBtnCalculations: TBitBtn
+    Left = 154
+    Top = 495
+    Width = 41
+    Height = 41
+    Glyph.Data = {
+      36090000424D3609000000000000360000002800000018000000180000000100
+      20000000000000090000C20E0000C20E00000000000000000000FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF000000000000000000FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+    TabOrder = 1
+    OnClick = BitBtnCalculationsClick
+  end
   object TimerMain: TTimer
     Enabled = False
     OnTimer = TimerMainTimer
-    Left = 272
-    Top = 416
+    Left = 248
+    Top = 448
   end
   object TrayIconApp: TTrayIcon
     BalloonFlags = bfInfo
@@ -2570,13 +2641,13 @@ object FormMain: TFormMain
     Visible = True
     OnBalloonClick = TrayIconAppBalloonClick
     OnDblClick = TrayIconAppDblClick
-    Left = 448
-    Top = 416
+    Left = 424
+    Top = 448
   end
   object PopupMenuTray: TPopupMenu
     OnPopup = PopupMenuTrayPopup
-    Left = 520
-    Top = 416
+    Left = 496
+    Top = 448
     object MenuItemShowHideAutomatizer: TMenuItem
       Caption = #1055#1086#1082#1072#1079#1072#1090#1100'/'#1089#1082#1088#1099#1090#1100' '#1072#1074#1090#1086#1084#1072#1090#1080#1079#1072#1090#1086#1088
       Default = True
@@ -2585,6 +2656,11 @@ object FormMain: TFormMain
     object MenuItemOpenResults: TMenuItem
       Caption = #1054#1090#1082#1088#1099#1090#1100' '#1076#1080#1088#1077#1082#1090#1086#1088#1080#1102' '#1088#1077#1079#1091#1083#1100#1090#1072#1090#1086#1074
       OnClick = MenuItemOpenResultsClick
+    end
+    object MenuItemOpenLogFile: TMenuItem
+      Caption = #1054#1090#1082#1088#1099#1090#1100' '#1078#1091#1088#1085#1072#1083#1100#1085#1099#1081' '#1092#1072#1081#1083
+      Visible = False
+      OnClick = MenuItemOpenLogFileClick
     end
     object N1: TMenuItem
       Caption = '-'
@@ -2612,28 +2688,28 @@ object FormMain: TFormMain
     FavoriteLinks = <>
     FileTypes = <>
     Options = []
-    Left = 112
-    Top = 416
+    Left = 88
+    Top = 448
   end
   object ColorDialogCPColor: TColorDialog
     Options = [cdFullOpen, cdAnyColor]
-    Left = 56
-    Top = 416
+    Left = 32
+    Top = 448
   end
   object TaskbarApp: TTaskbar
     TaskBarButtons = <>
     ProgressMaxValue = 100
     TabProperties = []
-    Left = 376
-    Top = 416
+    Left = 352
+    Top = 448
   end
   object ImageListRTButton: TImageList
     ColorDepth = cd32Bit
     Height = 24
     Masked = False
     Width = 24
-    Left = 200
-    Top = 416
+    Left = 176
+    Top = 448
     Bitmap = {
       494C010103000800040018001800FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
