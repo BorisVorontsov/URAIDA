@@ -14,6 +14,7 @@
 #include <Vcl.Themes.hpp>
 USEFORM("UnitFormMain.cpp", FormMain);
 USEFORM("UnitFormPickPoint.cpp", FormPickPoint);
+USEFORM("UnitFormCalculations.cpp", FormCalculations);
 //---------------------------------------------------------------------------
 int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 {
@@ -24,6 +25,7 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 		Application->Title = "Ultimate RAID Automatizer";
 		Application->CreateForm(__classid(TFormMain), &FormMain);
 		Application->CreateForm(__classid(TFormPickPoint), &FormPickPoint);
+		Application->CreateForm(__classid(TFormCalculations), &FormCalculations);
 		Application->Run();
 	}
 	catch (Exception &exception)

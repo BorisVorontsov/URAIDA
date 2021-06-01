@@ -13,9 +13,11 @@ public:
 	~TRAIDWorker();
 
 	bool IsGameRunning();
-	bool CaptureFrame(TCanvas *pDestination, const TSize& Size);
+	bool CaptureFrame();
+	bool GetFrameSize(TSize& Result);
+	bool DrawFrame(TCanvas *pDestination, const TSize& Size);
 	bool ComparePixels(const TPoint& PositionInFrame, TColor KeyColor, unsigned int uTolerance = 1);
-	TRect GetGameWindowSize(bool bClient = false);
+	bool GetGameWindowSize(TRect& Result, bool bClient = false);
 	void ResizeGameWindow(const TSize& NewSize);
 	void SendKey(System::WideChar Key);
 	void SendMouseClick(const TPoint& Coordinates);
@@ -34,7 +36,7 @@ private:
 	HBITMAP m_hRecentFrame;
 
 	bool GainGameWindow();
-	TRect UpdateRecentFrame();
+	bool UpdateRecentFrame();
 };
 
 #endif

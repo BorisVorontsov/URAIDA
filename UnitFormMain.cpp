@@ -11,6 +11,7 @@
 
 #include "UnitFormMain.h"
 #include "UnitFormPickPoint.h"
+#include "UnitFormCalculations.h"
 #include "UnitCommon.h"
 #include "UnitLogManager.h"
 //---------------------------------------------------------------------------
@@ -133,8 +134,6 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	if ((!nScreenCheckFailures || (nScreenCheckFailures && (uScreenCheckingTiomeout == g_pSettingsManager->ScreenCheckingPeriod))) &&
 		!bScreenCheckPassed)
 	{
-		bool bEnergyDialogProcessed = false;
-
 		g_pRAIDWorker->ValidateGameWindow();
 
 		uScreenCheckingTiomeout = 0;
@@ -145,6 +144,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			[](std::array<TControlPoint, g_uMaxControlPoints>& ControlPoints)
 			{
 				unsigned int nEnabledCPs = 0;
+
+				//Захватываем текущий кадр, над которым далее будет проводиться анализ
+				if (!g_pRAIDWorker->CaptureFrame())
+					return false;
+
 				for (auto& ControlPoint : ControlPoints)
 				{
 					if (ControlPoint.Enabled)
@@ -180,13 +184,10 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 		//Прерыватель задачи: диалог пополнения энергии
 		//Появляется при её нехватке после попытки запуска боя
-		//Вызываем после попыток запустить бой
 		auto EnergyDialogTest
 		{
-			[=, &bEnergyDialogProcessed] (bool& bExitTimer)
+			[=](bool& bExitTimer)
 			{
-				bEnergyDialogProcessed = false;
-
 				if (g_pSettingsManager->EnableLogging)
 					g_pLogManager->Append(L"Цикл %i: начало тестирования КТ диалога пополнения энергии", nCycleCounter);
 
@@ -203,7 +204,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 							bExitTimer = false;
 							break;
 						case PromptDialogAction::pdaSkip:
-							g_pRAIDWorker->SendKey(VK_ESCAPE);
+							g_pRAIDWorker->SendMouseClick(TPoint(1, 1));
 							bExitTimer = false;
 							break;
 						case PromptDialogAction::pdaAbort:
@@ -216,12 +217,20 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 						}
 					}
 
-					bEnergyDialogProcessed = true;
+					return true;
 				}
 
-				return bEnergyDialogProcessed;
+				return false;
 			}
 		};
+
+		//Возможное обнаружение диалога пополнения энергии
+		bool bExitTimer;
+		if (EnergyDialogTest(bExitTimer))
+		{
+			if (bExitTimer)
+				return;
+		}
 
 		//Прерыватель задачи: диалог работ на сервере
 		if (g_pSettingsManager->EnableLogging)
@@ -233,11 +242,21 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				g_pLogManager->Append(L"Выполнение действий для диалога работ на сервере");
 
 			//Просто игнорируем
-			g_pRAIDWorker->SendKey(VK_ESCAPE);
+			g_pRAIDWorker->SendMouseClick(TPoint(1, 1));
 		}
 
-		//Если задан этот параметр, сначала проверяем кнопку "Начать", подразумевая, что перед нами экран начала боя
-		if (nCycleCounter == 1 && m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
+		auto DoOnSuccessOperations
+		{
+			[=]()
+			{
+				LabelBattlesCounter->Font->Color = clBlack;
+				ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
+				bScreenCheckPassed = true;
+			}
+		};
+
+		//Если задан параметр "STARTScreenFirst", начинам с анализа на экран начала боя
+		if ((nCycleCounter == 1) && m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
 		{
 			if (g_pSettingsManager->EnableLogging)
 				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана НАЧАТЬ", nCycleCounter);
@@ -258,17 +277,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				}
 				else
 				{
-					LabelBattlesCounter->Font->Color = clBlack;
-					ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
-					bScreenCheckPassed = true;
+					DoOnSuccessOperations();
                 }
 			}
 		}
-
-		//Если мы прошли первый бой или если не удалось найти кнопку "Начать", подразумеваем, что перед нами экран
-		//результатов боя и пытаемся нажать кнопку "Повтор"
-		if (!bEnergyDialogProcessed && (!m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst || (m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst && nCycleCounter > 1)
-			|| (m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst && !bScreenCheckPassed)))
+		else //Если параметр поиска экрана начала боя не задан, или мы уже на втором или более цикле, переходим к анализу экрана "Повтор/Далее"
 		{
 			if (g_pSettingsManager->EnableLogging)
 				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана ПОВТОР/ДАЛЕЕ", nCycleCounter);
@@ -310,13 +323,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 					}
 					else
 					{
-						LabelBattlesCounter->Font->Color = clBlack;
-						ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
+						DoOnSuccessOperations();
 					}
 				}
-
-				if (!bEnergyDialogProcessed)
-					bScreenCheckPassed = true;
+				else
+                    bScreenCheckPassed = true;
 			}
 			else
 				nScreenCheckFailures++;
@@ -452,6 +463,7 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 		g_pLogManager->LogFile = strLogFile;
 		g_pLogManager->OpenLog();
 		g_pLogManager->MaximumEntries = g_pSettingsManager->MaxLogEntries;
+        MenuItemOpenLogFile->Visible = true;
     }
 }
 //---------------------------------------------------------------------------
@@ -543,7 +555,7 @@ void TFormMain::UpdateGMSpecSettingsFrame()
 
 	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.Delay);
 	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.Delay);
-	UpDownNumberofBattles->Position = GMSpecSettings.NumberOfBattles;
+	UpDownNumberOfBattles->Position = GMSpecSettings.NumberOfBattles;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
@@ -575,7 +587,7 @@ void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 	}
 
 	GMSpecSettings.Delay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
-	GMSpecSettings.NumberOfBattles = UpDownNumberofBattles->Position;
+	GMSpecSettings.NumberOfBattles = UpDownNumberOfBattles->Position;
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 }
@@ -651,15 +663,8 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 		float fWidthCoeff, fHeightCoeff;
 		TGameModeSpecSettings GMSpecSettings;
 
-		if (NewGWSize.cx < CurrentGWSize.cx)
-			fWidthCoeff = static_cast<float>(CurrentGWSize.cx) / static_cast<float>(NewGWSize.cx);
-		else
-			fWidthCoeff = static_cast<float>(NewGWSize.cx) / static_cast<float>(CurrentGWSize.cx);
-
-		if (NewGWSize.cy < CurrentGWSize.cy)
-			fHeightCoeff = static_cast<float>(CurrentGWSize.cy) / static_cast<float>(NewGWSize.cy);
-		else
-			fHeightCoeff = static_cast<float>(NewGWSize.cy) / static_cast<float>(CurrentGWSize.cy);
+		fWidthCoeff = static_cast<float>(NewGWSize.cx) / static_cast<float>(CurrentGWSize.cx);
+		fHeightCoeff = static_cast<float>(NewGWSize.cy) / static_cast<float>(CurrentGWSize.cy);
 
 		auto GMSSShiftCoordinates
 		{
@@ -779,9 +784,12 @@ void __fastcall TFormMain::ButtonUseCurrentGWSizeClick(TObject *Sender)
 {
 	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
-	TRect GameWindowSize = g_pRAIDWorker->GetGameWindowSize(true);
-	UpDownGWWidth->Position = GameWindowSize.Width();
-	UpDownGWHeight->Position = GameWindowSize.Height();
+    TRect GameWindowSize;
+	if (g_pRAIDWorker->GetGameWindowSize(GameWindowSize, true))
+	{
+		UpDownGWWidth->Position = GameWindowSize.Width();
+		UpDownGWHeight->Position = GameWindowSize.Height();
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -803,7 +811,7 @@ void __fastcall TFormMain::BitBtnRSPickPointClick(TObject *Sender)
 void __fastcall TFormMain::FormResize(TObject *Sender)
 {
 	if (this->WindowState == wsMinimized)
-        this->Hide();
+		this->Hide();
 }
 //---------------------------------------------------------------------------
 
@@ -1011,6 +1019,10 @@ void TFormMain::StartTask()
 			break;
 	}
 
+	//Блокируем переход системы в экономичный режим и отключение экрана для корректной работы
+	//автоматизатора и игры
+	SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+
 	PageControlURAIDASettings->Visible = false;
 }
 //---------------------------------------------------------------------------
@@ -1112,6 +1124,9 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			this->Close();
 	}
 
+	//Снимаем блокировку
+	SetThreadExecutionState(ES_CONTINUOUS);
+
 	PageControlURAIDASettings->Visible = true;
 }
 //---------------------------------------------------------------------------
@@ -1158,55 +1173,73 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	strActiveTaskSubDir.sprintf(L"%s_%s", strGameMode.c_str(),
 		FormatDateTime(L"dd_mmmm_yyyy_hh-mm", m_ActiveTaskInfo.StartTime).c_str());
 
-	//Формируем имя файла JPEG
-	if (!bError)
-	{
-		strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
-	}
-	else
-	{
-		//Если bError, записываем как причину аварийной остановки задачи
-		strFileName.sprintf(L"Ошибка_%s.jpeg", FormatDateTime(L"hh-mm", Now()).c_str());
-	}
-
 	strFinalPath = IncludeTrailingPathDelimiter(strPathForResults) + strActiveTaskSubDir;
 	CreateDir(strFinalPath);
 
 	std::shared_ptr<TImage> pImage(new TImage(this));
-	std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
 
-	TRect FrameSize = g_pRAIDWorker->GetGameWindowSize(true);
-	pImage->Width = FrameSize.Right;
-	pImage->Height = FrameSize.Bottom;
-	g_pRAIDWorker->CaptureFrame(pImage->Canvas, TSize(FrameSize.Right, FrameSize.Bottom));
+	TSize FrameSize;
+	g_pRAIDWorker->GetFrameSize(FrameSize);
+	pImage->Width = FrameSize.cx;
+	pImage->Height = FrameSize.cy;
+	g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
 
+	//Если bError, записываем как причину аварийной остановки задачи
 	if (bError)
 	{
-		for (int i = 0; i < g_uMaxControlPoints; i++)
+		std::array<TControlPoint, g_uMaxControlPoints> ControlPoints;
+		if ((nBattleNumber == 1) && this->m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
 		{
-			//Дополнительно указываем на скриншоте координату проверки в виде красного крестика
-			const unsigned int uMarkerIndent = 10;
-			TPoint ControlPoint;
-			if (nBattleNumber > 1)
-			{
-				ControlPoint = this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoints[i].Coordinates;
-			}
-			else
-			{
-				ControlPoint = this->m_ActiveTaskInfo.Settings.STARTScreenControlPoints[i].Coordinates;
-			}
-
-			pImage->Canvas->Pen->Color = clRed;
-			pImage->Canvas->Pen->Width = 3;
-			pImage->Canvas->MoveTo(ControlPoint.x - uMarkerIndent , ControlPoint.y);
-			pImage->Canvas->LineTo(ControlPoint.x + uMarkerIndent, ControlPoint.y);
-			pImage->Canvas->MoveTo(ControlPoint.x, ControlPoint.y - uMarkerIndent);
-			pImage->Canvas->LineTo(ControlPoint.x, ControlPoint.y + uMarkerIndent);
+			ControlPoints = this->m_ActiveTaskInfo.Settings.STARTScreenControlPoints;
 		}
-	}
+		else
+		{
+			ControlPoints = this->m_ActiveTaskInfo.Settings.REPLAYScreenControlPoints;
+		}
+		for (auto& ControlPoint: ControlPoints)
+		{
+			if (ControlPoint.Enabled)
+			{
+				//Дополнительно указываем на скриншоте координату проверки в виде крестика
+				const unsigned int uMarkerIndent = 10;
 
-	pJPEGImage->Assign(pImage->Picture->Bitmap);
-	pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
+				auto DrawCrosshair
+				{
+					[&pImage, ControlPoint, uMarkerIndent]()
+					{
+						pImage->Canvas->MoveTo(ControlPoint.Coordinates.x - uMarkerIndent , ControlPoint.Coordinates.y);
+						pImage->Canvas->LineTo(ControlPoint.Coordinates.x + uMarkerIndent, ControlPoint.Coordinates.y);
+						pImage->Canvas->MoveTo(ControlPoint.Coordinates.x, ControlPoint.Coordinates.y - uMarkerIndent);
+						pImage->Canvas->LineTo(ControlPoint.Coordinates.x, ControlPoint.Coordinates.y + uMarkerIndent);
+					}
+				};
+
+				pImage->Canvas->Pen->Color = clRed;
+				pImage->Canvas->Pen->Width = 5;
+				DrawCrosshair();
+
+				pImage->Canvas->Pen->Color = ControlPoint.PixelColor;
+				pImage->Canvas->Pen->Width = 3;
+				DrawCrosshair();
+			}
+		}
+
+		//Сохраняем в формате PNG для возможности анализа цветов кадра
+		std::shared_ptr<TPngImage> pPngImage(new TPngImage());
+		pPngImage->Assign(pImage->Picture->Bitmap);
+
+		strFileName.sprintf(L"Ошибка_%s.png", FormatDateTime(L"hh-mm", Now()).c_str());
+		pPngImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
+	}
+	else
+	{
+		//Экономим место форматом JPEG
+		std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
+		pJPEGImage->Assign(pImage->Picture->Bitmap);
+
+		strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
+		pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -1339,6 +1372,7 @@ void __fastcall TFormMain::BitBtnStopTaskClick(TObject *Sender)
 void __fastcall TFormMain::PopupMenuTrayPopup(TObject *Sender)
 {
 	MenuItemMoveToCenter->Enabled = this->Visible;
+	MenuItemOpenLogFile->Enabled = TFile::Exists(g_pLogManager->LogFile);
 }
 //---------------------------------------------------------------------------
 
@@ -1449,6 +1483,18 @@ void __fastcall TFormMain::ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, i
 	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance;
 
 	//ButtonGroupSMDCPIndex->ItemIndex = Index;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::MenuItemOpenLogFileClick(TObject *Sender)
+{
+	ShellExecute(NULL, L"OPEN", g_pLogManager->LogFile.c_str(), NULL, NULL, SW_SHOWNORMAL);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
+{
+	FormCalculations->Execute(this);
 }
 //---------------------------------------------------------------------------
 

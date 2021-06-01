@@ -39,17 +39,45 @@ bool TRAIDWorker::IsGameRunning()
 	return (IsWindow(m_hGameWindow) == TRUE);
 }
 //---------------------------------------------------------------------------
-bool TRAIDWorker::CaptureFrame(TCanvas *pDestination, const TSize& Size)
+bool TRAIDWorker::CaptureFrame()
+{
+	if (!this->IsGameRunning())
+		return false;
+
+	this->UpdateRecentFrame();
+	TSize FrameSize;
+	this->GetFrameSize(FrameSize);
+
+	return ((FrameSize.cx > 0) && (FrameSize.cy > 0));
+}
+//---------------------------------------------------------------------------
+bool TRAIDWorker::GetFrameSize(TSize& Result)
+{
+	if (!m_hRecentFrame)
+		return false;
+
+	BITMAP RecentFrame = {0};
+	if (GetObject(m_hRecentFrame, sizeof(BITMAP), &RecentFrame))
+	{
+		Result = TSize(RecentFrame.bmWidth, RecentFrame.bmHeight);
+		return true;
+	}
+
+	return false;
+}
+//---------------------------------------------------------------------------
+bool TRAIDWorker::DrawFrame(TCanvas *pDestination, const TSize& Size)
 {
 	this->GainGameWindow();
 	if (!this->IsGameRunning())
 		return false;
 
-	TRect ClientRect = this->UpdateRecentFrame();
+	TSize FrameSize;
+	this->GetFrameSize(FrameSize);
 	//StretchBlt(pDestination->Handle, 0, 0, Size.cx, Size.cy, m_hRecentFrameDC, 0, 0,
-	//	ClientRect.Right - ClientRect.Left, ClientRect.Bottom - ClientRect.Top, SRCCOPY);
-	BitBlt(pDestination->Handle, 0, 0, ClientRect.Right - ClientRect.Left,
-		ClientRect.Bottom - ClientRect.Top, m_hRecentFrameDC, 0, 0, SRCCOPY);
+	//	FrameSize.cx, FrameSize.cy, SRCCOPY);
+	BitBlt(pDestination->Handle, 0, 0, FrameSize.cx, FrameSize.cy, m_hRecentFrameDC,
+		0, 0, SRCCOPY);
 
 	return true;
 }
@@ -60,7 +88,6 @@ bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor, 
 	if (!this->IsGameRunning())
 		return false;
 
-	this->UpdateRecentFrame();
 	COLORREF FramePixel = GetPixel(m_hRecentFrameDC, PositionInFrame.x, PositionInFrame.y);
 	unsigned int uDistance =
 		(GetRValue(FramePixel) - GetRValue(KeyColor)) ^ 2 +
@@ -70,9 +97,11 @@ bool TRAIDWorker::ComparePixels(const TPoint& PositionInFrame, TColor KeyColor, 
 	return (uDistance <= uTolerance);
 }
 //---------------------------------------------------------------------------
-TRect TRAIDWorker::GetGameWindowSize(bool bClient)
+bool TRAIDWorker::GetGameWindowSize(TRect& Result, bool bClient)
 {
 	this->GainGameWindow();
+	if (!this->IsGameRunning())
+		return false;
 
 	RECT GameWindowSize;
 	WINDOWPLACEMENT WindowPlacement;
@@ -92,7 +121,8 @@ TRect TRAIDWorker::GetGameWindowSize(bool bClient)
 		GetWindowRect(m_hGameWindow, &GameWindowSize);
 	}
 
-	return TRect(GameWindowSize);
+	Result = TRect(GameWindowSize);
+	return true;
 }
 //---------------------------------------------------------------------------
 void TRAIDWorker::ResizeGameWindow(const TSize& NewSize)
@@ -141,6 +171,8 @@ void TRAIDWorker::SendMouseClick(const TPoint& Coordinates)
 	SendMessage(m_hGameWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(Coordinates.x, Coordinates.y));
 	SendMessage(m_hGameWindow, WM_LBUTTONUP, 0, MAKELPARAM(Coordinates.x, Coordinates.y));
 
+    Wait(1000);
+
 	SetCursorPos(CurrentCursorPos.x, CurrentCursorPos.y);
 }
 //---------------------------------------------------------------------------
@@ -183,9 +215,11 @@ void TRAIDWorker::CloseGame()
 	CloseHandle(hSnapshot);
 }
 //---------------------------------------------------------------------------
-TRect TRAIDWorker::UpdateRecentFrame()
+bool TRAIDWorker::UpdateRecentFrame()
 {
-    this->GainGameWindow();
+	this->GainGameWindow();
+	if (!this->IsGameRunning())
+		return false;
 
 	RECT ClientRect;
 	WINDOWINFO WndInfo;
@@ -211,13 +245,14 @@ TRect TRAIDWorker::UpdateRecentFrame()
 
 	ReleaseDC(m_hGameWindow, hRAIDDC);
 
-	return TRect(ClientRect);
+	return true;
 }
 //---------------------------------------------------------------------------
 void TRAIDWorker::ValidateGameWindow()
 {
 	//Функция проверки и корректировки в случае необходимости размеров и состояния окна игры
-	TRect GameWindowSize = this->GetGameWindowSize(true);
+	TRect GameWindowSize;
+	this->GetGameWindowSize(GameWindowSize, true);
 	TSize GWSizeFromSettings = g_pSettingsManager->RAIDWindowSize;
 	if ((GameWindowSize.Width() != GWSizeFromSettings.cx) || (GameWindowSize.Height() != GWSizeFromSettings.cy))
 	{

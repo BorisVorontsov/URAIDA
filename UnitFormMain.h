@@ -161,14 +161,14 @@ __published:	// IDE-managed Components
 	TRadioButton *RadioButtonEDAbort;
 	TGroupBox *GroupBoxTaskParameters;
 	TEdit *EditBTMinutes;
-	TUpDown *UpDownNumberofBattles;
-	TEdit *EditNumberofBattles;
+	TUpDown *UpDownNumberOfBattles;
+	TEdit *EditNumberOfBattles;
 	TUpDown *UpDownBTSeconds;
 	TEdit *EditBTSeconds;
 	TLabel *LabelBTSeparator;
 	TUpDown *UpDownBTMinutes;
 	TLabel *LabelBT;
-	TLabel *LabelNumberofBattles;
+	TLabel *LabelNumberOfBattles;
 	TLabel *LabelRSAction;
 	TRadioButton *RadioButtonRSActionReplay;
 	TRadioButton *RadioButtonRSActionNext;
@@ -204,6 +204,8 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxRSCPState;
 	TCheckBox *CheckBoxEDCPState;
 	TCheckBox *CheckBoxSMDCPState;
+	TMenuItem *MenuItemOpenLogFile;
+	TBitBtn *BitBtnCalculations;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -241,6 +243,8 @@ __published:	// IDE-managed Components
 	void __fastcall ButtonGroupRSCPIndexButtonClicked(TObject *Sender, int Index);
 	void __fastcall ButtonGroupEDCPIndexButtonClicked(TObject *Sender, int Index);
 	void __fastcall ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, int Index);
+	void __fastcall MenuItemOpenLogFileClick(TObject *Sender);
+	void __fastcall BitBtnCalculationsClick(TObject *Sender);
 
 
 private:	// User declarations

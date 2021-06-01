@@ -58,8 +58,6 @@ void __fastcall TFormPickPoint::FormKeyPress(TObject *Sender, System::WideChar &
 }
 //---------------------------------------------------------------------------
 
-
-
 void __fastcall TFormPickPoint::ImageCapturedFrameMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y)
 {
@@ -131,7 +129,8 @@ void __fastcall TFormPickPoint::BitBtnSourceFromGameClick(TObject *Sender)
 	}
 
 	ImageCapturedFrame->Picture->Bitmap->SetSize(ImageCapturedFrame->Width, ImageCapturedFrame->Height);
-	g_pRAIDWorker->CaptureFrame(ImageCapturedFrame->Canvas, ImageCapturedFrame->BoundsRect.Size);
+	g_pRAIDWorker->CaptureFrame();
+	g_pRAIDWorker->DrawFrame(ImageCapturedFrame->Canvas, ImageCapturedFrame->BoundsRect.Size);
 }
 //---------------------------------------------------------------------------
 
