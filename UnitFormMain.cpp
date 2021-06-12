@@ -1494,7 +1494,7 @@ void __fastcall TFormMain::MenuItemOpenLogFileClick(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
 {
-	FormCalculations->Execute(this);
+	FormCalculations->Execute(this, UpDownNumberOfBattles);
 }
 //---------------------------------------------------------------------------
 
