@@ -60,7 +60,10 @@ void __fastcall TFormCalculations::BitBtnCopyFromReferenceClick(TObject *Sender)
 
 void __fastcall TFormCalculations::ComboBoxHeroRankChange(TObject *Sender)
 {
-	UpDownDesiredHeroLevel->Position = (ComboBoxHeroRank->ItemIndex + 1) * 10;
+	unsigned int uMaxHeroLevel = (ComboBoxHeroRank->ItemIndex + 1) * 10;
+	UpDownActualHeroLevel->Max = uMaxHeroLevel - 1;
+	UpDownDesiredHeroLevel->Max = uMaxHeroLevel;
+	UpDownDesiredHeroLevel->Position = uMaxHeroLevel;
 }
 //---------------------------------------------------------------------------
 
@@ -72,11 +75,36 @@ void __fastcall TFormCalculations::BitBtnCalcTaskCostClick(TObject *Sender)
 
 void __fastcall TFormCalculations::BitBtnCalcNumberOfBattlesClick(TObject *Sender)
 {
-	//TODO
+	unsigned int uRequiredXP = 0;
+	unsigned int nBattleCount = 0;
+	unsigned int uTotalLevelXP = 0, uTotalLevelSilver = 0, uTotalLevelEnergy = 0;
 
-	LabelNumberOfBattlesTotal->Caption = L"0";
-	LabelNBSilverTotal->Caption = L"0";
-    LabelNBEnergyTotal->Caption = L"0";
+	//—начала вычисл€ем, сколько опыта необходимо герою дл€ достижени€ нужного уровн€
+	HeroXPTable XPTable = g_HeroXPTable[ComboBoxHeroRank->ItemIndex];
+	for (size_t i = (UpDownActualHeroLevel->Position - 1); i < (UpDownDesiredHeroLevel->Position - 1); i++)
+	{
+		uRequiredXP += XPTable.XPArray[i];
+	}
+
+	//«атем вычисл€ем, сколько итераций уровн€ даст необходимую сумму опыта, учитыва€ количество героев и бустер опыта
+	CampaignLevelInfo LevelInfo;
+	LevelInfo = g_CampaignTable[ComboBoxChapter->ItemIndex].MapTable[ComboBoxDifficulty->ItemIndex].LevelInfo[ComboBoxChapterLevel->ItemIndex];
+	while (true)
+	{
+		if (uTotalLevelXP >= uRequiredXP)
+			break;
+
+		float fXPPerHero = ceil(static_cast<float>(LevelInfo.uXP) / static_cast<float>(ComboBoxHeroesCount->ItemIndex + 1));
+		uTotalLevelXP += fXPPerHero * ((CheckBoxXPBooster->Checked)?2:1);
+		uTotalLevelSilver += LevelInfo.uSilver;
+		uTotalLevelEnergy += LevelInfo.uBattleCost;
+
+		nBattleCount++;
+	}
+
+	LabelNumberOfBattlesTotal->Caption = String(nBattleCount);
+	LabelNBSilverTotal->Caption = Format(L"%.0n", ARRAYOFCONST((static_cast<float>(uTotalLevelSilver))));
+	LabelNBEnergyTotal->Caption = String(uTotalLevelEnergy);
 }
 //---------------------------------------------------------------------------
 

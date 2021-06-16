@@ -445,7 +445,7 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	PageControlURAIDASettings->ActivePageIndex = g_pSettingsManager->RecentActivePage;
 	this->UpdateNecessarySettings();
 	BitBtnRunTask->Caption = m_strButtonRTRunCaption;
-	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
+	std::unique_ptr<TBitmap> pGlyph(new TBitmap());
 	ImageListRTButton->GetBitmap(0, pGlyph.get());
 	BitBtnRunTask->Glyph = pGlyph.get();
 
@@ -823,13 +823,7 @@ void __fastcall TFormMain::LinkLabel1Click(TObject *Sender)
 
 void __fastcall TFormMain::LinkLabel2Click(TObject *Sender)
 {
-	String strAddress;
-	String strFullAppVersion;
-	GetFileVersion(Application->ExeName, strFullAppVersion, fvfMajorMinorReleaseBuild);
-	strAddress.sprintf(L"mailto:borisvorontsov@yandex.ru?subject=%s вер.%s через обратную связь",
-		Application->Title.c_str(), strFullAppVersion.c_str());
-
-	ShellExecute(NULL, NULL, strAddress.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(NULL, L"OPEN", L"https://discord.gg/EJs4gRSW4G", NULL, NULL, SW_SHOWNORMAL);
 }
 //---------------------------------------------------------------------------
 
@@ -921,16 +915,25 @@ void __fastcall TFormMain::ButtonClearAllResultsClick(TObject *Sender)
 	TDirectory::Delete(g_pSettingsManager->PathForResults, true);
 }
 //---------------------------------------------------------------------------
+bool TFormMain::CheckActivePageWithMessage()
+{
+	if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
+	{
+		MessageBox(this->Handle, L"Сначала выберите режим игры", L"Предупреждение", MB_ICONEXCLAMATION);
+		return false;
+	}
+
+	return true;
+}
+//---------------------------------------------------------------------------
 void TFormMain::StartTask()
 {
 	if (!g_pRAIDWorker->CheckGameStateWithMessage(this)) return;
 
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 	{
-		if (PageControlURAIDASettings->ActivePage == TabSheetCommon) {
-			MessageBox(this->Handle, L"Сначала выберите режим игры", L"Предупреждение", MB_ICONEXCLAMATION);
-			return;
-		}
+		if (!this->CheckActivePageWithMessage())
+            return;
 
 		//Запускаем таймер задачи по указанным параметрам
 		//Параметры будут применены только при старте новой задачи
@@ -990,10 +993,26 @@ void TFormMain::StartTask()
 		m_ActiveTaskInfo.StartTime = Now();
 
 		if (g_pSettingsManager->EnableLogging)
-			g_pLogManager->Append(L"Новая задача");
+		{
+			String strPresetName;
+			switch (m_ActiveTaskInfo.Settings.GameMode)
+			{
+				case SupportedGameModes::gmCampaign:
+					strPresetName = L"::gmCampaign";
+					break;
+				case SupportedGameModes::gmDungeons:
+					strPresetName = L"::gmDungeons";
+					break;
+				case SupportedGameModes::gmFactionWars:
+					strPresetName = L"::gmFactionWars";
+					break;
+			}
+
+			g_pLogManager->Append(L"Новая задача: %s", strPresetName.c_str());
+		}
 	}
 
-	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
+	std::unique_ptr<TBitmap> pGlyph(new TBitmap());
 	switch (m_ActiveTaskInfo.CurrentState)
 	{
 		case TaskState::tsStopped:
@@ -1038,7 +1057,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 
 	m_ActiveTaskInfo.CurrentState = TaskState::tsStopped;
 	BitBtnRunTask->Caption = m_strButtonRTRunCaption;
-	std::shared_ptr<TBitmap> pGlyph(new TBitmap());
+	std::unique_ptr<TBitmap> pGlyph(new TBitmap());
 	ImageListRTButton->GetBitmap(0, pGlyph.get());
 	BitBtnRunTask->Glyph = pGlyph.get();
 
@@ -1176,7 +1195,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	strFinalPath = IncludeTrailingPathDelimiter(strPathForResults) + strActiveTaskSubDir;
 	CreateDir(strFinalPath);
 
-	std::shared_ptr<TImage> pImage(new TImage(this));
+	std::unique_ptr<TImage> pImage(new TImage(this));
 
 	TSize FrameSize;
 	g_pRAIDWorker->GetFrameSize(FrameSize);
@@ -1225,7 +1244,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 		}
 
 		//Сохраняем в формате PNG для возможности анализа цветов кадра
-		std::shared_ptr<TPngImage> pPngImage(new TPngImage());
+		std::unique_ptr<TPngImage> pPngImage(new TPngImage());
 		pPngImage->Assign(pImage->Picture->Bitmap);
 
 		strFileName.sprintf(L"Ошибка_%s.png", FormatDateTime(L"hh-mm", Now()).c_str());
@@ -1234,7 +1253,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	else
 	{
 		//Экономим место форматом JPEG
-		std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
+		std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
 		pJPEGImage->Assign(pImage->Picture->Bitmap);
 
 		strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
@@ -1494,6 +1513,12 @@ void __fastcall TFormMain::MenuItemOpenLogFileClick(TObject *Sender)
 
 void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
 {
+	if (!this->CheckActivePageWithMessage())
+		return;
+
+	if (m_ActiveTaskInfo.CurrentState != TaskState::tsStopped)
+        return;
+
 	FormCalculations->Execute(this, UpDownNumberOfBattles);
 }
 //---------------------------------------------------------------------------

@@ -37,7 +37,7 @@ bool TSettingsManager::ReadINI()
 	String strAppPath = ExtractFilePath(Application->ExeName);
 	String strSettingsFile = strAppPath + m_strSettingsFileName;
 
-	std::shared_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
+	std::unique_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
 
 	//Кампания
 	m_CampaignSettings.Load(pSettings.get(), m_strSectionCampaign);
@@ -95,7 +95,7 @@ bool TSettingsManager::UpdateINI()
 	String strAppPath = ExtractFilePath(Application->ExeName);
 	String strSettingsFile = strAppPath + m_strSettingsFileName;
 
-	std::shared_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
+	std::unique_ptr<TIniFile> pSettings(new TIniFile(strSettingsFile));
 
 	//Кампания
 	m_CampaignSettings.Serialize(pSettings.get(), m_strSectionCampaign);

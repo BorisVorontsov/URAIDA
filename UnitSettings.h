@@ -73,7 +73,7 @@ public:
 	}
 	void Load(String strIniFile, String strSection) override
 	{
-		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		std::unique_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
 		this->Load(pOutput.get(), strSection);
 	}
 
@@ -87,7 +87,7 @@ public:
 	}
 	void Serialize(String strIniFile, String strSection) override
 	{
-		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		std::unique_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
 		this->Serialize(pOutput.get(), strSection);
 	}
 
@@ -141,7 +141,7 @@ public:
 	}
 	void Load(String strIniFile, String strSection) override
 	{
-		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		std::unique_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
 		this->Load(pOutput.get(), strSection);
 	}
 
@@ -162,7 +162,7 @@ public:
 	}
 	void Serialize(String strIniFile, String strSection) override
 	{
-		std::shared_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
+		std::unique_ptr<TIniFile> pOutput(new TIniFile(strIniFile));
 		this->Serialize(pOutput.get(), strSection);
 	}
 

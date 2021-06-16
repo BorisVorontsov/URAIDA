@@ -255,6 +255,8 @@ private:	// User declarations
 	static const String m_strButtonRTPauseCaption;
 	static const String m_strButtonRTResumeCaption;
 
+	bool CheckActivePageWithMessage();
+
 	void StartTask();
 	void StopTask(TaskStoppingReason Reason);
 

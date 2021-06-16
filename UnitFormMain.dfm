@@ -4,7 +4,7 @@ object FormMain: TFormMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Ultimate RAID Automatizer'
-  ClientHeight = 617
+  ClientHeight = 625
   ClientWidth = 577
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,14 +20,14 @@ object FormMain: TFormMain
   TextHeight = 19
   object Bevel1: TBevel
     Left = 8
-    Top = 545
+    Top = 553
     Width = 561
     Height = 11
     Shape = bsBottomLine
   end
   object LabelCopyright1: TLabel
     Left = 8
-    Top = 573
+    Top = 581
     Width = 305
     Height = 22
     AutoSize = False
@@ -41,7 +41,7 @@ object FormMain: TFormMain
   end
   object LabelCopyright2: TLabel
     Left = 8
-    Top = 593
+    Top = 601
     Width = 140
     Height = 22
     AutoSize = False
@@ -57,14 +57,14 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 561
-    Height = 455
+    Height = 467
     BevelOuter = bvNone
     TabOrder = 4
     object ImageAppIcon: TImage
       Left = 0
       Top = 0
       Width = 561
-      Height = 455
+      Height = 467
       Align = alClient
       Center = True
       Picture.Data = {
@@ -253,22 +253,24 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
     Width = 561
-    Height = 459
+    Height = 467
     ActivePage = TabSheetCampaign
     TabOrder = 3
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
       Caption = #1050#1072#1084#1087#1072#1085#1080#1103
+      ExplicitHeight = 425
       object ScrollBoxGMSpecSettings: TScrollBox
         Left = 0
         Top = 0
         Width = 553
-        Height = 425
+        Height = 433
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitHeight = 425
         object GroupBoxScreens: TGroupBox
           Left = 8
           Top = 16
@@ -752,14 +754,14 @@ object FormMain: TFormMain
           TabOrder = 1
           object LabelBTSeparator: TLabel
             Left = 455
-            Top = 29
+            Top = 30
             Width = 6
             Height = 19
             Caption = ':'
           end
           object LabelBT: TLabel
             Left = 16
-            Top = 31
+            Top = 32
             Width = 345
             Height = 19
             AutoSize = False
@@ -767,7 +769,7 @@ object FormMain: TFormMain
           end
           object LabelNumberOfBattles: TLabel
             Left = 16
-            Top = 64
+            Top = 65
             Width = 345
             Height = 19
             AutoSize = False
@@ -775,7 +777,7 @@ object FormMain: TFormMain
           end
           object EditBTMinutes: TEdit
             Left = 397
-            Top = 28
+            Top = 29
             Width = 38
             Height = 27
             Hint = #1052#1080#1085#1091#1090#1099
@@ -788,7 +790,7 @@ object FormMain: TFormMain
           end
           object UpDownNumberOfBattles: TUpDown
             Left = 505
-            Top = 61
+            Top = 62
             Width = 16
             Height = 27
             Associate = EditNumberOfBattles
@@ -799,7 +801,7 @@ object FormMain: TFormMain
           end
           object EditNumberOfBattles: TEdit
             Left = 467
-            Top = 61
+            Top = 62
             Width = 38
             Height = 27
             Alignment = taCenter
@@ -809,7 +811,7 @@ object FormMain: TFormMain
           end
           object UpDownBTSeconds: TUpDown
             Left = 505
-            Top = 28
+            Top = 29
             Width = 16
             Height = 27
             Associate = EditBTSeconds
@@ -819,7 +821,7 @@ object FormMain: TFormMain
           end
           object EditBTSeconds: TEdit
             Left = 467
-            Top = 28
+            Top = 29
             Width = 38
             Height = 27
             Hint = #1057#1077#1082#1091#1085#1076#1099
@@ -832,7 +834,7 @@ object FormMain: TFormMain
           end
           object UpDownBTMinutes: TUpDown
             Left = 435
-            Top = 28
+            Top = 29
             Width = 16
             Height = 27
             Associate = EditBTMinutes
@@ -846,23 +848,27 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
+      ExplicitHeight = 425
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
+      ExplicitHeight = 425
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
+      ExplicitHeight = 425
       object ScrollBox1: TScrollBox
         Left = 0
         Top = 0
         Width = 553
-        Height = 425
+        Height = 433
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitHeight = 425
         object LabelGWWidth: TLabel
           Left = 24
           Top = 50
@@ -1822,7 +1828,7 @@ object FormMain: TFormMain
   end
   object LinkLabel1: TLinkLabel
     Left = 419
-    Top = 573
+    Top = 581
     Width = 150
     Height = 22
     Alignment = taRightJustify
@@ -1838,13 +1844,13 @@ object FormMain: TFormMain
     OnClick = LinkLabel1Click
   end
   object LinkLabel2: TLinkLabel
-    Left = 450
-    Top = 593
-    Width = 119
+    Left = 455
+    Top = 601
+    Width = 114
     Height = 22
     Alignment = taRightJustify
     AutoSize = False
-    Caption = '<a>'#1054#1073#1088#1072#1090#1085#1072#1103' '#1089#1074#1103#1079#1100'</a>'
+    Caption = '<a>Discord-'#1089#1077#1088#1074#1077#1088'</a>'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
@@ -1856,7 +1862,7 @@ object FormMain: TFormMain
   end
   object ProgressBarBattle: TProgressBar
     Left = 8
-    Top = 473
+    Top = 481
     Width = 561
     Height = 8
     Hint = #1055#1088#1086#1075#1088#1077#1089#1089' '#1073#1086#1103
@@ -1866,7 +1872,7 @@ object FormMain: TFormMain
   end
   object PanelBattles: TPanel
     Left = 230
-    Top = 495
+    Top = 503
     Width = 117
     Height = 41
     BevelKind = bkFlat
@@ -1896,7 +1902,7 @@ object FormMain: TFormMain
   end
   object LinkLabelReleases: TLinkLabel
     Left = 154
-    Top = 593
+    Top = 601
     Width = 55
     Height = 22
     AutoSize = False
@@ -1912,7 +1918,7 @@ object FormMain: TFormMain
   end
   object BitBtnStopTask: TBitBtn
     Left = 428
-    Top = 495
+    Top = 503
     Width = 117
     Height = 41
     Caption = #1057#1090#1086#1087
@@ -2002,7 +2008,7 @@ object FormMain: TFormMain
   end
   object BitBtnRunTask: TBitBtn
     Left = 31
-    Top = 495
+    Top = 503
     Width = 117
     Height = 41
     Caption = '#'
@@ -2017,7 +2023,7 @@ object FormMain: TFormMain
   end
   object BitBtnCalculations: TBitBtn
     Left = 154
-    Top = 495
+    Top = 503
     Width = 41
     Height = 41
     Glyph.Data = {
@@ -2102,7 +2108,7 @@ object FormMain: TFormMain
     Enabled = False
     OnTimer = TimerMainTimer
     Left = 248
-    Top = 448
+    Top = 456
   end
   object TrayIconApp: TTrayIcon
     BalloonFlags = bfInfo
@@ -2642,12 +2648,12 @@ object FormMain: TFormMain
     OnBalloonClick = TrayIconAppBalloonClick
     OnDblClick = TrayIconAppDblClick
     Left = 424
-    Top = 448
+    Top = 456
   end
   object PopupMenuTray: TPopupMenu
     OnPopup = PopupMenuTrayPopup
     Left = 496
-    Top = 448
+    Top = 456
     object MenuItemShowHideAutomatizer: TMenuItem
       Caption = #1055#1086#1082#1072#1079#1072#1090#1100'/'#1089#1082#1088#1099#1090#1100' '#1072#1074#1090#1086#1084#1072#1090#1080#1079#1072#1090#1086#1088
       Default = True
@@ -2689,19 +2695,19 @@ object FormMain: TFormMain
     FileTypes = <>
     Options = []
     Left = 88
-    Top = 448
+    Top = 456
   end
   object ColorDialogCPColor: TColorDialog
     Options = [cdFullOpen, cdAnyColor]
     Left = 32
-    Top = 448
+    Top = 456
   end
   object TaskbarApp: TTaskbar
     TaskBarButtons = <>
     ProgressMaxValue = 100
     TabProperties = []
     Left = 352
-    Top = 448
+    Top = 456
   end
   object ImageListRTButton: TImageList
     ColorDepth = cd32Bit
@@ -2709,7 +2715,7 @@ object FormMain: TFormMain
     Masked = False
     Width = 24
     Left = 176
-    Top = 448
+    Top = 456
     Bitmap = {
       494C010103000800040018001800FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024

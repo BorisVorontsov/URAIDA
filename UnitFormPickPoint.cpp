@@ -138,12 +138,12 @@ void __fastcall TFormPickPoint::BitBtnSourceFromFileClick(TObject *Sender)
 {
 	if (FileOpenDialog1->Execute(this->Handle))
 	{
-		std::shared_ptr<TBitmap> pBitmap(new TBitmap());
+		std::unique_ptr<TBitmap> pBitmap(new TBitmap());
 		switch (FileOpenDialog1->FileTypeIndex)
 		{
 			case 1:
 			{
-				std::shared_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
+				std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
 				pJPEGImage->LoadFromFile(FileOpenDialog1->FileName);
 				pJPEGImage->DIBNeeded();
 				pBitmap->Assign(pJPEGImage.get());
@@ -151,7 +151,7 @@ void __fastcall TFormPickPoint::BitBtnSourceFromFileClick(TObject *Sender)
 			}
 			case 2:
 			{
-				std::shared_ptr<TPngImage> pPngImage(new TPngImage());
+				std::unique_ptr<TPngImage> pPngImage(new TPngImage());
 				pPngImage->LoadFromFile(FileOpenDialog1->FileName);
 				pBitmap->Assign(pPngImage.get());
 				break;
