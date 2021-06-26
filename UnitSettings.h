@@ -285,6 +285,7 @@ private:
 
     bool m_bEnableLogging;
 	unsigned int m_uMaxLogEntries;
+
 };
 
 //---------------------------------------------------------------------------

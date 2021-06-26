@@ -159,7 +159,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 						{
 							if (g_pSettingsManager->EnableLogging)
 							{
-								g_pLogManager->Append(L"Сравнение КТ провалено ( X: %i, Y: %i Цвет: %i Погрешность: %i )",
+								g_pLogManager->Append(L"Сравнение КТ провалено ( X: %i, Y: %i цвет: %i погрешность: %i )",
 									ControlPoint.Coordinates.x, ControlPoint.Coordinates.y, ControlPoint.PixelColor,
 									ControlPoint.Tolerance);
 							}
@@ -375,12 +375,6 @@ void __fastcall TFormMain::MenuItemShowHideAutomatizerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TFormMain::MenuItemOpenResultsClick(TObject *Sender)
 {
-	if (!g_pSettingsManager->PathForResults.IsEmpty() && !DirectoryExists(g_pSettingsManager->PathForResults))
-	{
-		MessageBox(this->Handle, L"Результаты отсутствуют!", L"Ошибка", MB_ICONSTOP);
-		return;
-	}
-
 	String strPath;
 	if (!g_pSettingsManager->PathForResults.IsEmpty())
 	{
@@ -455,16 +449,11 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	LabelCopyright1->Caption = Application->Title + L" вер." + strAppVersion + L" от";
 
 	g_pLogManager = new TLogManager;
-	if (g_pSettingsManager->EnableLogging)
-	{
-		String strLogFile, strExeName = Application->ExeName;
-		strLogFile = IncludeTrailingPathDelimiter(ExtractFilePath(strExeName)) +
-			TPath::GetFileNameWithoutExtension(strExeName) + L".log";
-		g_pLogManager->LogFile = strLogFile;
-		g_pLogManager->OpenLog();
-		g_pLogManager->MaximumEntries = g_pSettingsManager->MaxLogEntries;
-        MenuItemOpenLogFile->Visible = true;
-    }
+	//Безусловно инициализируем класс журналирования
+	String strLogFile, strExeName = Application->ExeName;
+	strLogFile = IncludeTrailingPathDelimiter(ExtractFilePath(strExeName)) +
+		TPath::GetFileNameWithoutExtension(strExeName) + L".log";
+	g_pLogManager->LogFile = strLogFile;
 }
 //---------------------------------------------------------------------------
 
@@ -649,6 +638,9 @@ void TFormMain::UpdateCommonSettingsFrame()
 	UpDownSMY->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates.y;
 	PanelSMColor->Color = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor;
 	UpDownSMColorTolerance->Position = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance;
+
+	CheckBoxEnableLogging->Checked = g_pSettingsManager->EnableLogging;
+	UpDownMaxLogEntries->Position = g_pSettingsManager->MaxLogEntries;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromCommonSettingsFrame()
@@ -748,6 +740,9 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 		TPoint(UpDownSMX->Position, UpDownSMY->Position);
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor = PanelSMColor->Color;
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance = UpDownSMColorTolerance->Position;
+
+	g_pSettingsManager->EnableLogging = CheckBoxEnableLogging->Checked;
+	g_pSettingsManager->MaxLogEntries = UpDownMaxLogEntries->Position;
 }
 //---------------------------------------------------------------------------
 void TFormMain::UpdateNecessarySettings()
@@ -857,7 +852,6 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 
 	this->SaveNecessarySettings();
 
-	g_pSettingsManager->StayOnTop = MenuItemStayOnTop->Checked;
 	g_pSettingsManager->RecentActivePage = PageControlURAIDASettings->ActivePageIndex;
 	g_pSettingsManager->MainWindowPosition = TPoint(this->Left, this->Top);
 
@@ -933,13 +927,29 @@ void TFormMain::StartTask()
 	if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 	{
 		if (!this->CheckActivePageWithMessage())
-            return;
+			return;
+
+		if ((g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaGoToSleep) ||
+			(g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaTurnOffPC))
+		{
+			if (MessageBox(this->Handle, L"Выбран сценарий спящего режима/выключения по завершению задачи. Продолжить?",
+				L"Внимание", MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
+			{
+				return;
+			}
+		}
+
+		if (g_pSettingsManager->EnableLogging)
+		{
+			g_pLogManager->OpenLog();
+			g_pLogManager->MaximumEntries = g_pSettingsManager->MaxLogEntries;
+        }
 
 		//Запускаем таймер задачи по указанным параметрам
 		//Параметры будут применены только при старте новой задачи
 		this->SaveSettingsFromGMSpecSettingsFrame();
 		TGameModeSpecSettings GMSpecSettings;
-        this->GetAppropriateGMSpecSettings(GMSpecSettings);
+		this->GetAppropriateGMSpecSettings(GMSpecSettings);
 
 		//Проверяем, не забыл ли пользователь включить хотя бы одну контрольную точку
 		unsigned int nCPCount = 0;
@@ -1008,7 +1018,9 @@ void TFormMain::StartTask()
 					break;
 			}
 
-			g_pLogManager->Append(L"Новая задача: %s", strPresetName.c_str());
+			g_pLogManager->Append(L"НОВАЯ ЗАДАЧА: %s (время боя: %i:%i, количество боёв: %i)",
+				strPresetName.c_str(), HIWORD(m_ActiveTaskInfo.Settings.Delay), LOWORD(m_ActiveTaskInfo.Settings.Delay),
+				m_ActiveTaskInfo.Settings.NumberOfBattles);
 		}
 	}
 
@@ -1096,7 +1108,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 	if (g_pSettingsManager->EnableLogging)
 	{
 		g_pLogManager->Append(L"Остановка задачи, причина: %s", strReason.c_str());
-		g_pLogManager->FlushToDisk();
+		g_pLogManager->CloseLog();
 	}
 
 	//Если это не пользователь нажал кнопку..
@@ -1362,6 +1374,7 @@ void __fastcall TFormMain::LinkLabelReleasesClick(TObject *Sender)
 void __fastcall TFormMain::MenuItemStayOnTopClick(TObject *Sender)
 {
 	MenuItemStayOnTop->Checked = !MenuItemStayOnTop->Checked;
+	g_pSettingsManager->StayOnTop = MenuItemStayOnTop->Checked;
 	this->FormStyle = (MenuItemStayOnTop->Checked)?TFormStyle::fsStayOnTop:TFormStyle::fsNormal;
 }
 //---------------------------------------------------------------------------
@@ -1391,6 +1404,13 @@ void __fastcall TFormMain::BitBtnStopTaskClick(TObject *Sender)
 void __fastcall TFormMain::PopupMenuTrayPopup(TObject *Sender)
 {
 	MenuItemMoveToCenter->Enabled = this->Visible;
+
+    //Если задан путь в настройках, меняем доступность меню в зависимости от валидности пути
+	if (!g_pSettingsManager->PathForResults.IsEmpty())
+	{
+		MenuItemOpenResults->Enabled = DirectoryExists(g_pSettingsManager->PathForResults);
+	}
+
 	MenuItemOpenLogFile->Enabled = TFile::Exists(g_pLogManager->LogFile);
 }
 //---------------------------------------------------------------------------
@@ -1522,4 +1542,12 @@ void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
 	FormCalculations->Execute(this, UpDownNumberOfBattles);
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TFormMain::FormKeyPress(TObject *Sender, System::WideChar &Key)
+{
+	if (Key == VK_ESCAPE)
+		this->Hide();
+}
+//---------------------------------------------------------------------------
+
 

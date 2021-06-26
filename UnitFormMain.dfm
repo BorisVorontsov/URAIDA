@@ -12,9 +12,11 @@ object FormMain: TFormMain
   Font.Height = -16
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 19
@@ -260,17 +262,17 @@ object FormMain: TFormMain
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
       Caption = #1050#1072#1084#1087#1072#1085#1080#1103
-      ExplicitHeight = 425
       object ScrollBoxGMSpecSettings: TScrollBox
         Left = 0
         Top = 0
         Width = 553
         Height = 433
+        HorzScrollBar.Tracking = True
+        VertScrollBar.Tracking = True
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitHeight = 425
         object GroupBoxScreens: TGroupBox
           Left = 8
           Top = 16
@@ -848,27 +850,28 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
-      ExplicitHeight = 425
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
-      ExplicitHeight = 425
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
-      ExplicitHeight = 425
-      object ScrollBox1: TScrollBox
+      object ScrollBoxCommonSettings: TScrollBox
         Left = 0
         Top = 0
         Width = 553
         Height = 433
+        HorzScrollBar.Tracking = True
+        VertScrollBar.Tracking = True
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitHeight = 425
+        ExplicitLeft = -3
+        ExplicitTop = -676
+        ExplicitHeight = 1089
         object LabelGWWidth: TLabel
           Left = 24
           Top = 50
@@ -895,7 +898,7 @@ object FormMain: TFormMain
         end
         object Bevel2: TBevel
           Left = 8
-          Top = 929
+          Top = 1041
           Width = 537
           Height = 43
           Shape = bsBottomLine
@@ -1823,6 +1826,54 @@ object FormMain: TFormMain
             end
           end
         end
+        object GroupBoxLogging: TGroupBox
+          Left = 8
+          Top = 929
+          Width = 537
+          Height = 109
+          Caption = #1046#1091#1088#1085#1072#1083#1080#1088#1086#1074#1072#1085#1080#1077
+          TabOrder = 12
+          object LabelMaxLogEntries: TLabel
+            Left = 32
+            Top = 62
+            Width = 282
+            Height = 19
+            AutoSize = False
+            Caption = #1052#1072#1082#1089#1080#1084#1072#1083#1100#1085#1086#1077' '#1082#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1079#1072#1087#1080#1089#1077#1081':'
+          end
+          object EditMaxLogEntries: TEdit
+            Left = 433
+            Top = 59
+            Width = 72
+            Height = 27
+            Hint = #1057#1077#1082#1091#1085#1076#1099
+            Alignment = taCenter
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = True
+            TabOrder = 1
+            Text = '1000'
+          end
+          object UpDownMaxLogEntries: TUpDown
+            Left = 505
+            Top = 59
+            Width = 16
+            Height = 27
+            Associate = EditMaxLogEntries
+            Min = 100
+            Max = 999999
+            Position = 1000
+            TabOrder = 2
+          end
+          object CheckBoxEnableLogging: TCheckBox
+            Left = 16
+            Top = 32
+            Width = 207
+            Height = 17
+            Caption = #1042#1077#1089#1090#1080' '#1078#1091#1088#1085#1072#1083' '#1076#1077#1081#1089#1090#1074#1080#1081
+            TabOrder = 0
+          end
+        end
       end
     end
   end
@@ -2665,7 +2716,6 @@ object FormMain: TFormMain
     end
     object MenuItemOpenLogFile: TMenuItem
       Caption = #1054#1090#1082#1088#1099#1090#1100' '#1078#1091#1088#1085#1072#1083#1100#1085#1099#1081' '#1092#1072#1081#1083
-      Visible = False
       OnClick = MenuItemOpenLogFileClick
     end
     object N1: TMenuItem

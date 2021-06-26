@@ -21,18 +21,16 @@ TLogManager::~TLogManager()
 		delete m_pData;
 }
 //---------------------------------------------------------------------------
-bool TLogManager::OpenLog()
+void TLogManager::OpenLog()
 {
-	if (m_strLogFile.IsEmpty() || !TFile::Exists(m_strLogFile))
-		return false;
-
 	if (m_pData)
 		delete m_pData;
 
 	m_pData = new TStringList();
-	m_pData->LoadFromFile(m_strLogFile);
-
-	return true;
+	if (!m_strLogFile.IsEmpty() && TFile::Exists(m_strLogFile))
+	{
+		m_pData->LoadFromFile(m_strLogFile);
+	}
 }
 //---------------------------------------------------------------------------
 bool TLogManager::Append(const wchar_t* format, ...)

@@ -60,7 +60,7 @@ __published:	// IDE-managed Components
 	TPopupMenu *PopupMenuTray;
 	TMenuItem *MenuItemShowHideAutomatizer;
 	TMenuItem *MenuItemExit;
-	TScrollBox *ScrollBox1;
+	TScrollBox *ScrollBoxCommonSettings;
 	TLabel *LabelGWWidth;
 	TEdit *EditGWWidth;
 	TUpDown *UpDownGWWidth;
@@ -206,6 +206,11 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxSMDCPState;
 	TMenuItem *MenuItemOpenLogFile;
 	TBitBtn *BitBtnCalculations;
+	TGroupBox *GroupBoxLogging;
+	TLabel *LabelMaxLogEntries;
+	TEdit *EditMaxLogEntries;
+	TUpDown *UpDownMaxLogEntries;
+	TCheckBox *CheckBoxEnableLogging;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -245,6 +250,7 @@ __published:	// IDE-managed Components
 	void __fastcall ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, int Index);
 	void __fastcall MenuItemOpenLogFileClick(TObject *Sender);
 	void __fastcall BitBtnCalculationsClick(TObject *Sender);
+	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 
 
 private:	// User declarations

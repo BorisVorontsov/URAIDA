@@ -12,7 +12,7 @@ public:
 	TLogManager();
 	~TLogManager();
 
-	bool OpenLog();
+	void OpenLog();
 	bool Append(const wchar_t* format, ...);
 	String GetEntry(unsigned int uIndex);
 	String GetLastEntry();

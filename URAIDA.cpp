@@ -20,6 +20,13 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 {
 	try
 	{
+		const wchar_t* pAppMutex = L"URAIDA_INSTANCE";
+		HANDLE hMutex = OpenMutex(MUTEX_ALL_ACCESS, 0, pAppMutex);
+		if (!hMutex)
+			hMutex = CreateMutex(NULL, FALSE, pAppMutex);
+		else
+			return 0;
+
 		Application->Initialize();
 		Application->MainFormOnTaskBar = true;
 		Application->Title = "Ultimate RAID Automatizer";

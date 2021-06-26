@@ -62,6 +62,7 @@ void __fastcall TFormCalculations::ComboBoxHeroRankChange(TObject *Sender)
 {
 	unsigned int uMaxHeroLevel = (ComboBoxHeroRank->ItemIndex + 1) * 10;
 	UpDownActualHeroLevel->Max = uMaxHeroLevel - 1;
+	UpDownActualHeroLevel->Position = std::min(UpDownActualHeroLevel->Position, static_cast<int>(uMaxHeroLevel - 1));
 	UpDownDesiredHeroLevel->Max = uMaxHeroLevel;
 	UpDownDesiredHeroLevel->Position = uMaxHeroLevel;
 }
@@ -75,6 +76,13 @@ void __fastcall TFormCalculations::BitBtnCalcTaskCostClick(TObject *Sender)
 
 void __fastcall TFormCalculations::BitBtnCalcNumberOfBattlesClick(TObject *Sender)
 {
+	if (UpDownActualHeroLevel->Position >= UpDownDesiredHeroLevel->Position)
+	{
+		MessageBox(this->Handle, L"Целевой уровень героя(ев) не может быть равен или ниже действительного",
+			L"Ошибка", MB_ICONEXCLAMATION);
+		return;
+	}
+
 	unsigned int uRequiredXP = 0;
 	unsigned int nBattleCount = 0;
 	unsigned int uTotalLevelXP = 0, uTotalLevelSilver = 0, uTotalLevelEnergy = 0;
