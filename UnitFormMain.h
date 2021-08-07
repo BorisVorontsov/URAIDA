@@ -211,6 +211,8 @@ __published:	// IDE-managed Components
 	TEdit *EditMaxLogEntries;
 	TUpDown *UpDownMaxLogEntries;
 	TCheckBox *CheckBoxEnableLogging;
+	TLabel *LabelTEAUDCommand;
+	TEdit *EditTEAUDCommand;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);

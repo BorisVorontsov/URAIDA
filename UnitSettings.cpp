@@ -59,6 +59,7 @@ bool TSettingsManager::ReadINI()
 	m_bClearOldResults = pSettings->ReadBool(m_strSectionCommon, L"ClearOldResults", false);
 
 	m_TaskEndAction = static_cast<TaskEndAction>(pSettings->ReadInteger(m_strSectionCommon, L"TaskEndAction", TaskEndAction::teaDoNothing));
+	m_strTEAUserDefinedCommand = pSettings->ReadString(m_strSectionCommon, L"TEAUserDefinedCommand", L"");
 	m_bExitOnTaskEnding = pSettings->ReadBool(m_strSectionCommon, L"ExitOnTaskEnding", false);
 	m_bCloseGameOnTaskEnding = pSettings->ReadBool(m_strSectionCommon, L"CloseGameOnTaskEnding", false);
 
@@ -117,6 +118,7 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteBool(m_strSectionCommon, L"ClearOldResults", m_bClearOldResults);
 
 	pSettings->WriteInteger(m_strSectionCommon, L"TaskEndAction", m_TaskEndAction);
+	pSettings->WriteString(m_strSectionCommon, L"TEAUserDefinedCommand", m_strTEAUserDefinedCommand);
 	pSettings->WriteBool(m_strSectionCommon, L"ExitOnTaskEnding", m_bExitOnTaskEnding);
 	pSettings->WriteBool(m_strSectionCommon, L"CloseGameOnTaskEnding", m_bCloseGameOnTaskEnding);
 

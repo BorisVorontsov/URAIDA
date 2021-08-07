@@ -162,6 +162,7 @@ void TRAIDWorker::SendMouseClick(const TPoint& Coordinates)
 	//—имулируем клик
     //Ёто требует моментального перемещени€ курсора дл€ обмана игры
 	POINT CurrentCursorPos, ScreenCoords;
+    RECT Clip, OldClip;
 
 	GetCursorPos(&CurrentCursorPos);
 	ScreenCoords = Coordinates;
@@ -171,8 +172,15 @@ void TRAIDWorker::SendMouseClick(const TPoint& Coordinates)
 	SendMessage(m_hGameWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(Coordinates.x, Coordinates.y));
 	SendMessage(m_hGameWindow, WM_LBUTTONUP, 0, MAKELPARAM(Coordinates.x, Coordinates.y));
 
-    Wait(1000);
+	//ƒополнительно блокируем на врем€ курсор дл€ корректной отработки игрой клика
+	GetClipCursor(&OldClip);
 
+	SetRect(&Clip, ScreenCoords.x, ScreenCoords.y, ScreenCoords.x + 1, ScreenCoords.y + 1);
+	ClipCursor(&Clip);
+
+	Wait(1000);
+
+	ClipCursor(&OldClip);
 	SetCursorPos(CurrentCursorPos.x, CurrentCursorPos.y);
 }
 //---------------------------------------------------------------------------

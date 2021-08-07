@@ -22,7 +22,8 @@ typedef enum tagTaskEndAction
 	teaShowNotification,
 	teaPlayAlert,
 	teaGoToSleep,
-	teaTurnOffPC
+	teaTurnOffPC,
+	teaUserDefinedCommand
 } TaskEndAction;
 
 typedef enum tagSupportedGameModes
@@ -223,6 +224,7 @@ public:
 	__property bool ClearOldResults = { read = m_bClearOldResults, write = m_bClearOldResults };
 
 	__property TaskEndAction TaskEndBehavior = { read = m_TaskEndAction, write = m_TaskEndAction };
+	__property String TEBUserDefinedCommand = { read = m_strTEAUserDefinedCommand, write = m_strTEAUserDefinedCommand };
 	__property bool ExitOnTaskEnding = { read = m_bExitOnTaskEnding, write = m_bExitOnTaskEnding };
 	__property bool CloseGameOnTaskEnding = { read = m_bCloseGameOnTaskEnding, write = m_bCloseGameOnTaskEnding };
 
@@ -266,6 +268,7 @@ private:
 	bool m_bClearOldResults;
 
 	TaskEndAction m_TaskEndAction;
+	String m_strTEAUserDefinedCommand;
 	bool m_bExitOnTaskEnding;
 	bool m_bCloseGameOnTaskEnding;
 

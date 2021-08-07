@@ -2,6 +2,7 @@
 #include "URAIDAPCH.h"
 #include <shlobj.h>
 #include <timeapi.h>
+#include <StrUtils.hpp>
 #pragma hdrstop
 
 #include "UnitCommon.h"
@@ -111,6 +112,43 @@ void Wait(DWORD dwMilliseconds)
 	}
 
 	timeEndPeriod(1);
+}
+//---------------------------------------------------------------------------
+bool SplitCommandToFileAndArgs(const String& strCommand, String& strFile, String& strArgs)
+{
+	if (strCommand.Length() <= 1)
+		return false;
+
+    //Так как согласно спецификации разделителем может быть знак табуляции, для упрощения парсинга заменяем табуляцию на пробелы
+	String strCommandWithoutTabs = ReplaceStr(strCommand, L'\t', L' ');
+	strCommandWithoutTabs = strCommandWithoutTabs.Trim();
+
+	//Команда состоит из двух частей: файл и (опционально) аргументы: 'file [-args]'
+	//Файл может быть в кавычках, для экранирования пробелов. В этом случае разделителем будет закрывающая кавычка
+	int intDelimiterPos = 0;
+	if (strCommandWithoutTabs.SubString(1, 1) == L'\"')
+	{
+		int intClosingQMPos = PosEx(L'\"', strCommandWithoutTabs, 2);
+		if (intClosingQMPos == 0)
+			return false;
+
+		intDelimiterPos = intClosingQMPos;
+	}
+	else
+	{
+		int intSpacePos = PosEx(L' ', strCommandWithoutTabs, 2);
+		if (intSpacePos == 0)
+			intDelimiterPos = strCommandWithoutTabs.Length();
+		else
+			intDelimiterPos  = intSpacePos;
+	}
+
+	strFile = strCommandWithoutTabs.SubString(1, intDelimiterPos).Trim();
+	if (intDelimiterPos < strCommandWithoutTabs.Length())
+		strArgs = strCommandWithoutTabs.SubString(intDelimiterPos + 1, strCommandWithoutTabs.Length()).Trim();
+	else
+		strArgs = L"";
+	return true;
 }
 //---------------------------------------------------------------------------
 

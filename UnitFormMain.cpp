@@ -127,6 +127,12 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		bScreenCheckPassed = false;
 		uScreenCheckingTiomeout = 0;
 		uResultSavingTimeout = 0;
+
+        //Сбрасываем лог в файл в начале каждого цикла
+		if (g_pSettingsManager->EnableLogging)
+		{
+			g_pLogManager->FlushToDisk();
+		}
 	}
 
 	//Тут 90% магии
@@ -603,6 +609,7 @@ void TFormMain::UpdateCommonSettingsFrame()
 	CheckBoxClearOldResults->Checked = g_pSettingsManager->ClearOldResults;
 
 	ComboBoxTaskEndAction->ItemIndex = static_cast<int>(g_pSettingsManager->TaskEndBehavior);
+	EditTEAUDCommand->Text = g_pSettingsManager->TEBUserDefinedCommand;
 	CheckBoxTEAExit->Checked = g_pSettingsManager->ExitOnTaskEnding;
 	CheckBoxTEACloseTheGame->Checked = g_pSettingsManager->CloseGameOnTaskEnding;
 
@@ -707,6 +714,7 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 	g_pSettingsManager->ClearOldResults = CheckBoxClearOldResults->Checked;
 
 	g_pSettingsManager->TaskEndBehavior = static_cast<TaskEndAction>(ComboBoxTaskEndAction->ItemIndex);
+	g_pSettingsManager->TEBUserDefinedCommand = EditTEAUDCommand->Text;
 	g_pSettingsManager->ExitOnTaskEnding = CheckBoxTEAExit->Checked;
 	g_pSettingsManager->CloseGameOnTaskEnding = CheckBoxTEACloseTheGame->Checked;
 
@@ -1149,6 +1157,32 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			case TaskEndAction::teaTurnOffPC:
 				ExitWindowsEx(EWX_SHUTDOWN, SHTDN_REASON_MAJOR_APPLICATION | SHTDN_REASON_MINOR_MAINTENANCE);
 				break;
+			case TaskEndAction::teaUserDefinedCommand:
+			{
+				String strFile, strArgs;
+				if (SplitCommandToFileAndArgs(EditTEAUDCommand->Text, strFile, strArgs))
+				{
+					HINSTANCE hResult = ShellExecute(NULL, L"OPEN", strFile.c_str(), strArgs.c_str(), NULL, SW_NORMAL);
+
+					if (reinterpret_cast<DWORD>(hResult) <= 32)
+					{
+						LPTSTR lpMsg = NULL;
+
+						FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+							FORMAT_MESSAGE_IGNORE_INSERTS, NULL, reinterpret_cast<DWORD>(hResult),
+							MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsg, 0, NULL);
+
+						MessageBox(this->Handle, lpMsg, L"Ошибка выполнения команды", MB_ICONEXCLAMATION);
+
+						LocalFree(lpMsg);
+					}
+				}
+				else
+				{
+					MessageBox(this->Handle, L"Не удалось распознать команду", L"Ошибка", MB_ICONEXCLAMATION);
+				}
+				break;
+            }
 		}
 
 		if (g_pSettingsManager->ExitOnTaskEnding)
@@ -1213,11 +1247,13 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	g_pRAIDWorker->GetFrameSize(FrameSize);
 	pImage->Width = FrameSize.cx;
 	pImage->Height = FrameSize.cy;
-	g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
 
 	//Если bError, записываем как причину аварийной остановки задачи
 	if (bError)
 	{
+		//Рисуем тот же самый кадр, который проходил тестирование в таймере
+		g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
+
 		std::array<TControlPoint, g_uMaxControlPoints> ControlPoints;
 		if ((nBattleNumber == 1) && this->m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
 		{
@@ -1264,6 +1300,12 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	}
 	else
 	{
+		//Если бой завершился успешно, выжидаем на всякий случай завершения анимации экрана результатов (~1сек.)
+		//и обновляем кадр для сохранения
+		Wait(1000);
+		g_pRAIDWorker->CaptureFrame();
+		g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
+
 		//Экономим место форматом JPEG
 		std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
 		pJPEGImage->Assign(pImage->Picture->Bitmap);
@@ -1537,7 +1579,7 @@ void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
 		return;
 
 	if (m_ActiveTaskInfo.CurrentState != TaskState::tsStopped)
-        return;
+		return;
 
 	FormCalculations->Execute(this, UpDownNumberOfBattles);
 }
@@ -1549,5 +1591,4 @@ void __fastcall TFormMain::FormKeyPress(TObject *Sender, System::WideChar &Key)
 		this->Hide();
 }
 //---------------------------------------------------------------------------
-
 

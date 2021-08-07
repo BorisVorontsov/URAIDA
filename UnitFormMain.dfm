@@ -764,15 +764,15 @@ object FormMain: TFormMain
           object LabelBT: TLabel
             Left = 16
             Top = 32
-            Width = 345
+            Width = 89
             Height = 19
             AutoSize = False
-            Caption = #1047#1072#1076#1077#1088#1078#1082#1072' ('#1089#1088#1077#1076#1085#1103#1103' '#1087#1088#1086#1076#1086#1083#1078#1080#1090#1077#1083#1100#1085#1086#1089#1090#1100' '#1073#1086#1103'):'
+            Caption = #1047#1072#1076#1077#1088#1078#1082#1072':'
           end
           object LabelNumberOfBattles: TLabel
             Left = 16
             Top = 65
-            Width = 345
+            Width = 145
             Height = 19
             AutoSize = False
             Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1073#1086#1105#1074':'
@@ -869,9 +869,6 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitLeft = -3
-        ExplicitTop = -676
-        ExplicitHeight = 1089
         object LabelGWWidth: TLabel
           Left = 24
           Top = 50
@@ -898,7 +895,7 @@ object FormMain: TFormMain
         end
         object Bevel2: TBevel
           Left = 8
-          Top = 1041
+          Top = 1084
           Width = 537
           Height = 43
           Shape = bsBottomLine
@@ -910,6 +907,14 @@ object FormMain: TFormMain
           Height = 19
           AutoSize = False
           Caption = #1055#1088#1077#1076#1087#1086#1095#1080#1090#1072#1077#1084#1099#1081' '#1088#1072#1079#1084#1077#1088' '#1086#1082#1085#1072' '#1080#1075#1088#1099':'
+        end
+        object LabelTEAUDCommand: TLabel
+          Left = 24
+          Top = 393
+          Width = 69
+          Height = 19
+          AutoSize = False
+          Caption = #1050#1086#1084#1072#1085#1076#1072':'
         end
         object EditGWWidth: TEdit
           Left = 96
@@ -1076,7 +1081,8 @@ object FormMain: TFormMain
             #1055#1086#1082#1072#1079#1072#1090#1100' '#1091#1074#1077#1076#1086#1084#1083#1077#1085#1080#1077
             #1057#1080#1088#1077#1085#1072' ('#1090#1088#1080' '#1089#1080#1075#1085#1072#1083#1072')'
             #1055#1077#1088#1077#1081#1090#1080' '#1074' '#1089#1087#1103#1097#1080#1081' '#1088#1077#1078#1080#1084
-            #1042#1099#1082#1083#1102#1095#1080#1090#1100' '#1082#1086#1084#1087#1100#1102#1090#1077#1088)
+            #1042#1099#1082#1083#1102#1095#1080#1090#1100' '#1082#1086#1084#1087#1100#1102#1090#1077#1088
+            #1042#1099#1087#1086#1083#1085#1080#1090#1100' '#1082#1086#1084#1072#1085#1076#1091'...')
         end
         object CheckBoxTEAExit: TCheckBox
           Left = 273
@@ -1096,11 +1102,11 @@ object FormMain: TFormMain
         end
         object GroupBoxErrorHandling: TGroupBox
           Left = 8
-          Top = 386
+          Top = 429
           Width = 537
           Height = 113
           Caption = #1054#1073#1088#1072#1073#1086#1090#1082#1072' '#1086#1096#1080#1073#1086#1082
-          TabOrder = 10
+          TabOrder = 11
           object LabelTriesBeforeForceTaskEnding: TLabel
             Left = 24
             Top = 34
@@ -1183,11 +1189,11 @@ object FormMain: TFormMain
         end
         object GroupBoxTaskBreakers: TGroupBox
           Left = 8
-          Top = 502
+          Top = 545
           Width = 537
           Height = 424
           Caption = #1055#1088#1077#1088#1099#1074#1072#1090#1077#1083#1080' '#1079#1072#1076#1072#1095#1080
-          TabOrder = 11
+          TabOrder = 12
           object GroupBoxEnergyDialog: TGroupBox
             Left = 8
             Top = 24
@@ -1828,11 +1834,11 @@ object FormMain: TFormMain
         end
         object GroupBoxLogging: TGroupBox
           Left = 8
-          Top = 929
+          Top = 972
           Width = 537
           Height = 109
           Caption = #1046#1091#1088#1085#1072#1083#1080#1088#1086#1074#1072#1085#1080#1077
-          TabOrder = 12
+          TabOrder = 13
           object LabelMaxLogEntries: TLabel
             Left = 32
             Top = 62
@@ -1852,7 +1858,7 @@ object FormMain: TFormMain
             ReadOnly = True
             ShowHint = True
             TabOrder = 1
-            Text = '1000'
+            Text = '1'#160'000'
           end
           object UpDownMaxLogEntries: TUpDown
             Left = 505
@@ -1873,6 +1879,16 @@ object FormMain: TFormMain
             Caption = #1042#1077#1089#1090#1080' '#1078#1091#1088#1085#1072#1083' '#1076#1077#1081#1089#1090#1074#1080#1081
             TabOrder = 0
           end
+        end
+        object EditTEAUDCommand: TEdit
+          Left = 99
+          Top = 388
+          Width = 430
+          Height = 27
+          Hint = #1055#1091#1090#1100
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 10
         end
       end
     end
