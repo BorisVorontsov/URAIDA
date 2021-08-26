@@ -533,6 +533,8 @@ object FormCalculations: TFormCalculations
         Width = 126
         Height = 20
         Caption = #1041#1091#1089#1090#1077#1088' '#1086#1087#1099#1090#1072
+        Checked = True
+        State = cbChecked
         TabOrder = 0
       end
       object GroupBoxHeroesSetup: TGroupBox

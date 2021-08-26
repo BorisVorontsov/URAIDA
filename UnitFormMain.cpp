@@ -1639,7 +1639,7 @@ void TFormMain::ToggleContainer(TWinControl* pContainer, bool bDisable)
 		pContainer->Controls[i]->Enabled = !bDisable;
 		pContainer->Controls[i]->Cursor = (bDisable)?crNo:crDefault;
 
-        //Рекурсивноо меняем состоояние элементов в дочерних контейнерах
+		//Рекурсивно меняем состояние элементов в дочерних контейнерах
 		if (dynamic_cast<TWinControl*>(pContainer->Controls[i]) &&
 			dynamic_cast<TWinControl*>(pContainer->Controls[i])->ControlCount)
 		{
@@ -1690,7 +1690,6 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 		pFilter->FileMask = L"*.exe";
 		pFilter->DisplayName = L"Исполняемый файл Windows";
 		FileOpenDialogGeneric->DefaultFolder = L"";
-		//BrowseForFolderDialog
 		if (FileOpenDialogGeneric->Execute(this->Handle))
 		{
 			g_pSettingsManager->PathToPlariumPlay = FileOpenDialogGeneric->FileName;
