@@ -221,7 +221,7 @@ public:
 	__property ResultSavingMode ResultSavingMethod = { read = m_ResultSavingMode, write = m_ResultSavingMode };
 	__property unsigned int ResultSavingPeriod = { read = m_uResultSavingPeriod, write = m_uResultSavingPeriod };
 	__property String PathForResults = { read = m_strPathForResults, write = m_strPathForResults };
-	__property bool ClearOldResults = { read = m_bClearOldResults, write = m_bClearOldResults };
+	__property bool DeletePreviousResults = { read = m_bDeletePreviousResults, write = m_bDeletePreviousResults };
 
 	__property TaskEndAction TaskEndBehavior = { read = m_TaskEndAction, write = m_TaskEndAction };
 	__property String TEBUserDefinedCommand = { read = m_strTEAUserDefinedCommand, write = m_strTEAUserDefinedCommand };
@@ -246,6 +246,8 @@ public:
 	__property bool EnableLogging = { read = m_bEnableLogging, write = m_bEnableLogging };
 	__property unsigned int MaxLogEntries = { read = m_uMaxLogEntries, write = m_uMaxLogEntries };
 
+	__property String PathToPlariumPlay = { read = m_strPathToPlariumPlay, write = m_strPathToPlariumPlay };
+
 private:
 	static const String m_strSettingsFileName;
 
@@ -265,7 +267,7 @@ private:
 	ResultSavingMode m_ResultSavingMode;
 	unsigned int m_uResultSavingPeriod;
 	String m_strPathForResults;
-	bool m_bClearOldResults;
+	bool m_bDeletePreviousResults;
 
 	TaskEndAction m_TaskEndAction;
 	String m_strTEAUserDefinedCommand;
@@ -288,6 +290,8 @@ private:
 
     bool m_bEnableLogging;
 	unsigned int m_uMaxLogEntries;
+
+	String m_strPathToPlariumPlay;
 
 };
 

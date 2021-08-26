@@ -4,7 +4,7 @@ object FormMain: TFormMain
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Ultimate RAID Automatizer'
-  ClientHeight = 625
+  ClientHeight = 681
   ClientWidth = 577
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,14 +22,14 @@ object FormMain: TFormMain
   TextHeight = 19
   object Bevel1: TBevel
     Left = 8
-    Top = 553
+    Top = 609
     Width = 561
     Height = 11
     Shape = bsBottomLine
   end
   object LabelCopyright1: TLabel
     Left = 8
-    Top = 581
+    Top = 637
     Width = 305
     Height = 22
     AutoSize = False
@@ -43,7 +43,7 @@ object FormMain: TFormMain
   end
   object LabelCopyright2: TLabel
     Left = 8
-    Top = 601
+    Top = 657
     Width = 140
     Height = 22
     AutoSize = False
@@ -57,11 +57,11 @@ object FormMain: TFormMain
   end
   object PanelCover: TPanel
     Left = 8
-    Top = 8
+    Top = 64
     Width = 561
     Height = 467
     BevelOuter = bvNone
-    TabOrder = 4
+    TabOrder = 5
     object ImageAppIcon: TImage
       Left = 0
       Top = 0
@@ -253,11 +253,11 @@ object FormMain: TFormMain
   end
   object PageControlURAIDASettings: TPageControl
     Left = 8
-    Top = 8
+    Top = 64
     Width = 561
     Height = 467
     ActivePage = TabSheetCampaign
-    TabOrder = 3
+    TabOrder = 4
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
     object TabSheetCampaign: TTabSheet
@@ -361,8 +361,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 15
             Text = '0'
@@ -392,8 +392,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 13
             Text = '0'
@@ -502,8 +502,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 5
             Text = '0'
@@ -630,8 +630,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1055#1080#1082#1089#1077#1083#1080
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 3
             Text = '0'
@@ -668,7 +668,7 @@ object FormMain: TFormMain
             Width = 38
             Height = 27
             Alignment = taCenter
-            ReadOnly = True
+            NumbersOnly = True
             TabOrder = 8
             Text = '1'
           end
@@ -689,7 +689,7 @@ object FormMain: TFormMain
             Width = 38
             Height = 27
             Alignment = taCenter
-            ReadOnly = True
+            NumbersOnly = True
             TabOrder = 18
             Text = '1'
           end
@@ -784,8 +784,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1052#1080#1085#1091#1090#1099
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 0
             Text = '0'
@@ -807,7 +807,7 @@ object FormMain: TFormMain
             Width = 38
             Height = 27
             Alignment = taCenter
-            ReadOnly = True
+            NumbersOnly = True
             TabOrder = 2
             Text = '1'
           end
@@ -828,8 +828,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 4
             Text = '0'
@@ -923,8 +923,8 @@ object FormMain: TFormMain
           Height = 27
           Hint = #1055#1080#1082#1089#1077#1083#1080
           Alignment = taCenter
+          NumbersOnly = True
           ParentShowHint = False
-          ReadOnly = True
           ShowHint = True
           TabOrder = 0
           Text = '200'
@@ -947,8 +947,8 @@ object FormMain: TFormMain
           Height = 27
           Hint = #1055#1080#1082#1089#1077#1083#1080
           Alignment = taCenter
+          NumbersOnly = True
           ParentShowHint = False
-          ReadOnly = True
           ShowHint = True
           TabOrder = 2
           Text = '200'
@@ -1013,6 +1013,7 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
             ShowHint = True
             TabOrder = 3
@@ -1058,12 +1059,12 @@ object FormMain: TFormMain
             TabOrder = 7
             OnClick = ButtonClearAllResultsClick
           end
-          object CheckBoxClearOldResults: TCheckBox
+          object CheckBoxDeletePreviousResults: TCheckBox
             Left = 16
             Top = 166
-            Width = 425
+            Width = 276
             Height = 25
-            Caption = #1059#1076#1072#1083#1103#1090#1100' '#1089#1090#1072#1088#1099#1077' '#1088#1077#1079#1091#1083#1100#1090#1072#1090#1099' '#1087#1088#1080' '#1089#1090#1072#1088#1090#1077' '#1085#1086#1074#1086#1081' '#1079#1072#1076#1072#1095#1080
+            Caption = #1059#1076#1072#1083#1103#1090#1100' '#1087#1088#1077#1076#1099#1076#1091#1097#1080#1077' '#1088#1077#1079#1091#1083#1100#1090#1072#1090#1099
             TabOrder = 8
           end
         end
@@ -1129,7 +1130,7 @@ object FormMain: TFormMain
             Width = 38
             Height = 27
             Alignment = taCenter
-            ReadOnly = True
+            NumbersOnly = True
             TabOrder = 0
             Text = '1'
           end
@@ -1151,8 +1152,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 2
             Text = '1'
@@ -1274,8 +1275,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 4
               Text = '0'
@@ -1402,8 +1403,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 2
               Text = '0'
@@ -1433,8 +1434,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 10
               Text = '0'
@@ -1455,8 +1456,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 12
               Text = '0'
@@ -1567,7 +1568,7 @@ object FormMain: TFormMain
               Width = 38
               Height = 27
               Alignment = taCenter
-              ReadOnly = True
+              NumbersOnly = True
               TabOrder = 7
               Text = '1'
             end
@@ -1654,8 +1655,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 4
               Text = '0'
@@ -1782,8 +1783,8 @@ object FormMain: TFormMain
               Height = 27
               Hint = #1055#1080#1082#1089#1077#1083#1080
               Alignment = taCenter
+              NumbersOnly = True
               ParentShowHint = False
-              ReadOnly = True
               ShowHint = True
               TabOrder = 2
               Text = '0'
@@ -1794,7 +1795,7 @@ object FormMain: TFormMain
               Width = 38
               Height = 27
               Alignment = taCenter
-              ReadOnly = True
+              NumbersOnly = True
               TabOrder = 7
               Text = '1'
             end
@@ -1854,8 +1855,8 @@ object FormMain: TFormMain
             Height = 27
             Hint = #1057#1077#1082#1091#1085#1076#1099
             Alignment = taCenter
+            NumbersOnly = True
             ParentShowHint = False
-            ReadOnly = True
             ShowHint = True
             TabOrder = 1
             Text = '1'#160'000'
@@ -1895,7 +1896,7 @@ object FormMain: TFormMain
   end
   object LinkLabel1: TLinkLabel
     Left = 419
-    Top = 581
+    Top = 637
     Width = 150
     Height = 22
     Alignment = taRightJustify
@@ -1907,12 +1908,12 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 9
     OnClick = LinkLabel1Click
   end
   object LinkLabel2: TLinkLabel
     Left = 455
-    Top = 601
+    Top = 657
     Width = 114
     Height = 22
     Alignment = taRightJustify
@@ -1924,27 +1925,27 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 9
+    TabOrder = 10
     OnClick = LinkLabel2Click
   end
   object ProgressBarBattle: TProgressBar
     Left = 8
-    Top = 481
+    Top = 537
     Width = 561
     Height = 8
     Hint = #1055#1088#1086#1075#1088#1077#1089#1089' '#1073#1086#1103
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 5
+    TabOrder = 6
   end
   object PanelBattles: TPanel
     Left = 230
-    Top = 503
+    Top = 559
     Width = 117
     Height = 41
     BevelKind = bkFlat
     BevelOuter = bvNone
-    TabOrder = 6
+    TabOrder = 7
     DesignSize = (
       113
       37)
@@ -1969,7 +1970,7 @@ object FormMain: TFormMain
   end
   object LinkLabelReleases: TLinkLabel
     Left = 154
-    Top = 601
+    Top = 657
     Width = 55
     Height = 22
     AutoSize = False
@@ -1980,12 +1981,12 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 8
     OnClick = LinkLabelReleasesClick
   end
   object BitBtnStopTask: TBitBtn
     Left = 428
-    Top = 503
+    Top = 559
     Width = 117
     Height = 41
     Caption = #1057#1090#1086#1087
@@ -2070,12 +2071,12 @@ object FormMain: TFormMain
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 3
     OnClick = BitBtnStopTaskClick
   end
   object BitBtnRunTask: TBitBtn
     Left = 31
-    Top = 503
+    Top = 559
     Width = 117
     Height = 41
     Caption = '#'
@@ -2085,12 +2086,12 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 0
+    TabOrder = 1
     OnClick = BitBtnRunTaskClick
   end
   object BitBtnCalculations: TBitBtn
     Left = 154
-    Top = 503
+    Top = 559
     Width = 41
     Height = 41
     Glyph.Data = {
@@ -2168,14 +2169,97 @@ object FormMain: TFormMain
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-    TabOrder = 1
+    TabOrder = 2
     OnClick = BitBtnCalculationsClick
+  end
+  object BitBtnLaunchGame: TBitBtn
+    Left = 8
+    Top = 8
+    Width = 41
+    Height = 41
+    Glyph.Data = {
+      36090000424D3609000000000000360000002800000018000000180000000100
+      20000000000000090000120B0000120B00000000000000000000FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00E8E8E800C0C0C000FFFFFF00F9F9F9000606060000000000000000000000
+      000017171700FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00C0C0
+      C0001D1D1D008E8E8E00FFFFFF00C2C2C2000000000000000000000000000000
+      000076767600FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00C1C1C100AAAAAA00ABABAB00C2C2C200C6C6C600676767000303
+      0300000000008E8E8E00FFFFFF00686868000000000000000000000000000303
+      0300E3E3E300FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00F8F8F800C6C6C6008B8B8B004444440009090900000000000000
+      0000000000008E8E8E00F8F8F800141414000000000000000000000000004C4C
+      4C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F9F9F900C3C3C3008080
+      80003C3C3C009A9A9A00AAAAAA0000000000000000000000000000000000B0B0
+      B000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00BFBFBF00F7F7F700FFFF
+      FF00FFFFFF00FFFFFF00D3D3D30061616100161616000000000018181800FCFC
+      FC00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000070707003C3C
+      3C0078787800B3B3B300F1F1F100FFFFFF00FFFFFF00CECECE00C7C7C700FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      00000000000000000000000000002C2C2C006C6C6C00AAAAAA00E3E3E300FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000002020
+      2000B2B2B200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000001212120020202000161616000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E0E0E0000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E3E3E3000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E3E3E3000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E3E3E3000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E3E3E3000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000008E8E8E00FFFFFF00E2E2E2000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      000000000000111111001F1F1F00161616000000000000000000000000000000
+      000092929200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000001515
+      1500C9C9C900FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      00000000000000000000000000000000000000000000000000002A2A2A00D9D9
+      D900FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000000000000000
+      000000000000000000000000000000000000000000002F2F2F00EFEFEF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+    TabOrder = 0
+    OnClick = BitBtnLaunchGameClick
   end
   object TimerMain: TTimer
     Enabled = False
     OnTimer = TimerMainTimer
     Left = 248
-    Top = 456
+    Top = 512
   end
   object TrayIconApp: TTrayIcon
     BalloonFlags = bfInfo
@@ -2715,12 +2799,12 @@ object FormMain: TFormMain
     OnBalloonClick = TrayIconAppBalloonClick
     OnDblClick = TrayIconAppDblClick
     Left = 424
-    Top = 456
+    Top = 512
   end
   object PopupMenuTray: TPopupMenu
     OnPopup = PopupMenuTrayPopup
     Left = 496
-    Top = 456
+    Top = 512
     object MenuItemShowHideAutomatizer: TMenuItem
       Caption = #1055#1086#1082#1072#1079#1072#1090#1100'/'#1089#1082#1088#1099#1090#1100' '#1072#1074#1090#1086#1084#1072#1090#1080#1079#1072#1090#1086#1088
       Default = True
@@ -2761,19 +2845,19 @@ object FormMain: TFormMain
     FileTypes = <>
     Options = []
     Left = 88
-    Top = 456
+    Top = 512
   end
   object ColorDialogCPColor: TColorDialog
     Options = [cdFullOpen, cdAnyColor]
     Left = 32
-    Top = 456
+    Top = 512
   end
   object TaskbarApp: TTaskbar
     TaskBarButtons = <>
     ProgressMaxValue = 100
     TabProperties = []
     Left = 352
-    Top = 456
+    Top = 512
   end
   object ImageListRTButton: TImageList
     ColorDepth = cd32Bit
@@ -2781,7 +2865,7 @@ object FormMain: TFormMain
     Masked = False
     Width = 24
     Left = 176
-    Top = 456
+    Top = 512
     Bitmap = {
       494C010103000800040018001800FFFFFFFF2000FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024

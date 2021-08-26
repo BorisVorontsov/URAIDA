@@ -192,7 +192,7 @@ __published:	// IDE-managed Components
 	TMenuItem *N2;
 	TMenuItem *MenuItemStayOnTop;
 	TMenuItem *MenuItemMoveToCenter;
-	TCheckBox *CheckBoxClearOldResults;
+	TCheckBox *CheckBoxDeletePreviousResults;
 	TBitBtn *BitBtnStopTask;
 	TBitBtn *BitBtnRunTask;
 	TImageList *ImageListRTButton;
@@ -213,6 +213,7 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxEnableLogging;
 	TLabel *LabelTEAUDCommand;
 	TEdit *EditTEAUDCommand;
+	TBitBtn *BitBtnLaunchGame;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -253,6 +254,7 @@ __published:	// IDE-managed Components
 	void __fastcall MenuItemOpenLogFileClick(TObject *Sender);
 	void __fastcall BitBtnCalculationsClick(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
+	void __fastcall BitBtnLaunchGameClick(TObject *Sender);
 
 
 private:	// User declarations
@@ -268,6 +270,7 @@ private:	// User declarations
 	void StartTask();
 	void StopTask(TaskStoppingReason Reason);
 
+	String ActiveTaskGameModeToString();
 	void SaveResult(unsigned int nBattleNumber, bool bError = false);
 
 	void GetAppropriateGMSpecSettings(TGameModeSpecSettings& Result);
@@ -280,9 +283,11 @@ private:	// User declarations
 	void UpdateNecessarySettings();
 	void SaveNecessarySettings();
 
+	void ToggleContainer(TWinControl* pContainer, bool bDisable);
 public:		// User declarations
 	__fastcall TFormMain(TComponent* Owner);
 };
+
 //---------------------------------------------------------------------------
 extern PACKAGE TFormMain *FormMain;
 //---------------------------------------------------------------------------

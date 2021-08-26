@@ -114,11 +114,14 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			LabelBattlesCounter->Caption = String(nCycleCounter) + L"/" +
 				String(m_ActiveTaskInfo.Settings.NumberOfBattles);
 
-			String strTrayHint;
-			strTrayHint.sprintf(L"%s (%i/%i)", Application->Title.c_str(), nCycleCounter,
-				m_ActiveTaskInfo.Settings.NumberOfBattles);
+			String strHint;
+			strHint.sprintf(L"%s (%s: %i/%i)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str(),
+				nCycleCounter, m_ActiveTaskInfo.Settings.NumberOfBattles);
+
+			this->Caption = strHint;
+
 			TrayIconApp->BalloonHint = L"";
-			TrayIconApp->Hint = strTrayHint;
+			TrayIconApp->Hint = strHint;
 		}
 		LabelBattlesCounter->Font->Color = clSilver;
 		ProgressBarBattle->Style = TProgressBarStyle::pbstMarquee;
@@ -153,7 +156,12 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 				//Захватываем текущий кадр, над которым далее будет проводиться анализ
 				if (!g_pRAIDWorker->CaptureFrame())
+				{
+					if (g_pSettingsManager->EnableLogging)
+						g_pLogManager->Append(L"Сравнение КТ провалено: ошибка захвата кадра");
+
 					return false;
+				}
 
 				for (auto& ControlPoint : ControlPoints)
 				{
@@ -606,7 +614,7 @@ void TFormMain::UpdateCommonSettingsFrame()
 
 	UpDownSRPeriodically->Position = g_pSettingsManager->ResultSavingPeriod;
 	EditSRPath->Text = g_pSettingsManager->PathForResults;
-	CheckBoxClearOldResults->Checked = g_pSettingsManager->ClearOldResults;
+	CheckBoxDeletePreviousResults->Checked = g_pSettingsManager->DeletePreviousResults;
 
 	ComboBoxTaskEndAction->ItemIndex = static_cast<int>(g_pSettingsManager->TaskEndBehavior);
 	EditTEAUDCommand->Text = g_pSettingsManager->TEBUserDefinedCommand;
@@ -711,7 +719,7 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 
 	g_pSettingsManager->ResultSavingPeriod = UpDownSRPeriodically->Position;
 	g_pSettingsManager->PathForResults = EditSRPath->Text;
-	g_pSettingsManager->ClearOldResults = CheckBoxClearOldResults->Checked;
+	g_pSettingsManager->DeletePreviousResults = CheckBoxDeletePreviousResults->Checked;
 
 	g_pSettingsManager->TaskEndBehavior = static_cast<TaskEndAction>(ComboBoxTaskEndAction->ItemIndex);
 	g_pSettingsManager->TEBUserDefinedCommand = EditTEAUDCommand->Text;
@@ -884,16 +892,16 @@ void __fastcall TFormMain::PageControlURAIDASettingsChanging(TObject *Sender, bo
 
 void __fastcall TFormMain::ButtonSRBrowsePathClick(TObject *Sender)
 {
-	String strPath;
 	String strInitialDir = (EditSRPath->Text.IsEmpty())?ExtractFilePath(Application->ExeName):EditSRPath->Text;
 	FileOpenDialogGeneric->Options = TFileDialogOptions() << fdoPickFolders << fdoPathMustExist;
 	FileOpenDialogGeneric->Title = L"Выберите директорию для сохранения результатов";
 	FileOpenDialogGeneric->DefaultFolder = strInitialDir;
-    //BrowseForFolderDialog
+    FileOpenDialogGeneric->FileTypes->Clear();
+	//BrowseForFolderDialog
 	if (FileOpenDialogGeneric->Execute(this->Handle))
 	{
 		EditSRPath->Text = FileOpenDialogGeneric->FileName;
-    }
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -995,7 +1003,7 @@ void TFormMain::StartTask()
 		m_ActiveTaskInfo.Settings = GMSpecSettings;
 
         //Очищаем папку результатов перед началом выполнения задачи, если указана такая опция
-		if (g_pSettingsManager->ClearOldResults)
+		if (g_pSettingsManager->DeletePreviousResults)
 		{
 			if (!g_pSettingsManager->PathForResults.IsEmpty() && DirectoryExists(g_pSettingsManager->PathForResults) &&
 				!TDirectory::IsEmpty(g_pSettingsManager->PathForResults))
@@ -1037,6 +1045,15 @@ void TFormMain::StartTask()
 	{
 		case TaskState::tsStopped:
 		case TaskState::tsPaused:
+			PageControlURAIDASettings->Visible = false;
+
+            //Делаем на время выполнения задачи все элементы недоступными
+			if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
+			{
+				ToggleContainer(ScrollBoxGMSpecSettings, true);
+				ToggleContainer(ScrollBoxCommonSettings, true);
+			}
+
 			m_ActiveTaskInfo.CurrentState = TaskState::tsRunning;
 			BitBtnRunTask->Caption = m_strButtonRTPauseCaption;
 			ImageListRTButton->GetBitmap(1, pGlyph.get());
@@ -1047,6 +1064,8 @@ void TFormMain::StartTask()
 			TimerMain->Enabled = true;
 			break;
 		case TaskState::tsRunning:
+			PageControlURAIDASettings->Visible = true;
+
 			m_ActiveTaskInfo.CurrentState = TaskState::tsPaused;
 			BitBtnRunTask->Caption = m_strButtonRTResumeCaption;
 			ImageListRTButton->GetBitmap(2, pGlyph.get());
@@ -1058,11 +1077,11 @@ void TFormMain::StartTask()
 			break;
 	}
 
+	BitBtnCalculations->Enabled = false;
+
 	//Блокируем переход системы в экономичный режим и отключение экрана для корректной работы
 	//автоматизатора и игры
 	SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
-
-	PageControlURAIDASettings->Visible = false;
 }
 //---------------------------------------------------------------------------
 void TFormMain::StopTask(TaskStoppingReason Reason)
@@ -1083,6 +1102,8 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 
 	TrayIconApp->BalloonHint = L"";
 	TrayIconApp->Hint = Application->Title;
+
+	this->Caption = Application->Title;
 
 	String strReason;
 	switch (Reason)
@@ -1192,7 +1213,32 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 	//Снимаем блокировку
 	SetThreadExecutionState(ES_CONTINUOUS);
 
+	//Делаем все элементы снова доступными
+	BitBtnCalculations->Enabled = true;
+
+	ToggleContainer(ScrollBoxGMSpecSettings, false);
+	ToggleContainer(ScrollBoxCommonSettings, false);
+
 	PageControlURAIDASettings->Visible = true;
+}
+//---------------------------------------------------------------------------
+String TFormMain::ActiveTaskGameModeToString()
+{
+	String strGameMode;
+	switch (m_ActiveTaskInfo.Settings.GameMode)
+	{
+		case SupportedGameModes::gmCampaign:
+			strGameMode = L"Кампания";
+			break;
+		case SupportedGameModes::gmDungeons:
+			strGameMode = L"Подземелья";
+			break;
+		case SupportedGameModes::gmFactionWars:
+			strGameMode = L"Войны Фракций";
+			break;
+	}
+
+	return strGameMode;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
@@ -1223,20 +1269,8 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	}
 
 	//Формируем имя подпапки для текущей задачи
-	switch (m_ActiveTaskInfo.Settings.GameMode)
-	{
-		case SupportedGameModes::gmCampaign:
-			strGameMode = L"Кампания";
-			break;
-		case SupportedGameModes::gmDungeons:
-			strGameMode = L"Подземелья";
-			break;
-		case SupportedGameModes::gmFactionWars:
-			strGameMode = L"ВойныФракций";
-			break;
-	}
-	strActiveTaskSubDir.sprintf(L"%s_%s", strGameMode.c_str(),
-		FormatDateTime(L"dd_mmmm_yyyy_hh-mm", m_ActiveTaskInfo.StartTime).c_str());
+	strActiveTaskSubDir.sprintf(L"%s %s", this->ActiveTaskGameModeToString().c_str(),
+		FormatDateTime(L"dd mmmm yyyy hh-mm", m_ActiveTaskInfo.StartTime).c_str());
 
 	strFinalPath = IncludeTrailingPathDelimiter(strPathForResults) + strActiveTaskSubDir;
 	CreateDir(strFinalPath);
@@ -1302,16 +1336,26 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	{
 		//Если бой завершился успешно, выжидаем на всякий случай завершения анимации экрана результатов (~1сек.)
 		//и обновляем кадр для сохранения
+		bool bMainTimerState = TimerMain->Enabled;
+		TimerMain->Enabled = false;
 		Wait(1000);
-		g_pRAIDWorker->CaptureFrame();
-		g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
+		if (g_pRAIDWorker->CaptureFrame())
+		{
+			g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
 
-		//Экономим место форматом JPEG
-		std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
-		pJPEGImage->Assign(pImage->Picture->Bitmap);
+			//Экономим место форматом JPEG
+			std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
+			pJPEGImage->Assign(pImage->Picture->Bitmap);
 
-		strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
-		pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
+			strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
+			pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
+		}
+		else
+		{
+			if (g_pSettingsManager->EnableLogging)
+				g_pLogManager->Append(L"Не удалось сохранить прогресс боя %i: ошибка захвата кадра", nBattleNumber);
+		}
+        TimerMain->Enabled = bMainTimerState;
 	}
 }
 
@@ -1578,9 +1622,6 @@ void __fastcall TFormMain::BitBtnCalculationsClick(TObject *Sender)
 	if (!this->CheckActivePageWithMessage())
 		return;
 
-	if (m_ActiveTaskInfo.CurrentState != TaskState::tsStopped)
-		return;
-
 	FormCalculations->Execute(this, UpDownNumberOfBattles);
 }
 //---------------------------------------------------------------------------
@@ -1589,6 +1630,99 @@ void __fastcall TFormMain::FormKeyPress(TObject *Sender, System::WideChar &Key)
 {
 	if (Key == VK_ESCAPE)
 		this->Hide();
+}
+//---------------------------------------------------------------------------
+void TFormMain::ToggleContainer(TWinControl* pContainer, bool bDisable)
+{
+	for (int i = 0; i < pContainer->ControlCount; i++)
+	{
+		pContainer->Controls[i]->Enabled = !bDisable;
+		pContainer->Controls[i]->Cursor = (bDisable)?crNo:crDefault;
+
+        //Рекурсивноо меняем состоояние элементов в дочерних контейнерах
+		if (dynamic_cast<TWinControl*>(pContainer->Controls[i]) &&
+			dynamic_cast<TWinControl*>(pContainer->Controls[i])->ControlCount)
+		{
+			ToggleContainer(dynamic_cast<TWinControl*>(pContainer->Controls[i]), bDisable);
+        }
+	}
+	pContainer->Cursor = (bDisable)?crNo:crDefault;
+}
+
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
+{
+	if (g_pRAIDWorker->IsGameRunning())
+	{
+		SetForegroundWindow(g_pRAIDWorker->GetGameWindowHandle());
+		return;
+	}
+
+	if (g_pSettingsManager->PathToPlariumPlay.IsEmpty() || !TFile::Exists(g_pSettingsManager->PathToPlariumPlay))
+	{
+		//Сначала пытаемся вычитать путь к лаунчеру из системного реестра
+		HKEY hKey;
+		LSTATUS Result;
+		Result = RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\PlariumPlayInstaller", 0, KEY_READ, &hKey);
+
+		if (Result == ERROR_SUCCESS)
+		{
+			WCHAR szBuffer[MAX_PATH] = {0};
+			DWORD dwBufferSize = sizeof(szBuffer);
+			Result = RegQueryValueExW(hKey, L"InstallFolder", 0, NULL, reinterpret_cast<LPBYTE>(szBuffer), &dwBufferSize);
+			if (Result == ERROR_SUCCESS)
+			{
+				g_pSettingsManager->PathToPlariumPlay = IncludeTrailingPathDelimiter(szBuffer) +
+					L"PlariumPlay\\PlariumPlay.exe";
+			}
+
+			RegCloseKey(hKey);
+		}
+	}
+
+	if (g_pSettingsManager->PathToPlariumPlay.IsEmpty() || !TFile::Exists(g_pSettingsManager->PathToPlariumPlay))
+	{
+		//Нет? Спрашиваем пользователя
+		FileOpenDialogGeneric->Options = TFileDialogOptions() << fdoFileMustExist;
+		FileOpenDialogGeneric->Title = L"Укажите местоположение Plarium Play";
+		TFileTypeItem *pFilter = FileOpenDialogGeneric->FileTypes->Add();
+		pFilter->FileMask = L"*.exe";
+		pFilter->DisplayName = L"Исполняемый файл Windows";
+		FileOpenDialogGeneric->DefaultFolder = L"";
+		//BrowseForFolderDialog
+		if (FileOpenDialogGeneric->Execute(this->Handle))
+		{
+			g_pSettingsManager->PathToPlariumPlay = FileOpenDialogGeneric->FileName;
+		}
+		else return;
+	}
+
+	STARTUPINFO StartupInfo = {0};
+	PROCESS_INFORMATION ProcessInfo = {0};
+
+	const String strCommandLine = L"--args -gameid=101 -tray-start";
+
+	StartupInfo.cb = sizeof(StartupInfo);
+
+	//Пытаемся запустить Plarium Play с параметрами для запуска игры
+	if (!CreateProcess( g_pSettingsManager->PathToPlariumPlay.c_str(),
+		strCommandLine.c_str(),
+		NULL,
+		NULL,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		&StartupInfo,
+		&ProcessInfo))
+    {
+		MessageBox(this->Handle, L"Не удалось запустить процесс Plarium Play", L"Ошибка", MB_ICONSTOP);
+		return;
+	}
+
+	CloseHandle(ProcessInfo.hProcess);
+	CloseHandle(ProcessInfo.hThread);
 }
 //---------------------------------------------------------------------------
 

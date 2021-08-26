@@ -81,7 +81,7 @@ object FormCalculations: TFormCalculations
         Width = 38
         Height = 27
         Alignment = taCenter
-        ReadOnly = True
+        NumbersOnly = True
         TabOrder = 1
         Text = '1'
       end
@@ -580,7 +580,7 @@ object FormCalculations: TFormCalculations
           Width = 38
           Height = 27
           Alignment = taCenter
-          ReadOnly = True
+          NumbersOnly = True
           TabOrder = 0
           Text = '1'
         end
@@ -601,7 +601,7 @@ object FormCalculations: TFormCalculations
           Width = 38
           Height = 27
           Alignment = taCenter
-          ReadOnly = True
+          NumbersOnly = True
           TabOrder = 2
           Text = '2'
         end

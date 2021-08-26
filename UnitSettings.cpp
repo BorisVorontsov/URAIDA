@@ -56,7 +56,7 @@ bool TSettingsManager::ReadINI()
 	m_ResultSavingMode = static_cast<ResultSavingMode>(pSettings->ReadInteger(m_strSectionCommon, L"ResultSavingMode", ResultSavingMode::rsmAtTheEndOfEachBattle));
 	m_uResultSavingPeriod = pSettings->ReadInteger(m_strSectionCommon, L"ResultSavingPeriod", 60);
 	m_strPathForResults = pSettings->ReadString(m_strSectionCommon, L"PathForResults", L"");
-	m_bClearOldResults = pSettings->ReadBool(m_strSectionCommon, L"ClearOldResults", false);
+	m_bDeletePreviousResults = pSettings->ReadBool(m_strSectionCommon, L"DeletePreviousResults", false);
 
 	m_TaskEndAction = static_cast<TaskEndAction>(pSettings->ReadInteger(m_strSectionCommon, L"TaskEndAction", TaskEndAction::teaDoNothing));
 	m_strTEAUserDefinedCommand = pSettings->ReadString(m_strSectionCommon, L"TEAUserDefinedCommand", L"");
@@ -84,6 +84,7 @@ bool TSettingsManager::ReadINI()
 	m_bStayOnTop = pSettings->ReadBool(m_strSectionInternal, L"StayOnTop", false);
 	m_bEnableLogging = pSettings->ReadBool(m_strSectionInternal, L"EnableLogging", false);
 	m_uMaxLogEntries = pSettings->ReadInteger(m_strSectionInternal, L"MaxLogEntries", 1000);
+	m_strPathToPlariumPlay = pSettings->ReadString(m_strSectionInternal, L"PathToPlariumPlay", L"");
 
 	if (!FileExists(strSettingsFile))
 		this->UpdateINI();
@@ -115,7 +116,7 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteInteger(m_strSectionCommon, L"ResultSavingMode", m_ResultSavingMode);
 	pSettings->WriteInteger(m_strSectionCommon, L"ResultSavingPeriod", m_uResultSavingPeriod);
 	pSettings->WriteString(m_strSectionCommon, L"PathForResults", m_strPathForResults);
-	pSettings->WriteBool(m_strSectionCommon, L"ClearOldResults", m_bClearOldResults);
+	pSettings->WriteBool(m_strSectionCommon, L"DeletePreviousResults", m_bDeletePreviousResults);
 
 	pSettings->WriteInteger(m_strSectionCommon, L"TaskEndAction", m_TaskEndAction);
 	pSettings->WriteString(m_strSectionCommon, L"TEAUserDefinedCommand", m_strTEAUserDefinedCommand);
@@ -143,8 +144,9 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteBool(m_strSectionInternal, L"StayOnTop", m_bStayOnTop);
 	pSettings->WriteBool(m_strSectionInternal, L"EnableLogging", m_bEnableLogging);
 	pSettings->WriteInteger(m_strSectionInternal, L"MaxLogEntries", m_uMaxLogEntries);
+	pSettings->WriteString(m_strSectionInternal, L"PathToPlariumPlay", m_strPathToPlariumPlay);
 
-    return true;
+	return true;
 }
 //---------------------------------------------------------------------------
 

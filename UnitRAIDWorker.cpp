@@ -129,12 +129,21 @@ void TRAIDWorker::ResizeGameWindow(const TSize& NewSize)
 {
 	this->GainGameWindow();
 
-	RECT NewWindowSize;
-	SetRect(&NewWindowSize, 0, 0, NewSize.cx, NewSize.cy);
-	AdjustWindowRectEx(&NewWindowSize, GetWindowLong(m_hGameWindow, GWL_STYLE),
-		FALSE, GetWindowLong(m_hGameWindow, GWL_EXSTYLE));
-	SetWindowPos(m_hGameWindow, NULL, 0, 0, NewWindowSize.right - NewWindowSize.left,
-		NewWindowSize.bottom - NewWindowSize.top, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
+	TRect CurrentSize;
+	this->GetGameWindowSize(CurrentSize, false);
+
+	if ((CurrentSize.Width() != NewSize.cx) || (CurrentSize.Height() != NewSize.cy))
+	{
+		RECT NewWindowSize;
+		SetRect(&NewWindowSize, 0, 0, NewSize.cx, NewSize.cy);
+		AdjustWindowRectEx(&NewWindowSize, GetWindowLong(m_hGameWindow, GWL_STYLE),
+			FALSE, GetWindowLong(m_hGameWindow, GWL_EXSTYLE));
+		SetWindowPos(m_hGameWindow, NULL, 0, 0, NewWindowSize.right - NewWindowSize.left,
+			NewWindowSize.bottom - NewWindowSize.top, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
+
+		//Дополнительное время для перерисовки кадра игры после масштабирования
+		Wait(1000);
+    }
 }
 //---------------------------------------------------------------------------
 void TRAIDWorker::SendKey(System::WideChar Key)
@@ -247,7 +256,7 @@ bool TRAIDWorker::UpdateRecentFrame()
 	}
 
 	//PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY);
-	RedrawWindow(m_hGameWindow, NULL, NULL, RDW_INVALIDATE | RDW_INTERNALPAINT);
+	RedrawWindow(m_hGameWindow, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_UPDATENOW);
 	BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
 		hRAIDDC, 0, 0, SRCCOPY);
 
