@@ -117,8 +117,9 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			}
 			else
 			{
-				LabelBattlesCounter->Caption = L"∞";
-				strHint.sprintf(L"%s (%s: ∞)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str());
+				LabelBattlesCounter->Caption = String(nCycleCounter) + L"/∞";
+				strHint.sprintf(L"%s (%s: %i/∞)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str(),
+					nCycleCounter);
 			}
 
 			this->Caption = strHint;

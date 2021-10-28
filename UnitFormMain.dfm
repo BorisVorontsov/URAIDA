@@ -858,14 +858,26 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ScrollBoxCommonSettings: TScrollBox
         Left = 0
         Top = 0
@@ -1867,7 +1879,7 @@ object FormMain: TFormMain
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            Text = '1'#160'000'
+            Text = '1000'
           end
           object UpDownMaxLogEntries: TUpDown
             Left = 505
