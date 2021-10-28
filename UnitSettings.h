@@ -139,6 +139,7 @@ public:
 		m_REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pIniFile->ReadInteger(strSection, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
 		m_uDelay = pIniFile->ReadInteger(strSection, L"Delay", 10);
 		m_nNumberOfBattles = pIniFile->ReadInteger(strSection, L"NumberOfBattles", 1);
+		m_bEndlessMode = pIniFile->ReadBool(strSection, L"EndlessMode", false);
 	}
 	void Load(String strIniFile, String strSection) override
 	{
@@ -160,6 +161,7 @@ public:
 		pIniFile->WriteInteger(strSection, L"REPLAYScreenAction", m_REPLAYScreenPreferredAction);
 		pIniFile->WriteInteger(strSection, L"Delay", m_uDelay);
 		pIniFile->WriteInteger(strSection, L"NumberOfBattles", m_nNumberOfBattles);
+		pIniFile->WriteBool(strSection, L"EndlessMode", m_bEndlessMode);
 	}
 	void Serialize(String strIniFile, String strSection) override
 	{
@@ -177,6 +179,7 @@ public:
 	__property REPLAYScreenAction REPLAYScreenPreferredAction = { read = m_REPLAYScreenPreferredAction, write = m_REPLAYScreenPreferredAction };
 	__property unsigned int Delay = { read = m_uDelay, write = m_uDelay };
 	__property unsigned int NumberOfBattles = { read = m_nNumberOfBattles, write = m_nNumberOfBattles };
+	__property bool EndlessMode = { read = m_bEndlessMode, write = m_bEndlessMode };
 
 private:
 	SupportedGameModes m_GameMode;
@@ -188,6 +191,7 @@ private:
 	REPLAYScreenAction m_REPLAYScreenPreferredAction;
 	unsigned int m_uDelay;
 	unsigned int m_nNumberOfBattles;
+	bool m_bEndlessMode;
 };
 
 //Возможные действия с диалогами, прерывающими выполнение задачи

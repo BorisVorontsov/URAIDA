@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vcl.h>
+#include <dwmapi.h>
 #include <tchar.h>
 
 #include "UnitSettings.h"

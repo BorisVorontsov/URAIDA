@@ -751,7 +751,7 @@ object FormMain: TFormMain
           Left = 8
           Top = 244
           Width = 537
-          Height = 113
+          Height = 138
           Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1079#1072#1076#1072#1095#1080
           TabOrder = 1
           object LabelBTSeparator: TLabel
@@ -768,14 +768,6 @@ object FormMain: TFormMain
             Height = 19
             AutoSize = False
             Caption = #1047#1072#1076#1077#1088#1078#1082#1072':'
-          end
-          object LabelNumberOfBattles: TLabel
-            Left = 16
-            Top = 65
-            Width = 145
-            Height = 19
-            AutoSize = False
-            Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1073#1086#1105#1074':'
           end
           object EditBTMinutes: TEdit
             Left = 397
@@ -799,7 +791,7 @@ object FormMain: TFormMain
             Min = 1
             Max = 999
             Position = 1
-            TabOrder = 1
+            TabOrder = 6
           end
           object EditNumberOfBattles: TEdit
             Left = 467
@@ -808,7 +800,7 @@ object FormMain: TFormMain
             Height = 27
             Alignment = taCenter
             NumbersOnly = True
-            TabOrder = 2
+            TabOrder = 5
             Text = '1'
           end
           object UpDownBTSeconds: TUpDown
@@ -831,7 +823,7 @@ object FormMain: TFormMain
             NumbersOnly = True
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 4
+            TabOrder = 2
             Text = '0'
           end
           object UpDownBTMinutes: TUpDown
@@ -841,8 +833,24 @@ object FormMain: TFormMain
             Height = 27
             Associate = EditBTMinutes
             Max = 59
-            TabOrder = 5
+            TabOrder = 1
             Wrap = True
+          end
+          object RadioButtonNumberOfBattles: TRadioButton
+            Left = 16
+            Top = 67
+            Width = 154
+            Height = 17
+            Caption = #1050#1086#1083#1080#1095#1077#1089#1090#1074#1086' '#1073#1086#1105#1074':'
+            TabOrder = 4
+          end
+          object RadioButtonEndlessMode: TRadioButton
+            Left = 16
+            Top = 99
+            Width = 213
+            Height = 17
+            Caption = #1041#1077#1089#1082#1086#1085#1077#1095#1085#1099#1081' '#1088#1077#1078#1080#1084' ('#8734')'
+            TabOrder = 7
           end
         end
       end
@@ -850,26 +858,14 @@ object FormMain: TFormMain
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ScrollBoxCommonSettings: TScrollBox
         Left = 0
         Top = 0
@@ -1865,13 +1861,13 @@ object FormMain: TFormMain
             Top = 59
             Width = 72
             Height = 27
-            Hint = #1057#1077#1082#1091#1085#1076#1099
+            Hint = #1057#1090#1088#1086#1082#1080
             Alignment = taCenter
             NumbersOnly = True
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            Text = '1000'
+            Text = '1'#160'000'
           end
           object UpDownMaxLogEntries: TUpDown
             Left = 505

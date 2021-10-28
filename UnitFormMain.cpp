@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+п»ї//---------------------------------------------------------------------------
 
 #include "URAIDAPCH.h"
 #include <Mmsystem.h>
@@ -23,9 +23,9 @@ TSettingsManager *g_pSettingsManager;
 TRAIDWorker *g_pRAIDWorker;
 TLogManager *g_pLogManager;
 
-const String TFormMain::m_strButtonRTRunCaption = L"Старт";
-const String TFormMain::m_strButtonRTPauseCaption = L"Пауза";
-const String TFormMain::m_strButtonRTResumeCaption = L"Далее";
+const String TFormMain::m_strButtonRTRunCaption = L"РЎС‚Р°СЂС‚";
+const String TFormMain::m_strButtonRTPauseCaption = L"РџР°СѓР·Р°";
+const String TFormMain::m_strButtonRTResumeCaption = L"Р”Р°Р»РµРµ";
 
 //---------------------------------------------------------------------------
 __fastcall TFormMain::TFormMain(TComponent* Owner)
@@ -46,17 +46,17 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	static unsigned int uScreenCheckingTiomeout = 0;
 	static unsigned int uResultSavingTimeout = 0;
 
-	//А вдруг?
+	//Рђ РІРґСЂСѓРі?
 	if (!g_pRAIDWorker->IsGameRunning())
 	{
         nCycleCounter = 0;
 		this->StopTask(TaskStoppingReason::tsrError);
-		MessageBox(this->Handle, L"Не удаётся найти окно игры!", L"Ошибка", MB_ICONSTOP);
+		MessageBox(this->Handle, L"РќРµ СѓРґР°С‘С‚СЃСЏ РЅР°Р№С‚Рё РѕРєРЅРѕ РёРіСЂС‹!", L"РћС€РёР±РєР°", MB_ICONSTOP);
 
 		return;
 	}
 
-	//Сохранение скриншота (отчёта) боя с заданным периодом
+	//РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРєСЂРёРЅС€РѕС‚Р° (РѕС‚С‡С‘С‚Р°) Р±РѕСЏ СЃ Р·Р°РґР°РЅРЅС‹Рј РїРµСЂРёРѕРґРѕРј
 	if (g_pSettingsManager->SaveResults &&
 		(g_pSettingsManager->ResultSavingMethod == ResultSavingMode::rsmPeriodically) &&
 		(uResultSavingTimeout == g_pSettingsManager->ResultSavingPeriod))
@@ -67,21 +67,15 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 	if (!nCycleCounter)
 	{
-		//Кешируем значение времени задачи в секундах один раз, в начале первого боя
-		uBattleDelayInSeconds = (HIWORD(m_ActiveTaskInfo.Settings.Delay) * 60) + LOWORD(m_ActiveTaskInfo.Settings.Delay);
-
-		if (!uBattleDelayInSeconds)
-		{
-			this->StopTask(TaskStoppingReason::tsrError);
-			MessageBox(this->Handle, L"Время боя должно быть больше нуля!", L"Ошибка", MB_ICONSTOP);
-
-			return;
-        }
+		//РљРµС€РёСЂСѓРµРј Р·РЅР°С‡РµРЅРёРµ РІСЂРµРјРµРЅРё Р·Р°РґР°С‡Рё РІ СЃРµРєСѓРЅРґР°С… РѕРґРёРЅ СЂР°Р·, РІ РЅР°С‡Р°Р»Рµ РїРµСЂРІРѕРіРѕ Р±РѕСЏ
+		uBattleDelayInSeconds = (HIWORD(m_ActiveTaskInfo.Settings.Delay) * 60) +
+			LOWORD(m_ActiveTaskInfo.Settings.Delay);
 	}
 
-	if ((nCycleCounter > m_ActiveTaskInfo.Settings.NumberOfBattles) && bScreenCheckPassed)
+	if ((nCycleCounter > m_ActiveTaskInfo.Settings.NumberOfBattles) && bScreenCheckPassed &&
+		!m_ActiveTaskInfo.Settings.EndlessMode)
 	{
-		//Успешное завершение задачи
+		//РЈСЃРїРµС€РЅРѕРµ Р·Р°РІРµСЂС€РµРЅРёРµ Р·Р°РґР°С‡Рё
 		nCycleCounter = 0;
 		this->StopTask(TaskStoppingReason::tsrSuccessfulCompletion);
 
@@ -89,7 +83,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	}
 	else if (m_bForceStopTask)
 	{
-		//Выходим из задачи
+		//Р’С‹С…РѕРґРёРј РёР· Р·Р°РґР°С‡Рё
 		nCycleCounter = 0;
 		this->StopTask(TaskStoppingReason::tsrUser);
 
@@ -98,25 +92,34 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 	if (bScreenCheckPassed)
 	{
-		//Обновляем прогресс текущего боя
+		//РћР±РЅРѕРІР»СЏРµРј РїСЂРѕРіСЂРµСЃСЃ С‚РµРєСѓС‰РµРіРѕ Р±РѕСЏ
 		ProgressBarBattle->Position = 100.0f * (static_cast<float>(uBattleTimeout) /
 			static_cast<float>(uBattleDelayInSeconds));
 		TaskbarApp->ProgressValue = ProgressBarBattle->Position;
 	}
 
-    //Начало каждого боя
+    //РќР°С‡Р°Р»Рѕ РєР°Р¶РґРѕРіРѕ Р±РѕСЏ
 	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
 	{
 		nCycleCounter++;
-		if (nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles)
+		if ((nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles) || m_ActiveTaskInfo.Settings.EndlessMode)
 		{
 			uBattleTimeout = 0;
-			LabelBattlesCounter->Caption = String(nCycleCounter) + L"/" +
-				String(m_ActiveTaskInfo.Settings.NumberOfBattles);
 
 			String strHint;
-			strHint.sprintf(L"%s (%s: %i/%i)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str(),
-				nCycleCounter, m_ActiveTaskInfo.Settings.NumberOfBattles);
+
+			if (!m_ActiveTaskInfo.Settings.EndlessMode)
+			{
+				LabelBattlesCounter->Caption = String(nCycleCounter) + L"/" +
+					String(m_ActiveTaskInfo.Settings.NumberOfBattles);
+				strHint.sprintf(L"%s (%s: %i/%i)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str(),
+					nCycleCounter, m_ActiveTaskInfo.Settings.NumberOfBattles);
+			}
+			else
+			{
+				LabelBattlesCounter->Caption = L"в€ћ";
+				strHint.sprintf(L"%s (%s: в€ћ)", Application->Title.c_str(), this->ActiveTaskGameModeToString().c_str());
+			}
 
 			this->Caption = strHint;
 
@@ -131,15 +134,15 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		uScreenCheckingTiomeout = 0;
 		uResultSavingTimeout = 0;
 
-        //Сбрасываем лог в файл в начале каждого цикла
+        //РЎР±СЂР°СЃС‹РІР°РµРј Р»РѕРі РІ С„Р°Р№Р» РІ РЅР°С‡Р°Р»Рµ РєР°Р¶РґРѕРіРѕ С†РёРєР»Р°
 		if (g_pSettingsManager->EnableLogging)
 		{
 			g_pLogManager->FlushToDisk();
 		}
 	}
 
-	//Тут 90% магии
-	//Если мы сюда попали не потому, что это самое начало, а потому, что были ошибки, ждём до заданного периода
+	//РўСѓС‚ 90% РјР°РіРёРё
+	//Р•СЃР»Рё РјС‹ СЃСЋРґР° РїРѕРїР°Р»Рё РЅРµ РїРѕС‚РѕРјСѓ, С‡С‚Рѕ СЌС‚Рѕ СЃР°РјРѕРµ РЅР°С‡Р°Р»Рѕ, Р° РїРѕС‚РѕРјСѓ, С‡С‚Рѕ Р±С‹Р»Рё РѕС€РёР±РєРё, Р¶РґС‘Рј РґРѕ Р·Р°РґР°РЅРЅРѕРіРѕ РїРµСЂРёРѕРґР°
 	if ((!nScreenCheckFailures || (nScreenCheckFailures && (uScreenCheckingTiomeout == g_pSettingsManager->ScreenCheckingPeriod))) &&
 		!bScreenCheckPassed)
 	{
@@ -147,18 +150,18 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 		uScreenCheckingTiomeout = 0;
 
-		//Цикл сравнения контрольных точек с кадром
+		//Р¦РёРєР» СЃСЂР°РІРЅРµРЅРёСЏ РєРѕРЅС‚СЂРѕР»СЊРЅС‹С… С‚РѕС‡РµРє СЃ РєР°РґСЂРѕРј
 		auto CompareControlPoints
 		{
 			[](std::array<TControlPoint, g_uMaxControlPoints>& ControlPoints)
 			{
 				unsigned int nEnabledCPs = 0;
 
-				//Захватываем текущий кадр, над которым далее будет проводиться анализ
+				//Р—Р°С…РІР°С‚С‹РІР°РµРј С‚РµРєСѓС‰РёР№ РєР°РґСЂ, РЅР°Рґ РєРѕС‚РѕСЂС‹Рј РґР°Р»РµРµ Р±СѓРґРµС‚ РїСЂРѕРІРѕРґРёС‚СЊСЃСЏ Р°РЅР°Р»РёР·
 				if (!g_pRAIDWorker->CaptureFrame())
 				{
 					if (g_pSettingsManager->EnableLogging)
-						g_pLogManager->Append(L"Сравнение КТ провалено: ошибка захвата кадра");
+						g_pLogManager->Append(L"РЎСЂР°РІРЅРµРЅРёРµ РљРў РїСЂРѕРІР°Р»РµРЅРѕ: РѕС€РёР±РєР° Р·Р°С…РІР°С‚Р° РєР°РґСЂР°");
 
 					return false;
 				}
@@ -173,7 +176,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 						{
 							if (g_pSettingsManager->EnableLogging)
 							{
-								g_pLogManager->Append(L"Сравнение КТ провалено ( X: %i, Y: %i цвет: %i погрешность: %i )",
+								g_pLogManager->Append(L"РЎСЂР°РІРЅРµРЅРёРµ РљРў РїСЂРѕРІР°Р»РµРЅРѕ ( X: %i, Y: %i С†РІРµС‚: %i РїРѕРіСЂРµС€РЅРѕСЃС‚СЊ: %i )",
 									ControlPoint.Coordinates.x, ControlPoint.Coordinates.y, ControlPoint.PixelColor,
 									ControlPoint.Tolerance);
 							}
@@ -185,35 +188,35 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				if (!nEnabledCPs)
 				{
 					if (g_pSettingsManager->EnableLogging)
-						g_pLogManager->Append(L"Активных КТ не обнаружено, пропуск");
+						g_pLogManager->Append(L"РђРєС‚РёРІРЅС‹С… РљРў РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅРѕ, РїСЂРѕРїСѓСЃРє");
 
 					return false;
 				}
 
 				if (g_pSettingsManager->EnableLogging)
-					g_pLogManager->Append(L"Сравнение всех активных КТ завершено успешно");
+					g_pLogManager->Append(L"РЎСЂР°РІРЅРµРЅРёРµ РІСЃРµС… Р°РєС‚РёРІРЅС‹С… РљРў Р·Р°РІРµСЂС€РµРЅРѕ СѓСЃРїРµС€РЅРѕ");
 				return true;
 			}
 		};
 
-		//Прерыватель задачи: диалог пополнения энергии
-		//Появляется при её нехватке после попытки запуска боя
+		//РџСЂРµСЂС‹РІР°С‚РµР»СЊ Р·Р°РґР°С‡Рё: РґРёР°Р»РѕРі РїРѕРїРѕР»РЅРµРЅРёСЏ СЌРЅРµСЂРіРёРё
+		//РџРѕСЏРІР»СЏРµС‚СЃСЏ РїСЂРё РµС‘ РЅРµС…РІР°С‚РєРµ РїРѕСЃР»Рµ РїРѕРїС‹С‚РєРё Р·Р°РїСѓСЃРєР° Р±РѕСЏ
 		auto EnergyDialogTest
 		{
 			[=](bool& bExitTimer)
 			{
 				if (g_pSettingsManager->EnableLogging)
-					g_pLogManager->Append(L"Цикл %i: начало тестирования КТ диалога пополнения энергии", nCycleCounter);
+					g_pLogManager->Append(L"Р¦РёРєР» %i: РЅР°С‡Р°Р»Рѕ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РљРў РґРёР°Р»РѕРіР° РїРѕРїРѕР»РЅРµРЅРёСЏ СЌРЅРµСЂРіРёРё", nCycleCounter);
 
 				if (CompareControlPoints(g_pSettingsManager->EnergyDialogControlPoints))
 				{
 					if (g_pSettingsManager->EnableLogging)
-						g_pLogManager->Append(L"Выполнение действий для диалога пополнения энергии");
+						g_pLogManager->Append(L"Р’С‹РїРѕР»РЅРµРЅРёРµ РґРµР№СЃС‚РІРёР№ РґР»СЏ РґРёР°Р»РѕРіР° РїРѕРїРѕР»РЅРµРЅРёСЏ СЌРЅРµСЂРіРёРё");
 
 					switch (g_pSettingsManager->EnergyDialogPreferredAction)
 					{
 						case PromptDialogAction::pdaAccept:
-							//Кликаем, куда задал пользователь (предполагается кнопка "Получить")
+							//РљР»РёРєР°РµРј, РєСѓРґР° Р·Р°РґР°Р» РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ (РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ РєРЅРѕРїРєР° "РџРѕР»СѓС‡РёС‚СЊ")
 							g_pRAIDWorker->SendMouseClick(g_pSettingsManager->EnergyDialogGETButtonPoint);
 							bExitTimer = false;
 							break;
@@ -223,7 +226,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 							break;
 						case PromptDialogAction::pdaAbort:
 						{
-							//Если задано, просто заканчиваем задачу
+							//Р•СЃР»Рё Р·Р°РґР°РЅРѕ, РїСЂРѕСЃС‚Рѕ Р·Р°РєР°РЅС‡РёРІР°РµРј Р·Р°РґР°С‡Сѓ
 							nCycleCounter = 0;
 							this->StopTask(TaskStoppingReason::tsrUser);
 							bExitTimer = true;
@@ -238,7 +241,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			}
 		};
 
-		//Возможное обнаружение диалога пополнения энергии
+		//Р’РѕР·РјРѕР¶РЅРѕРµ РѕР±РЅР°СЂСѓР¶РµРЅРёРµ РґРёР°Р»РѕРіР° РїРѕРїРѕР»РЅРµРЅРёСЏ СЌРЅРµСЂРіРёРё
 		bool bExitTimer;
 		if (EnergyDialogTest(bExitTimer))
 		{
@@ -246,16 +249,16 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				return;
 		}
 
-		//Прерыватель задачи: диалог работ на сервере
+		//РџСЂРµСЂС‹РІР°С‚РµР»СЊ Р·Р°РґР°С‡Рё: РґРёР°Р»РѕРі СЂР°Р±РѕС‚ РЅР° СЃРµСЂРІРµСЂРµ
 		if (g_pSettingsManager->EnableLogging)
-			g_pLogManager->Append(L"Цикл %i: начало тестирования КТ диалога работ на сервере", nCycleCounter);
+			g_pLogManager->Append(L"Р¦РёРєР» %i: РЅР°С‡Р°Р»Рѕ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РљРў РґРёР°Р»РѕРіР° СЂР°Р±РѕС‚ РЅР° СЃРµСЂРІРµСЂРµ", nCycleCounter);
 
 		if (CompareControlPoints(g_pSettingsManager->SMDialogControlPoints))
 		{
 			if (g_pSettingsManager->EnableLogging)
-				g_pLogManager->Append(L"Выполнение действий для диалога работ на сервере");
+				g_pLogManager->Append(L"Р’С‹РїРѕР»РЅРµРЅРёРµ РґРµР№СЃС‚РІРёР№ РґР»СЏ РґРёР°Р»РѕРіР° СЂР°Р±РѕС‚ РЅР° СЃРµСЂРІРµСЂРµ");
 
-			//Просто игнорируем
+			//РџСЂРѕСЃС‚Рѕ РёРіРЅРѕСЂРёСЂСѓРµРј
 			g_pRAIDWorker->SendMouseClick(TPoint(1, 1));
 		}
 
@@ -269,18 +272,18 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			}
 		};
 
-		//Если задан параметр "STARTScreenFirst", начинам с анализа на экран начала боя
+		//Р•СЃР»Рё Р·Р°РґР°РЅ РїР°СЂР°РјРµС‚СЂ "STARTScreenFirst", РЅР°С‡РёРЅР°Рј СЃ Р°РЅР°Р»РёР·Р° РЅР° СЌРєСЂР°РЅ РЅР°С‡Р°Р»Р° Р±РѕСЏ
 		if ((nCycleCounter == 1) && m_ActiveTaskInfo.Settings.ProcessSTARTScreenFirst)
 		{
 			if (g_pSettingsManager->EnableLogging)
-				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана НАЧАТЬ", nCycleCounter);
+				g_pLogManager->Append(L"Р¦РёРєР» %i: РЅР°С‡Р°Р»Рѕ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РљРў СЌРєСЂР°РЅР° РќРђР§РђРўР¬", nCycleCounter);
 
 			if (CompareControlPoints(m_ActiveTaskInfo.Settings.STARTScreenControlPoints))
 			{
 				if (g_pSettingsManager->EnableLogging)
-					g_pLogManager->Append(L"Выполнение действий для экрана НАЧАТЬ");
+					g_pLogManager->Append(L"Р’С‹РїРѕР»РЅРµРЅРёРµ РґРµР№СЃС‚РІРёР№ РґР»СЏ СЌРєСЂР°РЅР° РќРђР§РђРўР¬");
 
-				//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
+				//РћС‚РїСЂР°РІР»СЏРµРј РєР»Р°РІРёС€Сѓ Enter РѕРєРЅСѓ РёРіСЂС‹, РЅР° СЌРєСЂР°РЅРµ РЅР°С‡Р°Р»Р° Р±РѕСЏ СЌС‚Рѕ СЂР°РІРЅРѕСЃРёР»СЊРЅРѕ РЅР°Р¶Р°С‚РёСЋ "РќР°С‡Р°С‚СЊ"
 				g_pRAIDWorker->SendKey(VK_RETURN);
 
 				bool bExitTimer;
@@ -295,37 +298,38 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
                 }
 			}
 		}
-		else //Если параметр поиска экрана начала боя не задан, или мы уже на втором или более цикле, переходим к анализу экрана "Повтор/Далее"
+		else //Р•СЃР»Рё РїР°СЂР°РјРµС‚СЂ РїРѕРёСЃРєР° СЌРєСЂР°РЅР° РЅР°С‡Р°Р»Р° Р±РѕСЏ РЅРµ Р·Р°РґР°РЅ, РёР»Рё РјС‹ СѓР¶Рµ РЅР° РІС‚РѕСЂРѕРј РёР»Рё Р±РѕР»РµРµ С†РёРєР»Рµ, РїРµСЂРµС…РѕРґРёРј Рє Р°РЅР°Р»РёР·Сѓ СЌРєСЂР°РЅР° "РџРѕРІС‚РѕСЂ/Р”Р°Р»РµРµ"
 		{
 			if (g_pSettingsManager->EnableLogging)
-				g_pLogManager->Append(L"Цикл %i: начало тестирования КТ экрана ПОВТОР/ДАЛЕЕ", nCycleCounter);
+				g_pLogManager->Append(L"Р¦РёРєР» %i: РЅР°С‡Р°Р»Рѕ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РљРў СЌРєСЂР°РЅР° РџРћР’РўРћР /Р”РђР›Р•Р•", nCycleCounter);
 
 			if (CompareControlPoints(m_ActiveTaskInfo.Settings.REPLAYScreenControlPoints))
 			{
-				//Отчёт, если задано создание скриншота по завершению каждого боя
+				//РћС‚С‡С‘С‚, РµСЃР»Рё Р·Р°РґР°РЅРѕ СЃРѕР·РґР°РЅРёРµ СЃРєСЂРёРЅС€РѕС‚Р° РїРѕ Р·Р°РІРµСЂС€РµРЅРёСЋ РєР°Р¶РґРѕРіРѕ Р±РѕСЏ
 				if ((nCycleCounter > 1) && g_pSettingsManager->SaveResults &&
 					(g_pSettingsManager->ResultSavingMethod == ResultSavingMode::rsmAtTheEndOfEachBattle))
 				{
 					this->SaveResult(nCycleCounter - 1);
 				}
 
-				//Если мы прошли последний бой (счётчик nCycleCounter будет равен nNumberOfBattles + 1),
-				//просто ждём экрана результатов
+				//Р•СЃР»Рё РјС‹ РїСЂРѕС€Р»Рё РїРѕСЃР»РµРґРЅРёР№ Р±РѕР№ (СЃС‡С‘С‚С‡РёРє nCycleCounter Р±СѓРґРµС‚ СЂР°РІРµРЅ nNumberOfBattles + 1),
+				//РїСЂРѕСЃС‚Рѕ Р¶РґС‘Рј СЌРєСЂР°РЅР° СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
 				if (nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles)
 				{
 					if (g_pSettingsManager->EnableLogging)
-						g_pLogManager->Append(L"Выполнение действий для экрана ПОВТОР/ДАЛЕЕ");
+						g_pLogManager->Append(L"Р’С‹РїРѕР»РЅРµРЅРёРµ РґРµР№СЃС‚РІРёР№ РґР»СЏ СЌРєСЂР°РЅР° РџРћР’РўРћР /Р”РђР›Р•Р•");
 
 					if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaReplay)
 					{
-						//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
+						//[R] РЅР° СЌРєСЂР°РЅРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ Р±РѕСЏ СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕ РЅР°Р¶Р°С‚РёСЋ РєРЅРѕРїРєРё "РџРѕРІС‚РѕСЂ"
 						g_pRAIDWorker->SendKey('R');
 					}
 					else if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaGoNext)
 					{
-						//Последовательное нажатие пробела и клавиши ввода запускает бой следующего уровня,
-						//эквивалентно нажатию кнопки "Далее"
+						//РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРµ РЅР°Р¶Р°С‚РёРµ РїСЂРѕР±РµР»Р° Рё РєР»Р°РІРёС€Рё РІРІРѕРґР° Р·Р°РїСѓСЃРєР°РµС‚ Р±РѕР№ СЃР»РµРґСѓСЋС‰РµРіРѕ СѓСЂРѕРІРЅСЏ,
+						//СЌРєРІРёРІР°Р»РµРЅС‚РЅРѕ РЅР°Р¶Р°С‚РёСЋ РєРЅРѕРїРєРё "Р”Р°Р»РµРµ"
 						g_pRAIDWorker->SendKey(VK_SPACE);
+                        Wait(1000);
 						g_pRAIDWorker->SendKey(VK_RETURN);
 					}
 
@@ -347,24 +351,28 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				nScreenCheckFailures++;
 		}
 
-		//Если превысили число ошибочных попыток сравнения, завершаем всю задачу
-		if (nScreenCheckFailures == g_pSettingsManager->TriesBeforeForceTaskEnding)
+		//Р‘Р•РЎРљРћРќР•Р§РќР«Р™ Р Р•Р–РРњ РёРіРЅРѕСЂРёСЂСѓРµС‚ РѕС€РёР±РєРё
+		if (!m_ActiveTaskInfo.Settings.EndlessMode)
 		{
-			if (g_pSettingsManager->EnableLogging)
+			//Р•СЃР»Рё РїСЂРµРІС‹СЃРёР»Рё С‡РёСЃР»Рѕ РѕС€РёР±РѕС‡РЅС‹С… РїРѕРїС‹С‚РѕРє СЃСЂР°РІРЅРµРЅРёСЏ, Р·Р°РІРµСЂС€Р°РµРј РІСЃСЋ Р·Р°РґР°С‡Сѓ
+			if (nScreenCheckFailures == g_pSettingsManager->TriesBeforeForceTaskEnding)
 			{
-				g_pLogManager->Append(L"Превышен лимит ошибочных тестирований экрана: %i/%i",
-					nScreenCheckFailures, g_pSettingsManager->TriesBeforeForceTaskEnding);
-            }
+				if (g_pSettingsManager->EnableLogging)
+				{
+					g_pLogManager->Append(L"РџСЂРµРІС‹С€РµРЅ Р»РёРјРёС‚ РѕС€РёР±РѕС‡РЅС‹С… С‚РµСЃС‚РёСЂРѕРІР°РЅРёР№ СЌРєСЂР°РЅР°: %i/%i",
+						nScreenCheckFailures, g_pSettingsManager->TriesBeforeForceTaskEnding);
+				}
 
-			if (g_pSettingsManager->SaveResults)
-			{
-				this->SaveResult(nCycleCounter, true);
+				if (g_pSettingsManager->SaveResults)
+				{
+					this->SaveResult(nCycleCounter, true);
+				}
+
+				nCycleCounter = 0;
+				this->StopTask(TaskStoppingReason::tsrError);
+
+				return;
 			}
-
-			nCycleCounter = 0;
-			this->StopTask(TaskStoppingReason::tsrError);
-
-			return;
 		}
 	}
 
@@ -457,13 +465,13 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	ImageListRTButton->GetBitmap(0, pGlyph.get());
 	BitBtnRunTask->Glyph = pGlyph.get();
 
-	//Вывод названия и версии программы
+	//Р’С‹РІРѕРґ РЅР°Р·РІР°РЅРёСЏ Рё РІРµСЂСЃРёРё РїСЂРѕРіСЂР°РјРјС‹
 	String strAppVersion;
 	GetFileVersion(Application->ExeName, strAppVersion, fvfMajorMinor);
-	LabelCopyright1->Caption = Application->Title + L" вер." + strAppVersion + L" от";
+	LabelCopyright1->Caption = Application->Title + L" РІРµСЂ." + strAppVersion + L" РѕС‚";
 
 	g_pLogManager = new TLogManager;
-	//Безусловно инициализируем класс журналирования
+	//Р‘РµР·СѓСЃР»РѕРІРЅРѕ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РєР»Р°СЃСЃ Р¶СѓСЂРЅР°Р»РёСЂРѕРІР°РЅРёСЏ
 	String strLogFile, strExeName = Application->ExeName;
 	strLogFile = IncludeTrailingPathDelimiter(ExtractFilePath(strExeName)) +
 		TPath::GetFileNameWithoutExtension(strExeName) + L".log";
@@ -527,7 +535,7 @@ void TFormMain::ApplyAppropriateGMSpecSettings(const TGameModeSpecSettings& Inpu
 //---------------------------------------------------------------------------
 void TFormMain::UpdateGMSpecSettingsFrame()
 {
-	//Чтение настроек
+	//Р§С‚РµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє
 
 	TGameModeSpecSettings GMSpecSettings;
 	this->GetAppropriateGMSpecSettings(GMSpecSettings);
@@ -559,6 +567,14 @@ void TFormMain::UpdateGMSpecSettingsFrame()
 	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.Delay);
 	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.Delay);
 	UpDownNumberOfBattles->Position = GMSpecSettings.NumberOfBattles;
+	if (GMSpecSettings.EndlessMode)
+	{
+		RadioButtonEndlessMode->Checked = true;
+	}
+	else
+	{
+		RadioButtonNumberOfBattles->Checked = true;
+	}
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
@@ -591,6 +607,7 @@ void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 
 	GMSpecSettings.Delay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
 	GMSpecSettings.NumberOfBattles = UpDownNumberOfBattles->Position;
+	GMSpecSettings.EndlessMode = RadioButtonEndlessMode->Checked;
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 }
@@ -663,8 +680,8 @@ void TFormMain::SaveSettingsFromCommonSettingsFrame()
 	TSize NewGWSize(UpDownGWWidth->Position, UpDownGWHeight->Position);
 	TSize CurrentGWSize = g_pSettingsManager->RAIDWindowSize;
 
-	//При сохранении размеров окна игры пересчитываем координаты всех контрольных точек,
-	//если новые размеры отличаются от прежних
+	//РџСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР° РёРіСЂС‹ РїРµСЂРµСЃС‡РёС‚С‹РІР°РµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ РІСЃРµС… РєРѕРЅС‚СЂРѕР»СЊРЅС‹С… С‚РѕС‡РµРє,
+	//РµСЃР»Рё РЅРѕРІС‹Рµ СЂР°Р·РјРµСЂС‹ РѕС‚Р»РёС‡Р°СЋС‚СЃСЏ РѕС‚ РїСЂРµР¶РЅРёС…
 	if (NewGWSize != CurrentGWSize)
 	{
 		float fWidthCoeff, fHeightCoeff;
@@ -858,7 +875,7 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 {
 	if (this->m_ActiveTaskInfo.CurrentState != TaskState::tsStopped)
 	{
-		if (MessageBox(this->Handle, L"Текущая задача не завершена. Всё равно выйти?", L"Внимание",
+		if (MessageBox(this->Handle, L"РўРµРєСѓС‰Р°СЏ Р·Р°РґР°С‡Р° РЅРµ Р·Р°РІРµСЂС€РµРЅР°. Р’СЃС‘ СЂР°РІРЅРѕ РІС‹Р№С‚Рё?", L"Р’РЅРёРјР°РЅРёРµ",
 			MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDNO)
 		{
 			Action = TCloseAction::caNone;
@@ -894,7 +911,7 @@ void __fastcall TFormMain::ButtonSRBrowsePathClick(TObject *Sender)
 {
 	String strInitialDir = (EditSRPath->Text.IsEmpty())?ExtractFilePath(Application->ExeName):EditSRPath->Text;
 	FileOpenDialogGeneric->Options = TFileDialogOptions() << fdoPickFolders << fdoPathMustExist;
-	FileOpenDialogGeneric->Title = L"Выберите директорию для сохранения результатов";
+	FileOpenDialogGeneric->Title = L"Р’С‹Р±РµСЂРёС‚Рµ РґРёСЂРµРєС‚РѕСЂРёСЋ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ";
 	FileOpenDialogGeneric->DefaultFolder = strInitialDir;
     FileOpenDialogGeneric->FileTypes->Clear();
 	//BrowseForFolderDialog
@@ -909,13 +926,13 @@ void __fastcall TFormMain::ButtonClearAllResultsClick(TObject *Sender)
 {
 	if (g_pSettingsManager->PathForResults.IsEmpty() || !DirectoryExists(g_pSettingsManager->PathForResults))
 	{
-		MessageBox(this->Handle, L"Путь не найден!", L"Ошибка", MB_ICONSTOP);
+		MessageBox(this->Handle, L"РџСѓС‚СЊ РЅРµ РЅР°Р№РґРµРЅ!", L"РћС€РёР±РєР°", MB_ICONSTOP);
 		return;
 	}
 
 	if (!TDirectory::IsEmpty(g_pSettingsManager->PathForResults))
 	{
-		if (MessageBox(this->Handle, L"Вы уверены, что хотите удалить все результаты?", L"Предупреждение",
+		if (MessageBox(this->Handle, L"Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ СѓРґР°Р»РёС‚СЊ РІСЃРµ СЂРµР·СѓР»СЊС‚Р°С‚С‹?", L"РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ",
 			MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
 		{
 			return;
@@ -929,7 +946,7 @@ bool TFormMain::CheckActivePageWithMessage()
 {
 	if (PageControlURAIDASettings->ActivePage == TabSheetCommon)
 	{
-		MessageBox(this->Handle, L"Сначала выберите режим игры", L"Предупреждение", MB_ICONEXCLAMATION);
+		MessageBox(this->Handle, L"РЎРЅР°С‡Р°Р»Р° РІС‹Р±РµСЂРёС‚Рµ СЂРµР¶РёРј РёРіСЂС‹", L"РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ", MB_ICONEXCLAMATION);
 		return false;
 	}
 
@@ -945,14 +962,40 @@ void TFormMain::StartTask()
 		if (!this->CheckActivePageWithMessage())
 			return;
 
-		if ((g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaGoToSleep) ||
-			(g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaTurnOffPC))
+		//Р—Р°РїСѓСЃРєР°РµРј С‚Р°Р№РјРµСЂ Р·Р°РґР°С‡Рё РїРѕ СѓРєР°Р·Р°РЅРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј
+		//РџР°СЂР°РјРµС‚СЂС‹ Р±СѓРґСѓС‚ РїСЂРёРјРµРЅРµРЅС‹ С‚РѕР»СЊРєРѕ РїСЂРё СЃС‚Р°СЂС‚Рµ РЅРѕРІРѕР№ Р·Р°РґР°С‡Рё
+		this->SaveSettingsFromGMSpecSettingsFrame();
+		TGameModeSpecSettings GMSpecSettings;
+		this->GetAppropriateGMSpecSettings(GMSpecSettings);
+
+		//Р•СЃР»Рё РІС‹Р±СЂР°РЅ Р‘Р•РЎРљРћРќР•Р§РќР«Р™ Р Р•Р–РРњ, РїСЂРѕСЃС‚Рѕ СЃРѕРѕР±С‰Р°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ РѕР± СЌС‚РѕРј
+		if (GMSpecSettings.EndlessMode)
 		{
-			if (MessageBox(this->Handle, L"Выбран сценарий спящего режима/выключения по завершению задачи. Продолжить?",
-				L"Внимание", MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
+			if (MessageBox(this->Handle, L"Р’С‹Р±СЂР°РЅ Р‘Р•РЎРљРћРќР•Р§РќР«Р™ Р Р•Р–РРњ: РѕС€РёР±РєРё Р±СѓРґСѓС‚ РёРіРЅРѕСЂРёСЂРѕРІР°С‚СЊСЃСЏ, СЃС†РµРЅР°СЂРёР№ Р·Р°РІРµСЂС€РµРЅРёСЏ "
+				"Р·Р°РґР°С‡Рё РЅРµ Р·Р°РїСѓСЃС‚РёС‚СЃСЏ.\nРџСЂРѕРґРѕР»Р¶РёС‚СЊ?", L"Р’РЅРёРјР°РЅРёРµ", MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
 			{
 				return;
 			}
+		}
+		else
+		{
+			//Р”РѕРї. РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ Рѕ СЃС†РµРЅР°СЂРёСЏС… Р·Р°РІРµСЂС€РµРЅРёСЏ Р·Р°РґР°С‡Рё, Р·Р°С‚СЂР°РіРёРІР°СЋС‰РёС… РїРёС‚Р°РЅРёРµ
+			if ((g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaGoToSleep) ||
+				(g_pSettingsManager->TaskEndBehavior == TaskEndAction::teaTurnOffPC))
+			{
+				if (MessageBox(this->Handle, L"Р’С‹Р±СЂР°РЅ СЃС†РµРЅР°СЂРёР№ СЃРїСЏС‰РµРіРѕ СЂРµР¶РёРјР°/РІС‹РєР»СЋС‡РµРЅРёСЏ РїРѕ Р·Р°РІРµСЂС€РµРЅРёСЋ Р·Р°РґР°С‡Рё.\nРџСЂРѕРґРѕР»Р¶РёС‚СЊ?",
+					L"Р’РЅРёРјР°РЅРёРµ", MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION) == IDNO)
+				{
+					return;
+				}
+			}
+		}
+
+		//РџСЂРѕРІРµСЂСЏРµРј РїСЂР°РІРёР»СЊРЅРѕСЃС‚СЊ Р·РЅР°С‡РµРЅРёСЏ Р·Р°РґРµСЂР¶РєРё
+		if (!GMSpecSettings.Delay)
+		{
+			MessageBox(this->Handle, L"Р’СЂРµРјСЏ Р±РѕСЏ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ РЅСѓР»СЏ!", L"РћС€РёР±РєР°", MB_ICONSTOP);
+			return;
 		}
 
 		if (g_pSettingsManager->EnableLogging)
@@ -961,13 +1004,7 @@ void TFormMain::StartTask()
 			g_pLogManager->MaximumEntries = g_pSettingsManager->MaxLogEntries;
         }
 
-		//Запускаем таймер задачи по указанным параметрам
-		//Параметры будут применены только при старте новой задачи
-		this->SaveSettingsFromGMSpecSettingsFrame();
-		TGameModeSpecSettings GMSpecSettings;
-		this->GetAppropriateGMSpecSettings(GMSpecSettings);
-
-		//Проверяем, не забыл ли пользователь включить хотя бы одну контрольную точку
+		//РџСЂРѕРІРµСЂСЏРµРј, РЅРµ Р·Р°Р±С‹Р» Р»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІРєР»СЋС‡РёС‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РєРѕРЅС‚СЂРѕР»СЊРЅСѓСЋ С‚РѕС‡РєСѓ
 		unsigned int nCPCount = 0;
 		if (GMSpecSettings.ProcessSTARTScreenFirst)
 		{
@@ -978,7 +1015,7 @@ void TFormMain::StartTask()
 			}
 			if (!nCPCount)
 			{
-				MessageBox(this->Handle, L"Включите хотя бы одну контрольную точку экрана НАЧАТЬ!", L"Предупреждение",
+				MessageBox(this->Handle, L"Р’РєР»СЋС‡РёС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РєРѕРЅС‚СЂРѕР»СЊРЅСѓСЋ С‚РѕС‡РєСѓ СЌРєСЂР°РЅР° РќРђР§РђРўР¬!", L"РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ",
 					MB_ICONEXCLAMATION);
 				return;
 			}
@@ -994,7 +1031,7 @@ void TFormMain::StartTask()
 			}
 			if (!nCPCount)
 			{
-				MessageBox(this->Handle, L"Включите хотя бы одну контрольную точку экрана ПОВТОР/ДАЛЕЕ!", L"Предупреждение",
+				MessageBox(this->Handle, L"Р’РєР»СЋС‡РёС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅСѓ РєРѕРЅС‚СЂРѕР»СЊРЅСѓСЋ С‚РѕС‡РєСѓ СЌРєСЂР°РЅР° РџРћР’РўРћР /Р”РђР›Р•Р•!", L"РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ",
 					MB_ICONEXCLAMATION);
 				return;
 			}
@@ -1002,7 +1039,7 @@ void TFormMain::StartTask()
 
 		m_ActiveTaskInfo.Settings = GMSpecSettings;
 
-        //Очищаем папку результатов перед началом выполнения задачи, если указана такая опция
+        //РћС‡РёС‰Р°РµРј РїР°РїРєСѓ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё, РµСЃР»Рё СѓРєР°Р·Р°РЅР° С‚Р°РєР°СЏ РѕРїС†РёСЏ
 		if (g_pSettingsManager->DeletePreviousResults)
 		{
 			if (!g_pSettingsManager->PathForResults.IsEmpty() && DirectoryExists(g_pSettingsManager->PathForResults) &&
@@ -1034,7 +1071,7 @@ void TFormMain::StartTask()
 					break;
 			}
 
-			g_pLogManager->Append(L"НОВАЯ ЗАДАЧА: %s (время боя: %i:%i, количество боёв: %i)",
+			g_pLogManager->Append(L"РќРћР’РђРЇ Р—РђР”РђР§Рђ: %s (РІСЂРµРјСЏ Р±РѕСЏ: %i:%i, РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕС‘РІ: %i)",
 				strPresetName.c_str(), HIWORD(m_ActiveTaskInfo.Settings.Delay), LOWORD(m_ActiveTaskInfo.Settings.Delay),
 				m_ActiveTaskInfo.Settings.NumberOfBattles);
 		}
@@ -1047,7 +1084,7 @@ void TFormMain::StartTask()
 		case TaskState::tsPaused:
 			PageControlURAIDASettings->Visible = false;
 
-            //Делаем на время выполнения задачи все элементы недоступными
+            //Р”РµР»Р°РµРј РЅР° РІСЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РґР°С‡Рё РІСЃРµ СЌР»РµРјРµРЅС‚С‹ РЅРµРґРѕСЃС‚СѓРїРЅС‹РјРё
 			if (m_ActiveTaskInfo.CurrentState == TaskState::tsStopped)
 			{
 				ToggleContainer(ScrollBoxGMSpecSettings, true);
@@ -1079,8 +1116,8 @@ void TFormMain::StartTask()
 
 	BitBtnCalculations->Enabled = false;
 
-	//Блокируем переход системы в экономичный режим и отключение экрана для корректной работы
-	//автоматизатора и игры
+	//Р‘Р»РѕРєРёСЂСѓРµРј РїРµСЂРµС…РѕРґ СЃРёСЃС‚РµРјС‹ РІ СЌРєРѕРЅРѕРјРёС‡РЅС‹Р№ СЂРµР¶РёРј Рё РѕС‚РєР»СЋС‡РµРЅРёРµ СЌРєСЂР°РЅР° РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕР№ СЂР°Р±РѕС‚С‹
+	//Р°РІС‚РѕРјР°С‚РёР·Р°С‚РѕСЂР° Рё РёРіСЂС‹
 	SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 }
 //---------------------------------------------------------------------------
@@ -1136,14 +1173,14 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 
 	if (g_pSettingsManager->EnableLogging)
 	{
-		g_pLogManager->Append(L"Остановка задачи, причина: %s", strReason.c_str());
+		g_pLogManager->Append(L"РћСЃС‚Р°РЅРѕРІРєР° Р·Р°РґР°С‡Рё, РїСЂРёС‡РёРЅР°: %s", strReason.c_str());
 		g_pLogManager->CloseLog();
 	}
 
-	//Если это не пользователь нажал кнопку..
-	if (Reason != TaskStoppingReason::tsrUser)
+	//Р•СЃР»Рё СЌС‚Рѕ РЅРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР°Р¶Р°Р» РєРЅРѕРїРєСѓ.. РїР»СЋСЃ РЅРµ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІРєР»СЋС‡С‘РЅ Р‘Р•РЎРљРћРќР•Р§РќР«Р™ Р Р•Р–РРњ
+	if ((Reason != TaskStoppingReason::tsrUser) && !m_ActiveTaskInfo.Settings.EndlessMode)
 	{
-		//Выполняем сценарий завершения задачи
+		//Р’С‹РїРѕР»РЅСЏРµРј СЃС†РµРЅР°СЂРёР№ Р·Р°РІРµСЂС€РµРЅРёСЏ Р·Р°РґР°С‡Рё
 		if (g_pSettingsManager->CloseGameOnTaskEnding)
 			g_pRAIDWorker->CloseGame();
 
@@ -1155,12 +1192,12 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 				TrayIconApp->BalloonTitle = Application->Title;
 				if (Reason == TaskStoppingReason::tsrSuccessfulCompletion)
 				{
-					TrayIconApp->BalloonHint = L"Задача успешно завершена";
+					TrayIconApp->BalloonHint = L"Р—Р°РґР°С‡Р° СѓСЃРїРµС€РЅРѕ Р·Р°РІРµСЂС€РµРЅР°";
 					TrayIconApp->BalloonFlags = TBalloonFlags::bfInfo;
 				}
 				else if (Reason == TaskStoppingReason::tsrError)
 				{
-					TrayIconApp->BalloonHint = L"Принудительное завершение задачи из-за ошибок";
+					TrayIconApp->BalloonHint = L"РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРµ Р·Р°РІРµСЂС€РµРЅРёРµ Р·Р°РґР°С‡Рё РёР·-Р·Р° РѕС€РёР±РѕРє";
                     TrayIconApp->BalloonFlags = TBalloonFlags::bfError;
 				}
 				TrayIconApp->ShowBalloonHint();
@@ -1193,14 +1230,14 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 							FORMAT_MESSAGE_IGNORE_INSERTS, NULL, reinterpret_cast<DWORD>(hResult),
 							MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsg, 0, NULL);
 
-						MessageBox(this->Handle, lpMsg, L"Ошибка выполнения команды", MB_ICONEXCLAMATION);
+						MessageBox(this->Handle, lpMsg, L"РћС€РёР±РєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РєРѕРјР°РЅРґС‹", MB_ICONEXCLAMATION);
 
 						LocalFree(lpMsg);
 					}
 				}
 				else
 				{
-					MessageBox(this->Handle, L"Не удалось распознать команду", L"Ошибка", MB_ICONEXCLAMATION);
+					MessageBox(this->Handle, L"РќРµ СѓРґР°Р»РѕСЃСЊ СЂР°СЃРїРѕР·РЅР°С‚СЊ РєРѕРјР°РЅРґСѓ", L"РћС€РёР±РєР°", MB_ICONEXCLAMATION);
 				}
 				break;
             }
@@ -1210,10 +1247,10 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 			this->Close();
 	}
 
-	//Снимаем блокировку
+	//РЎРЅРёРјР°РµРј Р±Р»РѕРєРёСЂРѕРІРєСѓ
 	SetThreadExecutionState(ES_CONTINUOUS);
 
-	//Делаем все элементы снова доступными
+	//Р”РµР»Р°РµРј РІСЃРµ СЌР»РµРјРµРЅС‚С‹ СЃРЅРѕРІР° РґРѕСЃС‚СѓРїРЅС‹РјРё
 	BitBtnCalculations->Enabled = true;
 
 	ToggleContainer(ScrollBoxGMSpecSettings, false);
@@ -1228,13 +1265,13 @@ String TFormMain::ActiveTaskGameModeToString()
 	switch (m_ActiveTaskInfo.Settings.GameMode)
 	{
 		case SupportedGameModes::gmCampaign:
-			strGameMode = L"Кампания";
+			strGameMode = L"РљР°РјРїР°РЅРёСЏ";
 			break;
 		case SupportedGameModes::gmDungeons:
-			strGameMode = L"Подземелья";
+			strGameMode = L"РџРѕРґР·РµРјРµР»СЊСЏ";
 			break;
 		case SupportedGameModes::gmFactionWars:
-			strGameMode = L"Войны Фракций";
+			strGameMode = L"Р’РѕР№РЅС‹ С„СЂР°РєС†РёР№";
 			break;
 	}
 
@@ -1248,14 +1285,14 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 
 	if (g_pSettingsManager->EnableLogging)
 	{
-		g_pLogManager->Append(L"Сохранение прогресса боя %i (%s)", nBattleNumber,
-			(bError)?L"ошибка тестирования":L"кадр");
+		g_pLogManager->Append(L"РЎРѕС…СЂР°РЅРµРЅРёРµ РїСЂРѕРіСЂРµСЃСЃР° Р±РѕСЏ %i (%s)", nBattleNumber,
+			(bError)?L"РѕС€РёР±РєР° С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ":L"РєР°РґСЂ");
 	}
 
 	String strPathForResults = g_pSettingsManager->PathForResults;
 	String strGameMode, strActiveTaskSubDir, strFinalPath;
 	String strFileName;
-	//Проверяем/формируем путь к результатам
+	//РџСЂРѕРІРµСЂСЏРµРј/С„РѕСЂРјРёСЂСѓРµРј РїСѓС‚СЊ Рє СЂРµР·СѓР»СЊС‚Р°С‚Р°Рј
 	if (strPathForResults.IsEmpty())
 	{
 		strPathForResults = IncludeTrailingPathDelimiter(ExtractFilePath(Application->ExeName)) +
@@ -1268,7 +1305,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 		TDirectory::CreateDirectory(strPathForResults);
 	}
 
-	//Формируем имя подпапки для текущей задачи
+	//Р¤РѕСЂРјРёСЂСѓРµРј РёРјСЏ РїРѕРґРїР°РїРєРё РґР»СЏ С‚РµРєСѓС‰РµР№ Р·Р°РґР°С‡Рё
 	strActiveTaskSubDir.sprintf(L"%s %s", this->ActiveTaskGameModeToString().c_str(),
 		FormatDateTime(L"dd mmmm yyyy hh-mm", m_ActiveTaskInfo.StartTime).c_str());
 
@@ -1282,10 +1319,10 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 	pImage->Width = FrameSize.cx;
 	pImage->Height = FrameSize.cy;
 
-	//Если bError, записываем как причину аварийной остановки задачи
+	//Р•СЃР»Рё bError, Р·Р°РїРёСЃС‹РІР°РµРј РєР°Рє РїСЂРёС‡РёРЅСѓ Р°РІР°СЂРёР№РЅРѕР№ РѕСЃС‚Р°РЅРѕРІРєРё Р·Р°РґР°С‡Рё
 	if (bError)
 	{
-		//Рисуем тот же самый кадр, который проходил тестирование в таймере
+		//Р РёСЃСѓРµРј С‚РѕС‚ Р¶Рµ СЃР°РјС‹Р№ РєР°РґСЂ, РєРѕС‚РѕСЂС‹Р№ РїСЂРѕС…РѕРґРёР» С‚РµСЃС‚РёСЂРѕРІР°РЅРёРµ РІ С‚Р°Р№РјРµСЂРµ
 		g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
 
 		std::array<TControlPoint, g_uMaxControlPoints> ControlPoints;
@@ -1301,7 +1338,7 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 		{
 			if (ControlPoint.Enabled)
 			{
-				//Дополнительно указываем на скриншоте координату проверки в виде крестика
+				//Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ СѓРєР°Р·С‹РІР°РµРј РЅР° СЃРєСЂРёРЅС€РѕС‚Рµ РєРѕРѕСЂРґРёРЅР°С‚Сѓ РїСЂРѕРІРµСЂРєРё РІ РІРёРґРµ РєСЂРµСЃС‚РёРєР°
 				const unsigned int uMarkerIndent = 10;
 
 				auto DrawCrosshair
@@ -1325,17 +1362,17 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 			}
 		}
 
-		//Сохраняем в формате PNG для возможности анализа цветов кадра
+		//РЎРѕС…СЂР°РЅСЏРµРј РІ С„РѕСЂРјР°С‚Рµ PNG РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё Р°РЅР°Р»РёР·Р° С†РІРµС‚РѕРІ РєР°РґСЂР°
 		std::unique_ptr<TPngImage> pPngImage(new TPngImage());
 		pPngImage->Assign(pImage->Picture->Bitmap);
 
-		strFileName.sprintf(L"Ошибка_%s.png", FormatDateTime(L"hh-mm", Now()).c_str());
+		strFileName.sprintf(L"РћС€РёР±РєР° %s.png", FormatDateTime(L"hh-mm", Now()).c_str());
 		pPngImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
 	}
 	else
 	{
-		//Если бой завершился успешно, выжидаем на всякий случай завершения анимации экрана результатов (~1сек.)
-		//и обновляем кадр для сохранения
+		//Р•СЃР»Рё Р±РѕР№ Р·Р°РІРµСЂС€РёР»СЃСЏ СѓСЃРїРµС€РЅРѕ, РІС‹Р¶РёРґР°РµРј РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ Р·Р°РІРµСЂС€РµРЅРёСЏ Р°РЅРёРјР°С†РёРё СЌРєСЂР°РЅР° СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ (~1СЃРµРє.)
+		//Рё РѕР±РЅРѕРІР»СЏРµРј РєР°РґСЂ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
 		bool bMainTimerState = TimerMain->Enabled;
 		TimerMain->Enabled = false;
 		Wait(1000);
@@ -1343,17 +1380,17 @@ void TFormMain::SaveResult(unsigned int nBattleNumber, bool bError)
 		{
 			g_pRAIDWorker->DrawFrame(pImage->Canvas, FrameSize);
 
-			//Экономим место форматом JPEG
+			//Р­РєРѕРЅРѕРјРёРј РјРµСЃС‚Рѕ С„РѕСЂРјР°С‚РѕРј JPEG
 			std::unique_ptr<TJPEGImage> pJPEGImage(new TJPEGImage());
 			pJPEGImage->Assign(pImage->Picture->Bitmap);
 
-			strFileName.sprintf(L"Бой%i_%s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
+			strFileName.sprintf(L"Р‘РѕР№%i %s.jpeg", nBattleNumber, FormatDateTime(L"hh-mm", Now()).c_str());
 			pJPEGImage->SaveToFile(IncludeTrailingPathDelimiter(strFinalPath) + strFileName);
 		}
 		else
 		{
 			if (g_pSettingsManager->EnableLogging)
-				g_pLogManager->Append(L"Не удалось сохранить прогресс боя %i: ошибка захвата кадра", nBattleNumber);
+				g_pLogManager->Append(L"РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РїСЂРѕРіСЂРµСЃСЃ Р±РѕСЏ %i: РѕС€РёР±РєР° Р·Р°С…РІР°С‚Р° РєР°РґСЂР°", nBattleNumber);
 		}
         TimerMain->Enabled = bMainTimerState;
 	}
@@ -1491,7 +1528,7 @@ void __fastcall TFormMain::PopupMenuTrayPopup(TObject *Sender)
 {
 	MenuItemMoveToCenter->Enabled = this->Visible;
 
-    //Если задан путь в настройках, меняем доступность меню в зависимости от валидности пути
+    //Р•СЃР»Рё Р·Р°РґР°РЅ РїСѓС‚СЊ РІ РЅР°СЃС‚СЂРѕР№РєР°С…, РјРµРЅСЏРµРј РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РјРµРЅСЋ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РІР°Р»РёРґРЅРѕСЃС‚Рё РїСѓС‚Рё
 	if (!g_pSettingsManager->PathForResults.IsEmpty())
 	{
 		MenuItemOpenResults->Enabled = DirectoryExists(g_pSettingsManager->PathForResults);
@@ -1508,7 +1545,7 @@ void __fastcall TFormMain::ButtonGroupSSCPIndexButtonClicked(TObject *Sender, in
 	TGameModeSpecSettings GMSpecSettings;
 	this->GetAppropriateGMSpecSettings(GMSpecSettings);
 
-	//Сохраняем параметры контрольной точки по старому индексу
+	//РЎРѕС…СЂР°РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅС‚СЂРѕР»СЊРЅРѕР№ С‚РѕС‡РєРё РїРѕ СЃС‚Р°СЂРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	GMSpecSettings.STARTScreenControlPointIndex = ButtonGroupSSCPIndex->ItemIndex;
 	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled = CheckBoxSSCPState->Checked;
 	GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Coordinates =
@@ -1518,7 +1555,7 @@ void __fastcall TFormMain::ButtonGroupSSCPIndexButtonClicked(TObject *Sender, in
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 
-	//Обновляем индекс и вычитываем параметры по выбранному индексу
+	//РћР±РЅРѕРІР»СЏРµРј РёРЅРґРµРєСЃ Рё РІС‹С‡РёС‚С‹РІР°РµРј РїР°СЂР°РјРµС‚СЂС‹ РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	GMSpecSettings.STARTScreenControlPointIndex = Index;
 
 	CheckBoxSSCPState->Checked = GMSpecSettings.STARTScreenControlPoints[GMSpecSettings.STARTScreenControlPointIndex].Enabled;
@@ -1538,7 +1575,7 @@ void __fastcall TFormMain::ButtonGroupRSCPIndexButtonClicked(TObject *Sender, in
 	TGameModeSpecSettings GMSpecSettings;
 	this->GetAppropriateGMSpecSettings(GMSpecSettings);
 
-	//Сохраняем параметры контрольной точки по старому индексу
+	//РЎРѕС…СЂР°РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅС‚СЂРѕР»СЊРЅРѕР№ С‚РѕС‡РєРё РїРѕ СЃС‚Р°СЂРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	GMSpecSettings.REPLAYScreenControlPointIndex = ButtonGroupRSCPIndex->ItemIndex;
 	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled = CheckBoxRSCPState->Checked;
 	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Coordinates =
@@ -1548,7 +1585,7 @@ void __fastcall TFormMain::ButtonGroupRSCPIndexButtonClicked(TObject *Sender, in
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 
-	//Обновляем индекс и вычитываем параметры по выбранному индексу
+	//РћР±РЅРѕРІР»СЏРµРј РёРЅРґРµРєСЃ Рё РІС‹С‡РёС‚С‹РІР°РµРј РїР°СЂР°РјРµС‚СЂС‹ РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	GMSpecSettings.REPLAYScreenControlPointIndex = Index;
 
 	CheckBoxRSCPState->Checked = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Enabled;
@@ -1565,7 +1602,7 @@ void __fastcall TFormMain::ButtonGroupEDCPIndexButtonClicked(TObject *Sender, in
 {
 	if (ButtonGroupEDCPIndex->ItemIndex == Index) return;
 
-	//Сохраняем параметры контрольной точки по старому индексу
+	//РЎРѕС…СЂР°РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅС‚СЂРѕР»СЊРЅРѕР№ С‚РѕС‡РєРё РїРѕ СЃС‚Р°СЂРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	g_pSettingsManager->EnergyDialogControlPointIndex = ButtonGroupEDCPIndex->ItemIndex;
 	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled = CheckBoxEDCPState->Checked;
 	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Coordinates =
@@ -1573,7 +1610,7 @@ void __fastcall TFormMain::ButtonGroupEDCPIndexButtonClicked(TObject *Sender, in
 	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].PixelColor = PanelEDColor->Color;
 	g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Tolerance = UpDownEDColorTolerance->Position;
 
-	//Обновляем по новому индексу
+	//РћР±РЅРѕРІР»СЏРµРј РїРѕ РЅРѕРІРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	g_pSettingsManager->EnergyDialogControlPointIndex = Index;
 
 	CheckBoxEDCPState->Checked = g_pSettingsManager->EnergyDialogControlPoints[g_pSettingsManager->EnergyDialogControlPointIndex].Enabled;
@@ -1590,7 +1627,7 @@ void __fastcall TFormMain::ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, i
 {
 	if (ButtonGroupSMDCPIndex->ItemIndex == Index) return;
 
-	//Сохраняем параметры контрольной точки по старому индексу
+	//РЎРѕС…СЂР°РЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ РєРѕРЅС‚СЂРѕР»СЊРЅРѕР№ С‚РѕС‡РєРё РїРѕ СЃС‚Р°СЂРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	g_pSettingsManager->SMDialogControlPointIndex = ButtonGroupSMDCPIndex->ItemIndex;
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled = CheckBoxSMDCPState->Checked;
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Coordinates =
@@ -1598,7 +1635,7 @@ void __fastcall TFormMain::ButtonGroupSMDCPIndexButtonClicked(TObject *Sender, i
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].PixelColor = PanelSMColor->Color;
 	g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Tolerance = UpDownSMColorTolerance->Position;
 
-	//Обновляем по новому индексу
+	//РћР±РЅРѕРІР»СЏРµРј РїРѕ РЅРѕРІРѕРјСѓ РёРЅРґРµРєСЃСѓ
 	g_pSettingsManager->SMDialogControlPointIndex = Index;
 
 	CheckBoxSMDCPState->Checked = g_pSettingsManager->SMDialogControlPoints[g_pSettingsManager->SMDialogControlPointIndex].Enabled;
@@ -1639,7 +1676,7 @@ void TFormMain::ToggleContainer(TWinControl* pContainer, bool bDisable)
 		pContainer->Controls[i]->Enabled = !bDisable;
 		pContainer->Controls[i]->Cursor = (bDisable)?crNo:crDefault;
 
-		//Рекурсивно меняем состояние элементов в дочерних контейнерах
+		//Р РµРєСѓСЂСЃРёРІРЅРѕ РјРµРЅСЏРµРј СЃРѕСЃС‚РѕСЏРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РІ РґРѕС‡РµСЂРЅРёС… РєРѕРЅС‚РµР№РЅРµСЂР°С…
 		if (dynamic_cast<TWinControl*>(pContainer->Controls[i]) &&
 			dynamic_cast<TWinControl*>(pContainer->Controls[i])->ControlCount)
 		{
@@ -1661,7 +1698,7 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 
 	if (g_pSettingsManager->PathToPlariumPlay.IsEmpty() || !TFile::Exists(g_pSettingsManager->PathToPlariumPlay))
 	{
-		//Сначала пытаемся вычитать путь к лаунчеру из системного реестра
+		//РЎРЅР°С‡Р°Р»Р° РїС‹С‚Р°РµРјСЃСЏ РІС‹С‡РёС‚Р°С‚СЊ РїСѓС‚СЊ Рє Р»Р°СѓРЅС‡РµСЂСѓ РёР· СЃРёСЃС‚РµРјРЅРѕРіРѕ СЂРµРµСЃС‚СЂР°
 		HKEY hKey;
 		LSTATUS Result;
 		Result = RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\PlariumPlayInstaller", 0, KEY_READ, &hKey);
@@ -1683,12 +1720,12 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 
 	if (g_pSettingsManager->PathToPlariumPlay.IsEmpty() || !TFile::Exists(g_pSettingsManager->PathToPlariumPlay))
 	{
-		//Нет? Спрашиваем пользователя
+		//РќРµС‚? РЎРїСЂР°С€РёРІР°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 		FileOpenDialogGeneric->Options = TFileDialogOptions() << fdoFileMustExist;
-		FileOpenDialogGeneric->Title = L"Укажите местоположение Plarium Play";
+		FileOpenDialogGeneric->Title = L"РЈРєР°Р¶РёС‚Рµ РјРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ Plarium Play";
 		TFileTypeItem *pFilter = FileOpenDialogGeneric->FileTypes->Add();
 		pFilter->FileMask = L"*.exe";
-		pFilter->DisplayName = L"Исполняемый файл Windows";
+		pFilter->DisplayName = L"РСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» Windows";
 		FileOpenDialogGeneric->DefaultFolder = L"";
 		if (FileOpenDialogGeneric->Execute(this->Handle))
 		{
@@ -1704,7 +1741,7 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 
 	StartupInfo.cb = sizeof(StartupInfo);
 
-	//Пытаемся запустить Plarium Play с параметрами для запуска игры
+	//РџС‹С‚Р°РµРјСЃСЏ Р·Р°РїСѓСЃС‚РёС‚СЊ Plarium Play СЃ РїР°СЂР°РјРµС‚СЂР°РјРё РґР»СЏ Р·Р°РїСѓСЃРєР° РёРіСЂС‹
 	if (!CreateProcess( g_pSettingsManager->PathToPlariumPlay.c_str(),
 		strCommandLine.c_str(),
 		NULL,
@@ -1716,7 +1753,7 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 		&StartupInfo,
 		&ProcessInfo))
     {
-		MessageBox(this->Handle, L"Не удалось запустить процесс Plarium Play", L"Ошибка", MB_ICONSTOP);
+		MessageBox(this->Handle, L"РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕС†РµСЃСЃ Plarium Play", L"РћС€РёР±РєР°", MB_ICONSTOP);
 		return;
 	}
 

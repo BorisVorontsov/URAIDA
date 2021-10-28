@@ -255,10 +255,9 @@ bool TRAIDWorker::UpdateRecentFrame()
 		DeleteObject(hOldBitmap);
 	}
 
-	//PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY);
-	RedrawWindow(m_hGameWindow, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_UPDATENOW);
-	BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
-		hRAIDDC, 0, 0, SRCCOPY);
+	PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY | PW_RENDERFULLCONTENT);
+	//BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
+	//	hRAIDDC, 0, 0, SRCCOPY);
 
 	ReleaseDC(m_hGameWindow, hRAIDDC);
 

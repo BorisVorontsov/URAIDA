@@ -168,7 +168,6 @@ __published:	// IDE-managed Components
 	TLabel *LabelBTSeparator;
 	TUpDown *UpDownBTMinutes;
 	TLabel *LabelBT;
-	TLabel *LabelNumberOfBattles;
 	TLabel *LabelRSAction;
 	TRadioButton *RadioButtonRSActionReplay;
 	TRadioButton *RadioButtonRSActionNext;
@@ -214,6 +213,8 @@ __published:	// IDE-managed Components
 	TLabel *LabelTEAUDCommand;
 	TEdit *EditTEAUDCommand;
 	TBitBtn *BitBtnLaunchGame;
+	TRadioButton *RadioButtonNumberOfBattles;
+	TRadioButton *RadioButtonEndlessMode;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
