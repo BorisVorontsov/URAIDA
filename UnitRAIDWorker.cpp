@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------
 #include "URAIDAPCH.h"
 #include <tlhelp32.h>
+#include <VersionHelpers.h>
 #pragma hdrstop
 
 #include "UnitRAIDWorker.h"
@@ -255,9 +256,15 @@ bool TRAIDWorker::UpdateRecentFrame()
 		DeleteObject(hOldBitmap);
 	}
 
-	PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY | PW_RENDERFULLCONTENT);
-	//BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
-	//	hRAIDDC, 0, 0, SRCCOPY);
+	if (IsWindows8OrGreater())
+	{
+		PrintWindow(m_hGameWindow, m_hRecentFrameDC, PW_CLIENTONLY | PW_RENDERFULLCONTENT);
+	}
+	else if (IsWindowsVistaOrGreater())
+	{
+		BitBlt(m_hRecentFrameDC, 0, 0, ClientRect.right - ClientRect.left, ClientRect.bottom - ClientRect.top,
+			hRAIDDC, 0, 0, SRCCOPY);
+	}
 
 	ReleaseDC(m_hGameWindow, hRAIDDC);
 
