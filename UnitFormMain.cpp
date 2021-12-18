@@ -98,7 +98,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		TaskbarApp->ProgressValue = ProgressBarBattle->Position;
 	}
 
-    //Начало каждого боя
+	//Начало каждого боя
 	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
 	{
 		nCycleCounter++;
@@ -315,7 +315,8 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 
 				//Если мы прошли последний бой (счётчик nCycleCounter будет равен nNumberOfBattles + 1),
 				//просто ждём экрана результатов
-				if (nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles)
+				//Если указан БЕСКОНЕЧНЫЙ РЕЖИМ, мы сюда заходим безусловно
+				if ((nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles) || m_ActiveTaskInfo.Settings.EndlessMode)
 				{
 					if (g_pSettingsManager->EnableLogging)
 						g_pLogManager->Append(L"Выполнение действий для экрана ПОВТОР/ДАЛЕЕ");
