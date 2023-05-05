@@ -13,12 +13,10 @@ object FormMain: TFormMain
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnResize = FormResize
-  PixelsPerInch = 96
   TextHeight = 19
   object Bevel1: TBevel
     Left = 8
@@ -273,6 +271,16 @@ object FormMain: TFormMain
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitLeft = -3
+        ExplicitTop = -212
+        ExplicitHeight = 653
+        object Bevel3: TBevel
+          Left = 8
+          Top = 573
+          Width = 537
+          Height = 43
+          Shape = bsBottomLine
+        end
         object GroupBoxScreens: TGroupBox
           Left = 8
           Top = 16
@@ -853,31 +861,208 @@ object FormMain: TFormMain
             TabOrder = 7
           end
         end
+        object GroupBoxGMAdvanced: TGroupBox
+          Left = 8
+          Top = 385
+          Width = 537
+          Height = 184
+          Caption = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086
+          TabOrder = 2
+          object GroupBoxGMABIMethod: TGroupBox
+            Left = 8
+            Top = 24
+            Width = 521
+            Height = 137
+            Caption = #1052#1077#1090#1086#1076' '#1080#1085#1080#1094#1080#1072#1094#1080#1080' '#1073#1086#1103
+            TabOrder = 0
+            object LabelBIMCX: TLabel
+              Left = 32
+              Top = 82
+              Width = 15
+              Height = 19
+              Caption = 'X:'
+            end
+            object LabelBIMCY: TLabel
+              Left = 133
+              Top = 82
+              Width = 16
+              Height = 19
+              Caption = 'Y:'
+            end
+            object RadioButtonBISendHotkey: TRadioButton
+              Left = 16
+              Top = 26
+              Width = 369
+              Height = 25
+              Caption = #1054#1090#1087#1088#1072#1074#1082#1072' '#1075#1086#1088#1103#1095#1077#1081' '#1082#1083#1072#1074#1080#1096#1080' [ENTER]'
+              Checked = True
+              TabOrder = 0
+              TabStop = True
+            end
+            object RadioButtonBISendMouseClick: TRadioButton
+              Left = 16
+              Top = 54
+              Width = 369
+              Height = 19
+              Caption = #1050#1083#1080#1082' '#1084#1099#1096#1082#1086#1081' '#1087#1086' '#1082#1086#1086#1088#1076#1080#1085#1072#1090#1072#1084':'
+              TabOrder = 1
+            end
+            object EditBIMCX: TEdit
+              Left = 53
+              Top = 79
+              Width = 52
+              Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
+              Alignment = taCenter
+              NumbersOnly = True
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 2
+              Text = '0'
+            end
+            object UpDownBIMCX: TUpDown
+              Left = 105
+              Top = 79
+              Width = 16
+              Height = 27
+              Associate = EditBIMCX
+              Max = 9999
+              TabOrder = 3
+            end
+            object EditBIMCY: TEdit
+              Left = 155
+              Top = 79
+              Width = 52
+              Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
+              Alignment = taCenter
+              NumbersOnly = True
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 4
+              Text = '0'
+            end
+            object UpDownBIMCY: TUpDown
+              Left = 207
+              Top = 79
+              Width = 16
+              Height = 27
+              Associate = EditBIMCY
+              Max = 9999
+              TabOrder = 5
+            end
+            object BitBtnBIMCPickPoint: TBitBtn
+              Left = 452
+              Top = 72
+              Width = 41
+              Height = 41
+              Glyph.Data = {
+                36090000424D3609000000000000360000002800000018000000180000000100
+                20000000000000090000C30E0000C30E00000000000000000000FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A8A8A8003333
+                33001010100001010100010101001111110033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000066666600FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000040404000FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004040
+                400000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0000000000F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800000000003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FAFAFA003B3B3B003B3B3B00FAFAFA00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00232323000000
+                00000000000000000000000000000505050000000000000000002C2C2C00FFFF
+                FF004B4B4B0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000050505000000000000000000000000000000000023232300232323000000
+                00000000000000000000000000000404040000000000000000002C2C2C00FFFF
+                FF004C4C4C0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000040404000000000000000000000000000000000023232300FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00F9F9F9003B3B3B003A3A3A00F9F9F900FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0001010100F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800010101003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000041414100FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004141
+                410000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000067676700FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7003333
+                33001010100001010100010101001010100033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+              TabOrder = 6
+              OnClick = BitBtnBIMCPickPointClick
+            end
+            object ButtonGroup1: TButtonGroup
+              Left = 312
+              Top = 24
+              Width = 176
+              Height = 27
+              BevelEdges = []
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              BorderStyle = bsNone
+              ButtonOptions = [gboGroupStyle, gboShowCaptions]
+              Items = <>
+              TabOrder = 7
+              OnButtonClicked = ButtonGroupEDCPIndexButtonClicked
+            end
+          end
+        end
       end
     end
     object TabSheetDungeons: TTabSheet
       Caption = #1055#1086#1076#1079#1077#1084#1077#1083#1100#1103
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetFactionWars: TTabSheet
       Caption = #1042#1086#1081#1085#1099' '#1092#1088#1072#1082#1094#1080#1081
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object TabSheetCommon: TTabSheet
       Caption = #1054#1073#1097#1080#1077' '#1085#1072#1089#1090#1088#1086#1081#1082#1080
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ScrollBoxCommonSettings: TScrollBox
         Left = 0
         Top = 0
@@ -1879,7 +2064,7 @@ object FormMain: TFormMain
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
-            Text = '1000'
+            Text = '1'#160'000'
           end
           object UpDownMaxLogEntries: TUpDown
             Left = 505
@@ -1948,7 +2133,7 @@ object FormMain: TFormMain
     TabOrder = 10
     OnClick = LinkLabel2Click
   end
-  object ProgressBarBattle: TProgressBar
+  object ProgressBarTask: TProgressBar
     Left = 8
     Top = 537
     Width = 561

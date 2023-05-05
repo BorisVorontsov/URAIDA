@@ -114,6 +114,13 @@ typedef enum tagREPLAYScreenAction
 	rsaGoNext
 } REPLAYScreenAction;
 
+//Возможные действия с диалогами, прерывающими выполнение задачи
+typedef enum tagBattleInitiationMethod
+{
+	bimByHotkey = 0,
+	bimByMouseClick
+} BattleInitiationMethod;
+
 //ООбщие настройки для отдельных игровых режимов
 class TGameModeSpecSettings : public IIniSerialization
 {
@@ -140,6 +147,9 @@ public:
 		m_uDelay = pIniFile->ReadInteger(strSection, L"Delay", 10);
 		m_nNumberOfBattles = pIniFile->ReadInteger(strSection, L"NumberOfBattles", 1);
 		m_bEndlessMode = pIniFile->ReadBool(strSection, L"EndlessMode", false);
+		m_BattleInitiationMethod = static_cast<BattleInitiationMethod>(pIniFile->ReadInteger(strSection, L"BattleInitiationMethod", BattleInitiationMethod::bimByHotkey));
+		m_BIWhereToClickPoint.x = pIniFile->ReadInteger(strSection, L"BattleInitiationWhereToClickPointX", 0);
+		m_BIWhereToClickPoint.y = pIniFile->ReadInteger(strSection, L"BattleInitiationWhereToClickPointY", 0);
 	}
 	void Load(String strIniFile, String strSection) override
 	{
@@ -162,6 +172,9 @@ public:
 		pIniFile->WriteInteger(strSection, L"Delay", m_uDelay);
 		pIniFile->WriteInteger(strSection, L"NumberOfBattles", m_nNumberOfBattles);
 		pIniFile->WriteBool(strSection, L"EndlessMode", m_bEndlessMode);
+		pIniFile->WriteInteger(strSection, L"BattleInitiationMethod", m_BattleInitiationMethod);
+		pIniFile->WriteInteger(strSection, L"BattleInitiationWhereToClickPointX", m_BIWhereToClickPoint.x);
+		pIniFile->WriteInteger(strSection, L"BattleInitiationWhereToClickPointY", m_BIWhereToClickPoint.y);
 	}
 	void Serialize(String strIniFile, String strSection) override
 	{
@@ -180,6 +193,8 @@ public:
 	__property unsigned int Delay = { read = m_uDelay, write = m_uDelay };
 	__property unsigned int NumberOfBattles = { read = m_nNumberOfBattles, write = m_nNumberOfBattles };
 	__property bool EndlessMode = { read = m_bEndlessMode, write = m_bEndlessMode };
+	__property BattleInitiationMethod BattleInitiationPreferredMethod = { read = m_BattleInitiationMethod, write = m_BattleInitiationMethod };
+	__property TPoint BattleInitiationWhereToClickPoint = { read = m_BIWhereToClickPoint, write = m_BIWhereToClickPoint };
 
 private:
 	SupportedGameModes m_GameMode;
@@ -192,6 +207,8 @@ private:
 	unsigned int m_uDelay;
 	unsigned int m_nNumberOfBattles;
 	bool m_bEndlessMode;
+	BattleInitiationMethod m_BattleInitiationMethod;
+	TPoint m_BIWhereToClickPoint;
 };
 
 //Возможные действия с диалогами, прерывающими выполнение задачи

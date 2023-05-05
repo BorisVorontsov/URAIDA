@@ -116,7 +116,7 @@ __published:	// IDE-managed Components
 	TLinkLabel *LinkLabel2;
 	TButton *ButtonApplyGWSize;
 	TButton *ButtonUseCurrentGWSize;
-	TProgressBar *ProgressBarBattle;
+	TProgressBar *ProgressBarTask;
 	TFileOpenDialog *FileOpenDialogGeneric;
 	TPanel *PanelCover;
 	TImage *ImageAppIcon;
@@ -215,6 +215,19 @@ __published:	// IDE-managed Components
 	TBitBtn *BitBtnLaunchGame;
 	TRadioButton *RadioButtonNumberOfBattles;
 	TRadioButton *RadioButtonEndlessMode;
+	TGroupBox *GroupBoxGMAdvanced;
+	TGroupBox *GroupBoxGMABIMethod;
+	TLabel *LabelBIMCX;
+	TLabel *LabelBIMCY;
+	TRadioButton *RadioButtonBISendHotkey;
+	TRadioButton *RadioButtonBISendMouseClick;
+	TEdit *EditBIMCX;
+	TUpDown *UpDownBIMCX;
+	TEdit *EditBIMCY;
+	TUpDown *UpDownBIMCY;
+	TBitBtn *BitBtnBIMCPickPoint;
+	TButtonGroup *ButtonGroup1;
+	TBevel *Bevel3;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -256,6 +269,7 @@ __published:	// IDE-managed Components
 	void __fastcall BitBtnCalculationsClick(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall BitBtnLaunchGameClick(TObject *Sender);
+	void __fastcall BitBtnBIMCPickPointClick(TObject *Sender);
 
 
 private:	// User declarations

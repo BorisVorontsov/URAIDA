@@ -29,7 +29,8 @@ public:
 private:
 	static const String m_strRAIDWindowTitle;
 	static const String m_strRAIDWindowClass;
-    static const String m_strRAIDProcessName;
+	static const String m_strRAIDProcessName;
+	static const String m_strLauncherName;
 
 	HWND m_hGameWindow;
 	HDC m_hRecentFrameDC;

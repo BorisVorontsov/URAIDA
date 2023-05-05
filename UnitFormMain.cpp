@@ -88,24 +88,21 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		this->StopTask(TaskStoppingReason::tsrUser);
 
         return;
-    }
+	}
 
 	if (bScreenCheckPassed)
 	{
-		//Обновляем прогресс текущего боя
-		ProgressBarBattle->Position = 100.0f * (static_cast<float>(uBattleTimeout) /
-			static_cast<float>(uBattleDelayInSeconds));
-		TaskbarApp->ProgressValue = ProgressBarBattle->Position;
+		//Обновляем прогресс текущей задачи
+		ProgressBarTask->Position = 100.0f * (static_cast<float>((uBattleDelayInSeconds * (nCycleCounter - 1)) + uBattleTimeout) /
+			static_cast<float>(uBattleDelayInSeconds * m_ActiveTaskInfo.Settings.NumberOfBattles));
+		TaskbarApp->ProgressValue = ProgressBarTask->Position;
 	}
 
-	//Начало каждого боя
-	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
+    //Обновление всех счётчиков боёв
+	auto UpdateCounters
 	{
-		nCycleCounter++;
-		if ((nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles) || m_ActiveTaskInfo.Settings.EndlessMode)
+		[=]()
 		{
-			uBattleTimeout = 0;
-
 			String strHint;
 
 			if (!m_ActiveTaskInfo.Settings.EndlessMode)
@@ -127,8 +124,22 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 			TrayIconApp->BalloonHint = L"";
 			TrayIconApp->Hint = strHint;
 		}
+	};
+
+	//Начало каждого боя
+	if (!nCycleCounter || ((uBattleTimeout == uBattleDelayInSeconds) && bScreenCheckPassed))
+	{
+		//Если начался первый бой в рамках задачи, обновляем счётчики в начале этого боя
+		if (!nCycleCounter)
+			UpdateCounters();
+
+		nCycleCounter++;
+		if ((nCycleCounter <= m_ActiveTaskInfo.Settings.NumberOfBattles) || m_ActiveTaskInfo.Settings.EndlessMode)
+		{
+			uBattleTimeout = 0;
+		}
 		LabelBattlesCounter->Font->Color = clSilver;
-		ProgressBarBattle->Style = TProgressBarStyle::pbstMarquee;
+		ProgressBarTask->Style = TProgressBarStyle::pbstMarquee;
 
 		nScreenCheckFailures = 0;
 		bScreenCheckPassed = false;
@@ -267,8 +278,11 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 		{
 			[=]()
 			{
+                //Обновляем счётчики и переходим в режим отсчёта времени боя
+				UpdateCounters();
+
 				LabelBattlesCounter->Font->Color = clBlack;
-				ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
+				ProgressBarTask->Style = TProgressBarStyle::pbstNormal;
 				bScreenCheckPassed = true;
 			}
 		};
@@ -284,8 +298,18 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				if (g_pSettingsManager->EnableLogging)
 					g_pLogManager->Append(L"Выполнение действий для экрана НАЧАТЬ");
 
-				//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
-				g_pRAIDWorker->SendKey(VK_RETURN);
+				//Какой режим инициации боя выбран?
+				switch (m_ActiveTaskInfo.Settings.BattleInitiationPreferredMethod)
+				{
+					case BattleInitiationMethod::bimByHotkey:
+						//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
+						g_pRAIDWorker->SendKey(VK_RETURN);
+						break;
+					case BattleInitiationMethod::bimByMouseClick:
+						//Кликаем по указанным координатам
+						g_pRAIDWorker->SendMouseClick(m_ActiveTaskInfo.Settings.BattleInitiationWhereToClickPoint);
+						break;
+				}
 
 				bool bExitTimer;
 				if (EnergyDialogTest(bExitTimer))
@@ -469,7 +493,7 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 
 	//Вывод названия и версии программы
 	String strAppVersion;
-	GetFileVersion(Application->ExeName, strAppVersion, fvfMajorMinor);
+	GetFileVersion(Application->ExeName, strAppVersion, fvfMajorMinorRelease);
 	LabelCopyright1->Caption = Application->Title + L" вер." + strAppVersion + L" от";
 
 	g_pLogManager = new TLogManager;
@@ -577,6 +601,21 @@ void TFormMain::UpdateGMSpecSettingsFrame()
 	{
 		RadioButtonNumberOfBattles->Checked = true;
 	}
+
+	switch (GMSpecSettings.BattleInitiationPreferredMethod)
+	{
+		case BattleInitiationMethod::bimByHotkey:
+			RadioButtonBISendHotkey->Checked = true;
+			break;
+		case BattleInitiationMethod::bimByMouseClick:
+			RadioButtonBISendMouseClick->Checked = true;
+			break;
+	}
+	UpDownBIMCX->Position = GMSpecSettings.BattleInitiationWhereToClickPoint.x;
+	UpDownBIMCY->Position = GMSpecSettings.BattleInitiationWhereToClickPoint.y;
+
+	//Делаем допступными некоторые дополнительные параметры только для "подземелий"
+	//this->ToggleContainer(GroupBoxGMABIMethod, (PageControlURAIDASettings->ActivePage != TabSheetDungeons));
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
@@ -610,6 +649,16 @@ void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 	GMSpecSettings.Delay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
 	GMSpecSettings.NumberOfBattles = UpDownNumberOfBattles->Position;
 	GMSpecSettings.EndlessMode = RadioButtonEndlessMode->Checked;
+
+	if (RadioButtonBISendHotkey->Checked)
+	{
+		GMSpecSettings.BattleInitiationPreferredMethod = BattleInitiationMethod::bimByHotkey;
+	}
+	else if (RadioButtonBISendMouseClick->Checked)
+	{
+		GMSpecSettings.BattleInitiationPreferredMethod = BattleInitiationMethod::bimByMouseClick;
+	}
+	GMSpecSettings.BattleInitiationWhereToClickPoint = TPoint(UpDownBIMCX->Position, UpDownBIMCY->Position);
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 }
@@ -1052,7 +1101,7 @@ void TFormMain::StartTask()
 		};
 
 		LabelBattlesCounter->Font->Color = clBlack;
-		ProgressBarBattle->Position = 0;
+		ProgressBarTask->Position = 0;
 		TaskbarApp->ProgressValue = 0;
 
 		m_ActiveTaskInfo.StartTime = Now();
@@ -1097,7 +1146,7 @@ void TFormMain::StartTask()
 			BitBtnRunTask->Caption = m_strButtonRTPauseCaption;
 			ImageListRTButton->GetBitmap(1, pGlyph.get());
 			BitBtnRunTask->Glyph = pGlyph.get();
-			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			ProgressBarTask->State = TProgressBarState::pbsNormal;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 
 			TimerMain->Enabled = true;
@@ -1109,7 +1158,7 @@ void TFormMain::StartTask()
 			BitBtnRunTask->Caption = m_strButtonRTResumeCaption;
 			ImageListRTButton->GetBitmap(2, pGlyph.get());
 			BitBtnRunTask->Glyph = pGlyph.get();
-			ProgressBarBattle->State = TProgressBarState::pbsPaused;
+			ProgressBarTask->State = TProgressBarState::pbsPaused;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Paused;
 
 			TimerMain->Enabled = false;
@@ -1129,8 +1178,8 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 		return;
 
 	TimerMain->Enabled = false;
-    ProgressBarBattle->Style = TProgressBarStyle::pbstNormal;
-	ProgressBarBattle->Position = 100;
+    ProgressBarTask->Style = TProgressBarStyle::pbstNormal;
+	ProgressBarTask->Position = 100;
 	TaskbarApp->ProgressValue = 100;
 
 	m_ActiveTaskInfo.CurrentState = TaskState::tsStopped;
@@ -1150,7 +1199,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 		case TaskStoppingReason::tsrUser:
 		{
 			LabelBattlesCounter->Font->Color = clGray;
-			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			ProgressBarTask->State = TProgressBarState::pbsNormal;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 			strReason = L"::tsrUser";
 			break;
@@ -1158,7 +1207,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 		case TaskStoppingReason::tsrSuccessfulCompletion:
 		{
 			LabelBattlesCounter->Font->Color = clGreen;
-			ProgressBarBattle->State = TProgressBarState::pbsNormal;
+			ProgressBarTask->State = TProgressBarState::pbsNormal;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Normal;
 			strReason = L"::tsrSuccessfulCompletion";
 			break;
@@ -1166,7 +1215,7 @@ void TFormMain::StopTask(TaskStoppingReason Reason)
 		case TaskStoppingReason::tsrError:
 		{
 			LabelBattlesCounter->Font->Color = clRed;
-			ProgressBarBattle->State = TProgressBarState::pbsError;
+			ProgressBarTask->State = TProgressBarState::pbsError;
 			TaskbarApp->ProgressState = TTaskBarProgressState::Error;
 			strReason = L"::tsrError";
 			break;
@@ -1761,6 +1810,20 @@ void __fastcall TFormMain::BitBtnLaunchGameClick(TObject *Sender)
 
 	CloseHandle(ProcessInfo.hProcess);
 	CloseHandle(ProcessInfo.hThread);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnBIMCPickPointClick(TObject *Sender)
+{
+	FormPickPoint->OnlyCoordinates = true;
+
+	if (FormPickPoint->Execute(this))
+	{
+		PickPointData Results = FormPickPoint->GetResults();
+
+		UpDownBIMCX->Position = Results.XY.x;
+		UpDownBIMCY->Position = Results.XY.y;
+	}
 }
 //---------------------------------------------------------------------------
 

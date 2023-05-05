@@ -32,6 +32,10 @@ bool GetFileVersion(String strFileName, String& strResult, FVFormat Format)
 		case fvfMajorMinor:
 			strResult.sprintf(L"%i.%i", HIWORD(VS_BUFF->dwProductVersionMS), LOWORD(VS_BUFF->dwProductVersionMS));
 			break;
+		case fvfMajorMinorRelease:
+			strResult.sprintf(L"%i.%i.%i", HIWORD(VS_BUFF->dwProductVersionMS), LOWORD(VS_BUFF->dwProductVersionMS),
+				HIWORD(VS_BUFF->dwProductVersionLS));
+			break;
 		case fvfMajorMinorBuild:
 			strResult.sprintf(L"%i.%i.%i", HIWORD(VS_BUFF->dwProductVersionMS), LOWORD(VS_BUFF->dwProductVersionMS),
 				LOWORD(VS_BUFF->dwProductVersionLS));

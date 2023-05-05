@@ -13,6 +13,7 @@
 const String TRAIDWorker::m_strRAIDWindowTitle = L"Raid: Shadow Legends";
 const String TRAIDWorker::m_strRAIDWindowClass = L"UnityWndClass";
 const String TRAIDWorker::m_strRAIDProcessName = L"Raid.exe";
+const String TRAIDWorker::m_strLauncherName = L"PlariumPlay.exe";
 
 //---------------------------------------------------------------------------
 TRAIDWorker::TRAIDWorker()
@@ -207,30 +208,41 @@ void TRAIDWorker::CloseGame()
 {
 	//Так как RAID по закрытию обычным способом (WM_CLOSE, "крестик" окна) показывает диалог подтверждения,
 	//что бы не добавлять новых настроек для кнопки – используем радикальный способ решения задачи
-	HANDLE hSnapshot;
-	PROCESSENTRY32 PE;
-	HANDLE hProcess;
 
-	hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hSnapshot != INVALID_HANDLE_VALUE)
+	auto TerminateProcessByName
 	{
-		PE.dwSize = sizeof(PROCESSENTRY32);
-		Process32First(hSnapshot, &PE);
-		do {
-			if (CompareStr(String(PE.szExeFile), m_strRAIDProcessName) == 0)
-			{
-				hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, PE.th32ProcessID);
-				if (TerminateProcess(hProcess, 0) == 0)
-				{
-					//Не получилось
-				}
-				CloseHandle(hProcess);
-                break;
-			}
-		} while (Process32Next(hSnapshot, &PE));
-	}
+		[](String strProcessName)
+		{
+			HANDLE hSnapshot;
+			PROCESSENTRY32 PE;
+			HANDLE hProcess;
 
-	CloseHandle(hSnapshot);
+			hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+			if (hSnapshot != INVALID_HANDLE_VALUE)
+			{
+				PE.dwSize = sizeof(PROCESSENTRY32);
+				Process32First(hSnapshot, &PE);
+				do {
+					if (CompareStr(String(PE.szExeFile), strProcessName) == 0)
+					{
+						hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, PE.th32ProcessID);
+						if (TerminateProcess(hProcess, 0) == 0)
+						{
+							//Не получилось
+						}
+						CloseHandle(hProcess);
+						break;
+					}
+				} while (Process32Next(hSnapshot, &PE));
+			}
+			CloseHandle(hSnapshot);
+        }
+	};
+
+	//Закрываем процесс игры
+	TerminateProcessByName(m_strRAIDProcessName);
+	//Закрываем все процессы лаунчера
+	TerminateProcessByName(m_strLauncherName);
 }
 //---------------------------------------------------------------------------
 bool TRAIDWorker::UpdateRecentFrame()

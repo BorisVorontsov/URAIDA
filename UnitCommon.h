@@ -8,6 +8,7 @@
 typedef enum tagFVFormat
 {
 	fvfMajorMinor = 1,
+    fvfMajorMinorRelease,
 	fvfMajorMinorBuild,
 	fvfMajorMinorReleaseBuild
 } FVFormat;
