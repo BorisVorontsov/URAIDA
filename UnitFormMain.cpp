@@ -93,6 +93,7 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 	if (bScreenCheckPassed)
 	{
 		//Обновляем прогресс текущей задачи
+        //Считаем время боя помноженное на количество боёв
 		ProgressBarTask->Position = 100.0f * (static_cast<float>((uBattleDelayInSeconds * (nCycleCounter - 1)) + uBattleTimeout) /
 			static_cast<float>(uBattleDelayInSeconds * m_ActiveTaskInfo.Settings.NumberOfBattles));
 		TaskbarApp->ProgressValue = ProgressBarTask->Position;
@@ -302,10 +303,19 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 				switch (m_ActiveTaskInfo.Settings.BattleInitiationPreferredMethod)
 				{
 					case BattleInitiationMethod::bimByHotkey:
+						if (g_pSettingsManager->EnableLogging)
+							g_pLogManager->Append(L"Экран НАЧАТЬ: отправка горячей клавиши");
+
 						//Отправляем клавишу Enter окну игры, на экране начала боя это равносильно нажатию "Начать"
 						g_pRAIDWorker->SendKey(VK_RETURN);
 						break;
 					case BattleInitiationMethod::bimByMouseClick:
+						if (g_pSettingsManager->EnableLogging)
+						{
+							g_pLogManager->Append(L"Экран НАЧАТЬ: клик в точке ( X: %i, Y: %i )",
+								m_ActiveTaskInfo.Settings.BattleInitiationWhereToClickPoint.x, m_ActiveTaskInfo.Settings.BattleInitiationWhereToClickPoint.y);
+						}
+
 						//Кликаем по указанным координатам
 						g_pRAIDWorker->SendMouseClick(m_ActiveTaskInfo.Settings.BattleInitiationWhereToClickPoint);
 						break;
@@ -345,18 +355,37 @@ void __fastcall TFormMain::TimerMainTimer(TObject *Sender)
 					if (g_pSettingsManager->EnableLogging)
 						g_pLogManager->Append(L"Выполнение действий для экрана ПОВТОР/ДАЛЕЕ");
 
-					if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaReplay)
+					//Какой режим для экрана повтора боя выбран?
+					switch (m_ActiveTaskInfo.Settings.BattleReplayPreferredMethod)
 					{
-						//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
-						g_pRAIDWorker->SendKey('R');
-					}
-					else if (m_ActiveTaskInfo.Settings.REPLAYScreenPreferredAction == REPLAYScreenAction::rsaGoNext)
-					{
-						//Последовательное нажатие пробела и клавиши ввода запускает бой следующего уровня,
-						//эквивалентно нажатию кнопки "Далее"
-						g_pRAIDWorker->SendKey(VK_SPACE);
-                        Wait(1000);
-						g_pRAIDWorker->SendKey(VK_RETURN);
+						case BattleReplayMethod::brmByHotkeys:
+							if (g_pSettingsManager->EnableLogging)
+								g_pLogManager->Append(L"Экран ПОВТОР/ДАЛЕЕ: отправка горячих клавиш");
+
+							if (m_ActiveTaskInfo.Settings.BattleReplayHKPreferredAction == BattleReplayHKAction::brhkaReplay)
+							{
+								//[R] на экране результатов боя эквивалентно нажатию кнопки "Повтор"
+								g_pRAIDWorker->SendKey('R');
+							}
+							else if (m_ActiveTaskInfo.Settings.BattleReplayHKPreferredAction == BattleReplayHKAction::brhkaGoNext)
+							{
+								//Последовательное нажатие пробела и клавиши ввода запускает бой следующего уровня,
+								//эквивалентно нажатию кнопки "Далее"
+								g_pRAIDWorker->SendKey(VK_SPACE);
+								Wait(1000);
+								g_pRAIDWorker->SendKey(VK_RETURN);
+							}
+							break;
+						case BattleReplayMethod::brmByMouseClick:
+							if (g_pSettingsManager->EnableLogging)
+							{
+								g_pLogManager->Append(L"Экран ПОВТОР/ДАЛЕЕ: клик в точке ( X: %i, Y: %i )",
+									m_ActiveTaskInfo.Settings.BattleReplayWhereToClickPoint.x, m_ActiveTaskInfo.Settings.BattleReplayWhereToClickPoint.y);
+							}
+
+							//Кликаем по указанным координатам
+							g_pRAIDWorker->SendMouseClick(m_ActiveTaskInfo.Settings.BattleReplayWhereToClickPoint);
+							break;
 					}
 
 					bool bExitTimer;
@@ -454,8 +483,9 @@ void __fastcall TFormMain::FormCreate(TObject *Sender)
 	g_pSettingsManager = new TSettingsManager;
 	g_pSettingsManager->ReadINI();
 
-	this->Left = g_pSettingsManager->MainWindowPosition.x;
-	this->Top = g_pSettingsManager->MainWindowPosition.y;
+	this->Left = g_pSettingsManager->MainWindowPosition.Left;
+	this->Top = g_pSettingsManager->MainWindowPosition.Top;
+	this->Height = g_pSettingsManager->MainWindowPosition.Bottom;
 
 	if (g_pSettingsManager->StayOnTop)
 	{
@@ -580,16 +610,6 @@ void TFormMain::UpdateGMSpecSettingsFrame()
 	PanelRSColor->Color = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor;
 	UpDownRSColorTolerance->Position = GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance;
 
-	switch (GMSpecSettings.REPLAYScreenPreferredAction)
-	{
-		case REPLAYScreenAction::rsaReplay:
-			RadioButtonRSActionReplay->Checked = true;
-			break;
-		case REPLAYScreenAction::rsaGoNext:
-			RadioButtonRSActionNext->Checked = true;
-            break;
-	}
-
 	UpDownBTMinutes->Position = HIWORD(GMSpecSettings.Delay);
 	UpDownBTSeconds->Position = LOWORD(GMSpecSettings.Delay);
 	UpDownNumberOfBattles->Position = GMSpecSettings.NumberOfBattles;
@@ -614,8 +634,18 @@ void TFormMain::UpdateGMSpecSettingsFrame()
 	UpDownBIMCX->Position = GMSpecSettings.BattleInitiationWhereToClickPoint.x;
 	UpDownBIMCY->Position = GMSpecSettings.BattleInitiationWhereToClickPoint.y;
 
-	//Делаем допступными некоторые дополнительные параметры только для "подземелий"
-	//this->ToggleContainer(GroupBoxGMABIMethod, (PageControlURAIDASettings->ActivePage != TabSheetDungeons));
+	switch (GMSpecSettings.BattleReplayPreferredMethod)
+	{
+		case BattleReplayMethod::brmByHotkeys:
+			RadioButtonBRSendHotkeys->Checked = true;
+			break;
+		case BattleReplayMethod::brmByMouseClick:
+			RadioButtonBRSendMouseClick->Checked = true;
+			break;
+	}
+	ComboBoxBRHKAction->ItemIndex = static_cast<int>(GMSpecSettings.BattleReplayHKPreferredAction);
+	UpDownBRMCX->Position = GMSpecSettings.BattleReplayWhereToClickPoint.x;
+	UpDownBRMCY->Position = GMSpecSettings.BattleReplayWhereToClickPoint.y;
 }
 //---------------------------------------------------------------------------
 void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
@@ -637,15 +667,6 @@ void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].PixelColor = PanelRSColor->Color;
 	GMSpecSettings.REPLAYScreenControlPoints[GMSpecSettings.REPLAYScreenControlPointIndex].Tolerance = UpDownRSColorTolerance->Position;
 
-	if (RadioButtonRSActionReplay->Checked)
-	{
-		GMSpecSettings.REPLAYScreenPreferredAction = REPLAYScreenAction::rsaReplay;
-	}
-	else if (RadioButtonRSActionNext->Checked)
-	{
-		GMSpecSettings.REPLAYScreenPreferredAction = REPLAYScreenAction::rsaGoNext;
-	}
-
 	GMSpecSettings.Delay = MAKELONG(UpDownBTSeconds->Position, UpDownBTMinutes->Position);
 	GMSpecSettings.NumberOfBattles = UpDownNumberOfBattles->Position;
 	GMSpecSettings.EndlessMode = RadioButtonEndlessMode->Checked;
@@ -659,6 +680,17 @@ void TFormMain::SaveSettingsFromGMSpecSettingsFrame()
 		GMSpecSettings.BattleInitiationPreferredMethod = BattleInitiationMethod::bimByMouseClick;
 	}
 	GMSpecSettings.BattleInitiationWhereToClickPoint = TPoint(UpDownBIMCX->Position, UpDownBIMCY->Position);
+
+	if (RadioButtonBRSendHotkeys->Checked)
+	{
+		GMSpecSettings.BattleReplayPreferredMethod = BattleReplayMethod::brmByHotkeys;
+	}
+	else if (RadioButtonBRSendMouseClick->Checked)
+	{
+		GMSpecSettings.BattleReplayPreferredMethod = BattleReplayMethod::brmByMouseClick;
+	}
+	GMSpecSettings.BattleReplayHKPreferredAction = static_cast<BattleReplayHKAction>(ComboBoxBRHKAction->ItemIndex);
+	GMSpecSettings.BattleReplayWhereToClickPoint = TPoint(UpDownBRMCX->Position, UpDownBRMCY->Position);
 
 	this->ApplyAppropriateGMSpecSettings(GMSpecSettings);
 }
@@ -937,7 +969,7 @@ void __fastcall TFormMain::FormClose(TObject *Sender, TCloseAction &Action)
 	this->SaveNecessarySettings();
 
 	g_pSettingsManager->RecentActivePage = PageControlURAIDASettings->ActivePageIndex;
-	g_pSettingsManager->MainWindowPosition = TPoint(this->Left, this->Top);
+	g_pSettingsManager->MainWindowPosition = TRect(this->Left, this->Top, 0, this->Height);
 
 	g_pSettingsManager->UpdateINI();
 
@@ -1823,6 +1855,20 @@ void __fastcall TFormMain::BitBtnBIMCPickPointClick(TObject *Sender)
 
 		UpDownBIMCX->Position = Results.XY.x;
 		UpDownBIMCY->Position = Results.XY.y;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormMain::BitBtnBRMCPickPointClick(TObject *Sender)
+{
+	FormPickPoint->OnlyCoordinates = true;
+
+	if (FormPickPoint->Execute(this))
+	{
+		PickPointData Results = FormPickPoint->GetResults();
+
+		UpDownBRMCX->Position = Results.XY.x;
+		UpDownBRMCY->Position = Results.XY.y;
 	}
 }
 //---------------------------------------------------------------------------

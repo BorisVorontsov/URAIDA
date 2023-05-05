@@ -168,9 +168,6 @@ __published:	// IDE-managed Components
 	TLabel *LabelBTSeparator;
 	TUpDown *UpDownBTMinutes;
 	TLabel *LabelBT;
-	TLabel *LabelRSAction;
-	TRadioButton *RadioButtonRSActionReplay;
-	TRadioButton *RadioButtonRSActionNext;
 	TTaskbar *TaskbarApp;
 	TPanel *PanelBattles;
 	TLabel *LabelBattlesCounter;
@@ -228,6 +225,18 @@ __published:	// IDE-managed Components
 	TBitBtn *BitBtnBIMCPickPoint;
 	TButtonGroup *ButtonGroup1;
 	TBevel *Bevel3;
+	TGroupBox *GroupBoxGMABRMethod;
+	TLabel *LabelBRMCX;
+	TLabel *LabelBRMCY;
+	TRadioButton *RadioButtonBRSendHotkeys;
+	TRadioButton *RadioButtonBRSendMouseClick;
+	TEdit *EditBRMCX;
+	TUpDown *UpDownBRMCX;
+	TEdit *EditBRMCY;
+	TUpDown *UpDownBRMCY;
+	TBitBtn *BitBtnBRMCPickPoint;
+	TButtonGroup *ButtonGroup2;
+	TComboBox *ComboBoxBRHKAction;
 	void __fastcall TimerMainTimer(TObject *Sender);
 	void __fastcall MenuItemShowHideAutomatizerClick(TObject *Sender);
 	void __fastcall MenuItemExitClick(TObject *Sender);
@@ -270,6 +279,7 @@ __published:	// IDE-managed Components
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall BitBtnLaunchGameClick(TObject *Sender);
 	void __fastcall BitBtnBIMCPickPointClick(TObject *Sender);
+	void __fastcall BitBtnBRMCPickPointClick(TObject *Sender);
 
 
 private:	// User declarations

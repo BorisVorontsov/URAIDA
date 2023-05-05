@@ -107,19 +107,26 @@ private:
 	String m_strControlPointName;
 };
 
-//Действия на экране ПОВТОР/ДАЛЕЕ
-typedef enum tagREPLAYScreenAction
-{
-	rsaReplay = 0,
-	rsaGoNext
-} REPLAYScreenAction;
-
-//Возможные действия с диалогами, прерывающими выполнение задачи
+//Метод взаимодействия с игрой для инициации боя
 typedef enum tagBattleInitiationMethod
 {
 	bimByHotkey = 0,
 	bimByMouseClick
 } BattleInitiationMethod;
+
+//Метод взаимодействия с игрой для повтора или начала следующего по уровню боя
+typedef enum tagBattleReplayMethod
+{
+	brmByHotkeys = 0,
+	brmByMouseClick
+} BattleReplayMethod;
+
+//Действия на экране ПОВТОР/ДАЛЕЕ с помощью горячих клавиш
+typedef enum tagBattleReplayHKAction
+{
+	brhkaReplay = 0,
+	brhkaGoNext
+} BattleReplayHKAction;
 
 //ООбщие настройки для отдельных игровых режимов
 class TGameModeSpecSettings : public IIniSerialization
@@ -143,13 +150,16 @@ public:
 		for (auto& ControlPoint : m_REPLAYScreenControlPoints)
 			ControlPoint.Load(pIniFile, strSection);
 		m_uREPLAYScreenControlPointIndex = pIniFile->ReadInteger(strSection, L"REPLAYScreenControlPointIndex", 0);
-		m_REPLAYScreenPreferredAction = static_cast<REPLAYScreenAction>(pIniFile->ReadInteger(strSection, L"REPLAYScreenAction", REPLAYScreenAction::rsaReplay));
 		m_uDelay = pIniFile->ReadInteger(strSection, L"Delay", 10);
 		m_nNumberOfBattles = pIniFile->ReadInteger(strSection, L"NumberOfBattles", 1);
 		m_bEndlessMode = pIniFile->ReadBool(strSection, L"EndlessMode", false);
 		m_BattleInitiationMethod = static_cast<BattleInitiationMethod>(pIniFile->ReadInteger(strSection, L"BattleInitiationMethod", BattleInitiationMethod::bimByHotkey));
 		m_BIWhereToClickPoint.x = pIniFile->ReadInteger(strSection, L"BattleInitiationWhereToClickPointX", 0);
 		m_BIWhereToClickPoint.y = pIniFile->ReadInteger(strSection, L"BattleInitiationWhereToClickPointY", 0);
+		m_BattleReplayMethod = static_cast<BattleReplayMethod>(pIniFile->ReadInteger(strSection, L"BattleReplayMethod", BattleReplayMethod::brmByHotkeys));
+		m_BattleReplayHKPreferredAction = static_cast<BattleReplayHKAction>(pIniFile->ReadInteger(strSection, L"BattleReplayHKAction", BattleReplayHKAction::brhkaReplay));
+		m_BRWhereToClickPoint.x = pIniFile->ReadInteger(strSection, L"BattleReplayWhereToClickPointX", 0);
+		m_BRWhereToClickPoint.y = pIniFile->ReadInteger(strSection, L"BattleReplayWhereToClickPointY", 0);
 	}
 	void Load(String strIniFile, String strSection) override
 	{
@@ -168,13 +178,16 @@ public:
 			ControlPoint.Serialize(pIniFile, strSection);
 		//m_REPLAYScreenControlPoints[m_uREPLAYScreenControlPointIndex].Serialize(pIniFile, strSection);
 		pIniFile->WriteInteger(strSection, L"REPLAYScreenControlPointIndex", m_uREPLAYScreenControlPointIndex);
-		pIniFile->WriteInteger(strSection, L"REPLAYScreenAction", m_REPLAYScreenPreferredAction);
 		pIniFile->WriteInteger(strSection, L"Delay", m_uDelay);
 		pIniFile->WriteInteger(strSection, L"NumberOfBattles", m_nNumberOfBattles);
 		pIniFile->WriteBool(strSection, L"EndlessMode", m_bEndlessMode);
 		pIniFile->WriteInteger(strSection, L"BattleInitiationMethod", m_BattleInitiationMethod);
 		pIniFile->WriteInteger(strSection, L"BattleInitiationWhereToClickPointX", m_BIWhereToClickPoint.x);
 		pIniFile->WriteInteger(strSection, L"BattleInitiationWhereToClickPointY", m_BIWhereToClickPoint.y);
+		pIniFile->WriteInteger(strSection, L"BattleReplayMethod", m_BattleReplayMethod);
+		pIniFile->WriteInteger(strSection, L"BattleReplayHKAction", m_BattleReplayHKPreferredAction);
+		pIniFile->WriteInteger(strSection, L"BattleReplayWhereToClickPointX", m_BRWhereToClickPoint.x);
+		pIniFile->WriteInteger(strSection, L"BattleReplayWhereToClickPointY", m_BRWhereToClickPoint.y);
 	}
 	void Serialize(String strIniFile, String strSection) override
 	{
@@ -189,12 +202,14 @@ public:
 	__property unsigned int STARTScreenControlPointIndex = { read = m_uSTARTScreenControlPointIndex, write = m_uSTARTScreenControlPointIndex };
 	__property std::array<TControlPoint, g_uMaxControlPoints>& REPLAYScreenControlPoints = { read = m_REPLAYScreenControlPoints, write = m_REPLAYScreenControlPoints };
 	__property unsigned int REPLAYScreenControlPointIndex = { read = m_uREPLAYScreenControlPointIndex, write = m_uREPLAYScreenControlPointIndex };
-	__property REPLAYScreenAction REPLAYScreenPreferredAction = { read = m_REPLAYScreenPreferredAction, write = m_REPLAYScreenPreferredAction };
 	__property unsigned int Delay = { read = m_uDelay, write = m_uDelay };
 	__property unsigned int NumberOfBattles = { read = m_nNumberOfBattles, write = m_nNumberOfBattles };
 	__property bool EndlessMode = { read = m_bEndlessMode, write = m_bEndlessMode };
 	__property BattleInitiationMethod BattleInitiationPreferredMethod = { read = m_BattleInitiationMethod, write = m_BattleInitiationMethod };
 	__property TPoint BattleInitiationWhereToClickPoint = { read = m_BIWhereToClickPoint, write = m_BIWhereToClickPoint };
+	__property BattleReplayMethod BattleReplayPreferredMethod = { read = m_BattleReplayMethod, write = m_BattleReplayMethod };
+	__property BattleReplayHKAction BattleReplayHKPreferredAction = { read = m_BattleReplayHKPreferredAction, write = m_BattleReplayHKPreferredAction };
+	__property TPoint BattleReplayWhereToClickPoint = { read = m_BRWhereToClickPoint, write = m_BRWhereToClickPoint };
 
 private:
 	SupportedGameModes m_GameMode;
@@ -203,12 +218,14 @@ private:
 	unsigned int m_uSTARTScreenControlPointIndex;
 	std::array<TControlPoint, g_uMaxControlPoints> m_REPLAYScreenControlPoints;
 	unsigned int m_uREPLAYScreenControlPointIndex;
-	REPLAYScreenAction m_REPLAYScreenPreferredAction;
 	unsigned int m_uDelay;
 	unsigned int m_nNumberOfBattles;
 	bool m_bEndlessMode;
 	BattleInitiationMethod m_BattleInitiationMethod;
 	TPoint m_BIWhereToClickPoint;
+	BattleReplayMethod m_BattleReplayMethod;
+	BattleReplayHKAction m_BattleReplayHKPreferredAction;
+	TPoint m_BRWhereToClickPoint;
 };
 
 //Возможные действия с диалогами, прерывающими выполнение задачи
@@ -260,7 +277,7 @@ public:
 	__property std::array<TControlPoint, g_uMaxControlPoints> SMDialogControlPoints = { read = m_SMDialogControlPoints, write = m_SMDialogControlPoints };
 	__property unsigned int SMDialogControlPointIndex = { read = m_uSMDialogControlPointIndex, write = m_uSMDialogControlPointIndex };
 
-	__property TPoint MainWindowPosition = { read = m_MainWindowPosition, write = m_MainWindowPosition };
+	__property TRect MainWindowPosition = { read = m_MainWindowPosition, write = m_MainWindowPosition };
 	__property unsigned int RecentActivePage = { read = m_uRecentActivePageIndex, write = m_uRecentActivePageIndex };
 	__property bool StayOnTop = { read = m_bStayOnTop, write = m_bStayOnTop };
 
@@ -305,7 +322,7 @@ private:
 	std::array<TControlPoint, g_uMaxControlPoints> m_SMDialogControlPoints;
 	unsigned int m_uSMDialogControlPointIndex;
 
-	TPoint m_MainWindowPosition;
+	TRect m_MainWindowPosition;
 	unsigned int m_uRecentActivePageIndex;
 	bool m_bStayOnTop;
 

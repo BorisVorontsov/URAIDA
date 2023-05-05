@@ -78,8 +78,9 @@ bool TSettingsManager::ReadINI()
 	m_uSMDialogControlPointIndex = pSettings->ReadInteger(m_strSectionCommon, L"SMDialogControlPointIndex", 0);
 
 	//Внутренние
-	m_MainWindowPosition.x = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowLeft", 100);
-	m_MainWindowPosition.y = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowTop", 100);
+	m_MainWindowPosition.Left = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowLeft", 100);
+	m_MainWindowPosition.Top = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowTop", 100);
+	m_MainWindowPosition.Bottom = pSettings->ReadInteger(m_strSectionInternal, L"MainWindowHeight", 720);
 	m_uRecentActivePageIndex = pSettings->ReadInteger(m_strSectionInternal, L"RecentActivePage", 0);
 	m_bStayOnTop = pSettings->ReadBool(m_strSectionInternal, L"StayOnTop", false);
 	m_bEnableLogging = pSettings->ReadBool(m_strSectionInternal, L"EnableLogging", false);
@@ -138,8 +139,9 @@ bool TSettingsManager::UpdateINI()
 	pSettings->WriteInteger(m_strSectionCommon, L"SMDialogControlPointIndex", m_uSMDialogControlPointIndex);
 
 	//Внутренние
-	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowLeft", m_MainWindowPosition.x);
-	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowTop", m_MainWindowPosition.y);
+	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowLeft", m_MainWindowPosition.Left);
+	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowTop", m_MainWindowPosition.Top);
+	pSettings->WriteInteger(m_strSectionInternal, L"MainWindowHeight", m_MainWindowPosition.Bottom);
 	pSettings->WriteInteger(m_strSectionInternal, L"RecentActivePage", m_uRecentActivePageIndex);
 	pSettings->WriteBool(m_strSectionInternal, L"StayOnTop", m_bStayOnTop);
 	pSettings->WriteBool(m_strSectionInternal, L"EnableLogging", m_bEnableLogging);

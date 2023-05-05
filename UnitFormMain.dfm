@@ -2,11 +2,13 @@ object FormMain: TFormMain
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
-  BorderStyle = bsSingle
   Caption = 'Ultimate RAID Automatizer'
-  ClientHeight = 681
+  ClientHeight = 682
   ClientWidth = 577
   Color = clBtnFace
+  Constraints.MaxWidth = 590
+  Constraints.MinHeight = 500
+  Constraints.MinWidth = 589
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -16
@@ -17,19 +19,25 @@ object FormMain: TFormMain
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnResize = FormResize
+  DesignSize = (
+    577
+    682)
   TextHeight = 19
   object Bevel1: TBevel
     Left = 8
-    Top = 609
+    Top = 610
     Width = 561
     Height = 11
+    Anchors = [akBottom]
     Shape = bsBottomLine
+    ExplicitTop = 609
   end
   object LabelCopyright1: TLabel
     Left = 8
-    Top = 637
+    Top = 638
     Width = 305
     Height = 22
+    Anchors = [akBottom]
     AutoSize = False
     Caption = '#'
     Font.Charset = DEFAULT_CHARSET
@@ -38,12 +46,14 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    ExplicitTop = 637
   end
   object LabelCopyright2: TLabel
     Left = 8
-    Top = 657
+    Top = 658
     Width = 140
     Height = 22
+    Anchors = [akBottom]
     AutoSize = False
     Caption = #1041#1086#1088#1080#1089#1072' '#1042#1086#1088#1086#1085#1094#1086#1074#1072
     Font.Charset = DEFAULT_CHARSET
@@ -52,19 +62,22 @@ object FormMain: TFormMain
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    ExplicitTop = 657
   end
   object PanelCover: TPanel
     Left = 8
     Top = 64
     Width = 561
-    Height = 467
+    Height = 468
+    Anchors = [akLeft, akTop, akBottom]
     BevelOuter = bvNone
     TabOrder = 5
+    ExplicitHeight = 467
     object ImageAppIcon: TImage
       Left = 0
       Top = 0
       Width = 561
-      Height = 467
+      Height = 468
       Align = alClient
       Center = True
       Picture.Data = {
@@ -253,30 +266,32 @@ object FormMain: TFormMain
     Left = 8
     Top = 64
     Width = 561
-    Height = 467
+    Height = 468
     ActivePage = TabSheetCampaign
+    Anchors = [akLeft, akTop, akBottom]
     TabOrder = 4
     OnChange = PageControlURAIDASettingsChange
     OnChanging = PageControlURAIDASettingsChanging
+    ExplicitHeight = 467
     object TabSheetCampaign: TTabSheet
       Caption = #1050#1072#1084#1087#1072#1085#1080#1103
       object ScrollBoxGMSpecSettings: TScrollBox
         Left = 0
         Top = 0
         Width = 553
-        Height = 433
+        Height = 434
         HorzScrollBar.Tracking = True
         VertScrollBar.Tracking = True
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
-        ExplicitLeft = -3
-        ExplicitTop = -212
-        ExplicitHeight = 653
+        ExplicitLeft = 3
+        ExplicitTop = -408
+        ExplicitHeight = 793
         object Bevel3: TBevel
           Left = 8
-          Top = 573
+          Top = 707
           Width = 537
           Height = 43
           Shape = bsBottomLine
@@ -285,7 +300,7 @@ object FormMain: TFormMain
           Left = 8
           Top = 16
           Width = 537
-          Height = 225
+          Height = 185
           Caption = #1069#1082#1088#1072#1085#1099
           TabOrder = 0
           object LabelRSY: TLabel
@@ -337,14 +352,6 @@ object FormMain: TFormMain
             Width = 41
             Height = 19
             Caption = #1062#1074#1077#1090':'
-          end
-          object LabelRSAction: TLabel
-            Left = 32
-            Top = 184
-            Width = 80
-            Height = 19
-            AutoSize = False
-            Caption = #1044#1077#1081#1089#1090#1074#1080#1077':'
           end
           object LabelSSColorTolerance: TLabel
             Left = 339
@@ -652,24 +659,6 @@ object FormMain: TFormMain
             Caption = #1050#1086#1085#1090#1088'. '#1090#1086#1095#1082#1080' '#1101#1082#1088#1072#1085#1072' '#1053#1040#1063#1040#1058#1068':'
             TabOrder = 0
           end
-          object RadioButtonRSActionReplay: TRadioButton
-            Left = 118
-            Top = 182
-            Width = 80
-            Height = 25
-            Caption = #1055#1086#1074#1090#1086#1088
-            Checked = True
-            TabOrder = 21
-            TabStop = True
-          end
-          object RadioButtonRSActionNext: TRadioButton
-            Left = 198
-            Top = 184
-            Width = 74
-            Height = 19
-            Caption = #1044#1072#1083#1077#1077
-            TabOrder = 22
-          end
           object EditSSColorTolerance: TEdit
             Left = 387
             Top = 58
@@ -757,7 +746,7 @@ object FormMain: TFormMain
         end
         object GroupBoxTaskParameters: TGroupBox
           Left = 8
-          Top = 244
+          Top = 204
           Width = 537
           Height = 138
           Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1079#1072#1076#1072#1095#1080
@@ -863,9 +852,9 @@ object FormMain: TFormMain
         end
         object GroupBoxGMAdvanced: TGroupBox
           Left = 8
-          Top = 385
+          Top = 345
           Width = 537
-          Height = 184
+          Height = 359
           Caption = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086
           TabOrder = 2
           object GroupBoxGMABIMethod: TGroupBox
@@ -894,7 +883,7 @@ object FormMain: TFormMain
               Top = 26
               Width = 369
               Height = 25
-              Caption = #1054#1090#1087#1088#1072#1074#1082#1072' '#1075#1086#1088#1103#1095#1077#1081' '#1082#1083#1072#1074#1080#1096#1080' [ENTER]'
+              Caption = #1043#1086#1088#1103#1095#1077#1081' '#1082#1083#1072#1074#1080#1096#1077#1081
               Checked = True
               TabOrder = 0
               TabStop = True
@@ -1049,6 +1038,200 @@ object FormMain: TFormMain
               OnButtonClicked = ButtonGroupEDCPIndexButtonClicked
             end
           end
+          object GroupBoxGMABRMethod: TGroupBox
+            Left = 8
+            Top = 164
+            Width = 521
+            Height = 173
+            Caption = #1052#1077#1090#1086#1076' '#1087#1086#1074#1090#1086#1088#1072'/'#1087#1088#1086#1076#1086#1083#1078#1077#1085#1080#1103' '#1073#1086#1103
+            TabOrder = 1
+            object LabelBRMCX: TLabel
+              Left = 32
+              Top = 119
+              Width = 15
+              Height = 19
+              Caption = 'X:'
+            end
+            object LabelBRMCY: TLabel
+              Left = 133
+              Top = 119
+              Width = 16
+              Height = 19
+              Caption = 'Y:'
+            end
+            object RadioButtonBRSendHotkeys: TRadioButton
+              Left = 16
+              Top = 21
+              Width = 369
+              Height = 25
+              Caption = #1043#1086#1088#1103#1095#1080#1084#1080' '#1082#1083#1072#1074#1080#1096#1072#1084#1080':'
+              Checked = True
+              TabOrder = 0
+              TabStop = True
+            end
+            object RadioButtonBRSendMouseClick: TRadioButton
+              Left = 16
+              Top = 91
+              Width = 369
+              Height = 19
+              Caption = #1050#1083#1080#1082' '#1084#1099#1096#1082#1086#1081' '#1087#1086' '#1082#1086#1086#1088#1076#1080#1085#1072#1090#1072#1084':'
+              TabOrder = 2
+            end
+            object EditBRMCX: TEdit
+              Left = 53
+              Top = 116
+              Width = 52
+              Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
+              Alignment = taCenter
+              NumbersOnly = True
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 3
+              Text = '0'
+            end
+            object UpDownBRMCX: TUpDown
+              Left = 105
+              Top = 116
+              Width = 16
+              Height = 27
+              Associate = EditBRMCX
+              Max = 9999
+              TabOrder = 4
+            end
+            object EditBRMCY: TEdit
+              Left = 155
+              Top = 116
+              Width = 52
+              Height = 27
+              Hint = #1055#1080#1082#1089#1077#1083#1080
+              Alignment = taCenter
+              NumbersOnly = True
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 5
+              Text = '0'
+            end
+            object UpDownBRMCY: TUpDown
+              Left = 207
+              Top = 116
+              Width = 16
+              Height = 27
+              Associate = EditBRMCY
+              Max = 9999
+              TabOrder = 6
+            end
+            object BitBtnBRMCPickPoint: TBitBtn
+              Left = 452
+              Top = 109
+              Width = 41
+              Height = 41
+              Glyph.Data = {
+                36090000424D3609000000000000360000002800000018000000180000000100
+                20000000000000090000C30E0000C30E00000000000000000000FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A8A8A8003333
+                33001010100001010100010101001111110033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000066666600FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000040404000FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004040
+                400000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0000000000F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800000000003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FAFAFA003B3B3B003B3B3B00FAFAFA00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00232323000000
+                00000000000000000000000000000505050000000000000000002C2C2C00FFFF
+                FF004B4B4B0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000050505000000000000000000000000000000000023232300232323000000
+                00000000000000000000000000000404040000000000000000002C2C2C00FFFF
+                FF004C4C4C0000000000000000004C4C4C00FFFFFF002C2C2C00000000000000
+                0000040404000000000000000000000000000000000023232300FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF001111110022222200FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00F9F9F9003B3B3B003A3A3A00F9F9F900FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF002222220011111100FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF003C3C3C0001010100F8F8F800FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00F8F8
+                F800010101003C3C3C00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00CECECE000000000041414100FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002D2D2D002D2D2D00FFFFFF00FFFFFF00FFFFFF00FFFFFF004141
+                410000000000CECECE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF004D4D4D000000000067676700FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00666666000000
+                00004D4D4D00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00242424000000000030303000D2D2
+                D200FFFFFF000303030003030300FFFFFF00D2D2D20030303000000000002424
+                2400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0037373700000000000000
+                00001E1E1E0004040400040404001E1E1E00000000000000000037373700FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A7A7A7003333
+                33001010100001010100010101001010100033333300A7A7A700FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000202020002020200FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF002424240024242400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
+              TabOrder = 7
+              OnClick = BitBtnBRMCPickPointClick
+            end
+            object ButtonGroup2: TButtonGroup
+              Left = 312
+              Top = 24
+              Width = 176
+              Height = 27
+              BevelEdges = []
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              BorderStyle = bsNone
+              ButtonOptions = [gboGroupStyle, gboShowCaptions]
+              Items = <>
+              TabOrder = 8
+              OnButtonClicked = ButtonGroupEDCPIndexButtonClicked
+            end
+            object ComboBoxBRHKAction: TComboBox
+              Left = 32
+              Top = 52
+              Width = 235
+              Height = 27
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 1
+              Text = #1055#1086#1074#1090#1086#1088' '#1090#1077#1082#1091#1097#1077#1075#1086' '#1073#1086#1103
+              Items.Strings = (
+                #1055#1086#1074#1090#1086#1088' '#1090#1077#1082#1091#1097#1077#1075#1086' '#1073#1086#1103
+                #1057#1083#1077#1076#1091#1102#1097#1080#1081' '#1073#1086#1081)
+            end
+          end
         end
       end
     end
@@ -1067,13 +1250,14 @@ object FormMain: TFormMain
         Left = 0
         Top = 0
         Width = 553
-        Height = 433
+        Height = 434
         HorzScrollBar.Tracking = True
         VertScrollBar.Tracking = True
         Align = alClient
         BevelInner = bvNone
         BorderStyle = bsNone
         TabOrder = 0
+        ExplicitHeight = 433
         object LabelGWWidth: TLabel
           Left = 24
           Top = 50
@@ -2101,10 +2285,11 @@ object FormMain: TFormMain
   end
   object LinkLabel1: TLinkLabel
     Left = 419
-    Top = 637
+    Top = 638
     Width = 150
     Height = 22
     Alignment = taRightJustify
+    Anchors = [akBottom]
     AutoSize = False
     Caption = '<a href="https://paypal.com">'#1055#1086#1076#1076#1077#1088#1078#1072#1090#1100' '#1087#1088#1086#1077#1082#1090'</a>'
     Font.Charset = DEFAULT_CHARSET
@@ -2115,13 +2300,15 @@ object FormMain: TFormMain
     ParentFont = False
     TabOrder = 9
     OnClick = LinkLabel1Click
+    ExplicitTop = 637
   end
   object LinkLabel2: TLinkLabel
     Left = 455
-    Top = 657
+    Top = 658
     Width = 114
     Height = 22
     Alignment = taRightJustify
+    Anchors = [akBottom]
     AutoSize = False
     Caption = '<a>Discord-'#1089#1077#1088#1074#1077#1088'</a>'
     Font.Charset = DEFAULT_CHARSET
@@ -2132,25 +2319,30 @@ object FormMain: TFormMain
     ParentFont = False
     TabOrder = 10
     OnClick = LinkLabel2Click
+    ExplicitTop = 657
   end
   object ProgressBarTask: TProgressBar
     Left = 8
-    Top = 537
+    Top = 538
     Width = 561
     Height = 8
     Hint = #1055#1088#1086#1075#1088#1077#1089#1089' '#1073#1086#1103
+    Anchors = [akBottom]
     ParentShowHint = False
     ShowHint = True
     TabOrder = 6
+    ExplicitTop = 537
   end
   object PanelBattles: TPanel
     Left = 230
-    Top = 559
+    Top = 560
     Width = 117
     Height = 41
+    Anchors = [akBottom]
     BevelKind = bkFlat
     BevelOuter = bvNone
     TabOrder = 7
+    ExplicitTop = 559
     DesignSize = (
       113
       37)
@@ -2175,9 +2367,10 @@ object FormMain: TFormMain
   end
   object LinkLabelReleases: TLinkLabel
     Left = 154
-    Top = 657
+    Top = 658
     Width = 55
     Height = 22
+    Anchors = [akBottom]
     AutoSize = False
     Caption = '<a>GitHub</a>'
     Font.Charset = DEFAULT_CHARSET
@@ -2188,12 +2381,14 @@ object FormMain: TFormMain
     ParentFont = False
     TabOrder = 8
     OnClick = LinkLabelReleasesClick
+    ExplicitTop = 657
   end
   object BitBtnStopTask: TBitBtn
     Left = 428
-    Top = 559
+    Top = 560
     Width = 117
     Height = 41
+    Anchors = [akBottom]
     Caption = #1057#1090#1086#1087
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -2278,12 +2473,14 @@ object FormMain: TFormMain
     ParentFont = False
     TabOrder = 3
     OnClick = BitBtnStopTaskClick
+    ExplicitTop = 559
   end
   object BitBtnRunTask: TBitBtn
     Left = 31
-    Top = 559
+    Top = 560
     Width = 117
     Height = 41
+    Anchors = [akBottom]
     Caption = '#'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -2293,12 +2490,14 @@ object FormMain: TFormMain
     ParentFont = False
     TabOrder = 1
     OnClick = BitBtnRunTaskClick
+    ExplicitTop = 559
   end
   object BitBtnCalculations: TBitBtn
     Left = 154
-    Top = 559
+    Top = 560
     Width = 41
     Height = 41
+    Anchors = [akBottom]
     Glyph.Data = {
       36090000424D3609000000000000360000002800000018000000180000000100
       20000000000000090000C20E0000C20E00000000000000000000FFFFFF00FFFF
@@ -2376,6 +2575,7 @@ object FormMain: TFormMain
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
     TabOrder = 2
     OnClick = BitBtnCalculationsClick
+    ExplicitTop = 559
   end
   object BitBtnLaunchGame: TBitBtn
     Left = 8
