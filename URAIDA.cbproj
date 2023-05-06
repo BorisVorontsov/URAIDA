@@ -174,8 +174,8 @@
         <UWP_CppLogo44>Resources\Icon (full sized).png</UWP_CppLogo44>
         <UWP_CppLogo150>Resources\Icon (full sized).png</UWP_CppLogo150>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.3.3.86;InternalName=;LegalCopyright=Борис Воронцов;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.3.0;Comments=Автоматизатор для игры RAID: Shadow Legends</VerInfo_Keys>
-        <VerInfo_Build>86</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=2.3.3.87;InternalName=;LegalCopyright=Борис Воронцов;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=2.3.3.0;Comments=Автоматизатор для игры RAID: Shadow Legends</VerInfo_Keys>
+        <VerInfo_Build>87</VerInfo_Build>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
         <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Release>3</VerInfo_Release>

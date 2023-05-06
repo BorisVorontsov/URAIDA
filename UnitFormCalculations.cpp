@@ -44,10 +44,6 @@ void __fastcall TFormCalculations::FormKeyPress(TObject *Sender, System::WideCha
 
 void __fastcall TFormCalculations::FormCreate(TObject *Sender)
 {
-	for (int i = 0; i < 24; i++)
-		ComboBoxBattleCost->AddItem(IntToStr(i + 1), nullptr);
-	ComboBoxBattleCost->ItemIndex = 7;
-
 	this->ComboBoxHeroRankChange(this);
 }
 //---------------------------------------------------------------------------
@@ -70,7 +66,7 @@ void __fastcall TFormCalculations::ComboBoxHeroRankChange(TObject *Sender)
 
 void __fastcall TFormCalculations::BitBtnCalcTaskCostClick(TObject *Sender)
 {
-	LabelTaskCostTotal->Caption = String(UpDownNumberOfBattles->Position * StrToInt(ComboBoxBattleCost->Text));
+	LabelTaskCostTotal->Caption = String(UpDownNumberOfBattles->Position * UpDownBattleCost->Position);
 }
 //---------------------------------------------------------------------------
 

@@ -12,11 +12,9 @@ object FormCalculations: TFormCalculations
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 19
   object PanelCalculations: TPanel
     Left = 0
@@ -179,14 +177,6 @@ object FormCalculations: TFormCalculations
         TabOrder = 0
         OnClick = BitBtnCopyFromReferenceClick
       end
-      object ComboBoxBattleCost: TComboBox
-        Left = 374
-        Top = 66
-        Width = 54
-        Height = 27
-        Style = csDropDownList
-        TabOrder = 3
-      end
       object BitBtnCalcTaskCost: TBitBtn
         Left = 219
         Top = 97
@@ -267,8 +257,29 @@ object FormCalculations: TFormCalculations
           FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
           FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
           FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00}
-        TabOrder = 4
+        TabOrder = 5
         OnClick = BitBtnCalcTaskCostClick
+      end
+      object UpDownBattleCost: TUpDown
+        Left = 412
+        Top = 66
+        Width = 16
+        Height = 27
+        Associate = EditBattleCost
+        Min = 1
+        Max = 99
+        Position = 8
+        TabOrder = 4
+      end
+      object EditBattleCost: TEdit
+        Left = 374
+        Top = 66
+        Width = 38
+        Height = 27
+        Alignment = taCenter
+        NumbersOnly = True
+        TabOrder = 3
+        Text = '8'
       end
     end
     object GroupBoxNumberOfBattles: TGroupBox

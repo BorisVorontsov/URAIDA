@@ -206,7 +206,6 @@ __published:	// IDE-managed Components
 	TUpDown *UpDownNumberOfBattles;
 	TBitBtn *BitBtnCopyFromReference;
 	TLabel *LabelBattleCost;
-	TComboBox *ComboBoxBattleCost;
 	TLabel *LabelTaskCostTotalInfo;
 	TLabel *LabelTaskCostTotal;
 	TGroupBox *GroupBoxNumberOfBattles;
@@ -239,6 +238,8 @@ __published:	// IDE-managed Components
 	TLabel *LabelNBSilverTotal;
 	TLabel *LabelNBEnergyTotalInfo;
 	TLabel *LabelNBEnergyTotal;
+	TUpDown *UpDownBattleCost;
+	TEdit *EditBattleCost;
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormKeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall FormCreate(TObject *Sender);
